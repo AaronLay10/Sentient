@@ -1,0 +1,9 @@
+{
+  "additionalFiles": "../..,../..",
+  "compiler.optimization_flags": "",
+  "customBuildProperties": "",
+  "fqbn": "teensy:avr:teensy41",
+  "hardwareFolders": "/Users/aaron/Library/Arduino15/packages",
+  "otherLibrariesFolders": "/Users/aaron/Development/sentientengine.ai/hardware/Custom Libraries,/Users/aaron/Documents/Arduino/libraries",
+  "sketchLocation": "/Users/aaron/Development/sentientengine.ai/hardware/Controller Code Teensy/study_b_v2"
+}

@@ -1,0 +1,237 @@
+name: sentient-dev
+
+services:
+  # =========================
+  # Core Infrastructure
+  # =========================
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: sentient_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    # These MUST exist in your .env file:
+    # POSTGRES_USER=postgres
+    # POSTGRES_PASSWORD=localdev
+    # POSTGRES_DB=sentient_dev
+    environment:
+      # Fallbacks if .env is missing values (optional)
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
+      POSTGRES_DB: ${POSTGRES_DB:-sentient_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - sentient_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: sentient_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - sentient_net
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: sentient_mqtt
+    restart: unless-stopped
+    # For local dev we'll allow anonymous access by using the
+    # default config. You can lock this down later.
+    ports:
+      - "1883:1883"    # MQTT
+      - "9001:9001"    # MQTT over WebSockets (optional)
+    networks:
+      - sentient_net
+
+  # =========================
+  # Sentient Engine Services
+  # =========================
+
+  api-service:
+    build:
+      context: .
+      dockerfile: apps/api-service/Dockerfile
+    container_name: sentient_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      API_PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient_dev}
+      REDIS_URL: redis://redis:6379
+      MQTT_URL: mqtt://mqtt:1883
+      JWT_SECRET: ${JWT_SECRET}
+      INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      mqtt:
+        condition: service_started
+    ports:
+      - "3001:3000"  # container 3000 -> host 3001
+    networks:
+      - sentient_net
+    command: sh -c "pnpm prisma:db:push && pnpm start:prod"
+
+  # orchestrator-service:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/orchestrator-service/Dockerfile
+  #   container_name: sentient_orchestrator
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient_dev}
+  #     REDIS_URL: redis://redis:6379
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - mqtt
+  #   volumes:
+  #     - ./apps/orchestrator-service:/app:cached
+  #   networks:
+  #     - sentient_net
+
+  # mqtt-gateway-service:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/mqtt-gateway-service/Dockerfile
+  #   container_name: sentient_mqtt_gateway
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     MQTT_URL: mqtt://mqtt:1883
+  #     REDIS_URL: redis://redis:6379
+  #   depends_on:
+  #     - mqtt
+  #     - redis
+  #   volumes:
+  #     - ./apps/mqtt-gateway-service:/app:cached
+  #   networks:
+  #     - sentient_net
+
+  # realtime-gateway-service:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/realtime-gateway-service/Dockerfile
+  #   container_name: sentient_realtime_gateway
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     REDIS_URL: redis://redis:6379
+  #     WS_PORT: 3002
+  #   depends_on:
+  #     - redis
+  #   ports:
+  #     - "3002:3002"
+  #   volumes:
+  #     - ./apps/realtime-gateway-service:/app:cached
+  #   networks:
+  #     - sentient_net
+
+  # jobs-service:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/jobs-service/Dockerfile
+  #   container_name: sentient_jobs
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient_dev}
+  #     REDIS_URL: redis://redis:6379
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   volumes:
+  #     - ./apps/jobs-service:/app:cached
+  #   networks:
+  #     - sentient_net
+
+  # gm-ui:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/gm-ui/Dockerfile
+  #   container_name: sentient_gm_ui
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+  #     NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:3002}
+  #   depends_on:
+  #     - api-service
+  #     - realtime-gateway-service
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./apps/gm-ui:/app:cached
+  #   networks:
+  #     - sentient_net
+
+  # admin-ui:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/admin-ui/Dockerfile
+  #   container_name: sentient_admin_ui
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+  #   depends_on:
+  #     - api-service
+  #   ports:
+  #     - "3005:3000"
+  #   volumes:
+  #     - ./apps/admin-ui:/app:cached
+  #   networks:
+  #     - sentient_net
+
+  # room-ui:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/room-ui/Dockerfile
+  #   container_name: sentient_room_ui
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:3002}
+  #   depends_on:
+  #     - realtime-gateway-service
+  #   ports:
+  #     - "3006:3000"
+  #   volumes:
+  #     - ./apps/room-ui:/app:cached
+  #   networks:
+  #     - sentient_net
+
+networks:
+  sentient_net:
+    driver: bridge
+
+volumes:
+  pgdata:
+  redisdata:

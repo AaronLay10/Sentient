@@ -1,0 +1,25 @@
+========================================
+Compiling All V2 Controllers
+========================================
+
+=== Compiling boiler_room_subpanel_v2 ===
+✗ FAILED: boiler_room_subpanel_v2
+
+⊘ SKIP: chemical_v2 (no .ino file)
+⊘ SKIP: clock_v2 (no .ino file)
+⊘ SKIP: crank_v2 (no .ino file)
+⊘ SKIP: floor_v2 (no .ino file)
+⊘ SKIP: fuse_v2 (no .ino file)
+=== Compiling gauge_1_3_4_v2 ===
+✗ FAILED: gauge_1_3_4_v2
+
+=== Compiling gauge_2_5_7_v2 ===
+✗ FAILED: gauge_2_5_7_v2
+
+=== Compiling gauge_6_leds_v2 ===
+✗ FAILED: gauge_6_leds_v2
+
+⊘ SKIP: gear_v2 (no .ino file)
+⊘ SKIP: gun_drawers_v2 (no .ino file)
+⊘ SKIP: gun_edith_v2 (no .ino file)
+=== Compiling keys_v2 ===

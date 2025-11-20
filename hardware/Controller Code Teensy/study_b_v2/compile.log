@@ -1,0 +1,54 @@
+WARNING: library TeensyID claims to run on Teensy architecture(s) and may be incompatible with your current board which runs on avr architecture(s).
+/Users/aaron/Documents/Arduino/libraries/PubSubClient/src/PubSubClient.cpp: In member function 'boolean PubSubClient::publish_P(const char*, const uint8_t*, unsigned int, boolean)':
+/Users/aaron/Documents/Arduino/libraries/PubSubClient/src/PubSubClient.cpp:523:16: warning: comparison of integer expressions of different signedness: 'unsigned int' and 'int' [-Wsign-compare]
+  523 |     return (rc == expectedLength);
+      |             ~~~^~~~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/NativeEthernet/src/NativeEthernetServer.cpp: In member function 'EthernetClient EthernetServer::available()':
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/NativeEthernet/src/NativeEthernetServer.cpp:119:103: warning: enum constant in boolean context [-Wint-in-bool-context]
+  119 |                                            if(socket_poll.events_occurred & (FNET_SOCKET_EVENT_OUT || FNET_SOCKET_EVENT_IN)) {
+      |                                                                                                       ^~~~~~~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/service/llmnr/fnet_llmnr.c:60:30: warning: 'fnet_llmnr_ip6_multicast_addr' defined but not used [-Wunused-const-variable=]
+   60 | static const fnet_ip6_addr_t fnet_llmnr_ip6_multicast_addr = FNET_IP6_ADDR_INIT(0xFF, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x00, 0x03);
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:1062:83: warning: argument 2 of type 'unsigned char[36]' with mismatched bound [-Warray-parameter=]
+ 1062 | MBEDTLSFLASHMEM void ssl_calc_verify_tls( mbedtls_ssl_context *ssl, unsigned char hash[36] )
+      |                                                                     ~~~~~~~~~~~~~~^~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:483:73: note: previously declared as 'unsigned char *'
+  483 | MBEDTLSFLASHMEM static void ssl_calc_verify_tls( mbedtls_ssl_context *, unsigned char * );
+      |                                                                         ^~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:1090:90: warning: argument 2 of type 'unsigned char[32]' with mismatched bound [-Warray-parameter=]
+ 1090 | MBEDTLSFLASHMEM void ssl_calc_verify_tls_sha256( mbedtls_ssl_context *ssl, unsigned char hash[32] )
+      |                                                                            ~~~~~~~~~~~~~~^~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:490:79: note: previously declared as 'unsigned char *'
+  490 | MBEDTLSFLASHMEM static void ssl_calc_verify_tls_sha256( mbedtls_ssl_context *,unsigned char * );
+      |                                                                               ^~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:1111:90: warning: argument 2 of type 'unsigned char[48]' with mismatched bound [-Warray-parameter=]
+ 1111 | MBEDTLSFLASHMEM void ssl_calc_verify_tls_sha384( mbedtls_ssl_context *ssl, unsigned char hash[48] )
+      |                                                                            ~~~~~~~~~~~~~~^~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:496:80: note: previously declared as 'unsigned char *'
+  496 | MBEDTLSFLASHMEM static void ssl_calc_verify_tls_sha384( mbedtls_ssl_context *, unsigned char * );
+      |                                                                                ^~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c: In function 'ssl_calc_verify_tls_sha384':
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:1120:5: warning: 'mbedtls_sha512_finish_ret' accessing 64 bytes in a region of size 48 [-Wstringop-overflow=]
+ 1120 |     mbedtls_sha512_finish_ret( &sha512, hash );
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:1120:5: note: referencing argument 2 of type 'unsigned char *'
+In file included from /Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/mbedtls/ssl_internal.h:43,
+                 from /Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:48:
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/mbedtls/sha512.h:128:21: note: in a call to function 'mbedtls_sha512_finish_ret'
+  128 | MBEDTLSFLASHMEM int mbedtls_sha512_finish_ret( mbedtls_sha512_context *ctx,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c: In function 'ssl_calc_finished_tls_sha384':
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:5376:5: warning: 'mbedtls_sha512_finish_ret' accessing 64 bytes in a region of size 48 [-Wstringop-overflow=]
+ 5376 |     mbedtls_sha512_finish_ret( &sha512, padbuf );
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:5376:5: note: referencing argument 2 of type 'unsigned char *'
+In file included from /Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/mbedtls/ssl_internal.h:43,
+                 from /Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/ssl_tls.c:48:
+/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/FNET/src/third_party/mbedtls-2.12.0/src/mbedtls/sha512.h:128:21: note: in a call to function 'mbedtls_sha512_finish_ret'
+  128 | MBEDTLSFLASHMEM int mbedtls_sha512_finish_ret( mbedtls_sha512_context *ctx,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~
+Memory Usage on Teensy 4.1:
+  FLASH: code:307000, data:83400, headers:8412   free for files:7727652
+   RAM1: variables:43012, code:168628, padding:27980   free for local variables:284668
+   RAM2: variables:12448  free for malloc/new:511840

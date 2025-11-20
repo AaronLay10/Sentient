@@ -1,0 +1,21 @@
+{
+  "name": "sentient-engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sentient Engine - Theatrical Control Platform",
+  "license": "MIT",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}
