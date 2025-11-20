@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  created_at DateTime @default(now())
+  venues     Venue[]
+  rooms      Room[]
+  users      User[]
+  controllers Controller[]
+  devices     Device[]
+}
+
+model Venue {
+  id         String   @id @default(cuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name       String
+  created_at DateTime @default(now())
+  rooms      Room[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model Room {
+  id         String   @id @default(cuid())
+  tenantId   String
+  venueId    String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  venue      Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  name       String
+  created_at DateTime @default(now())
+  controllers Controller[]
+  devices     Device[]
+
+  @@unique([venueId, name])
+  @@index([tenantId])
+  @@index([venueId])
+}
+
+enum UserRole {
+  OWNER
+  GM
+  TECH
+  VIEWER
+}
+
+model User {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email         String   @unique
+  password_hash String
+  role          UserRole @default(GM)
+  created_at    DateTime @default(now())
+}
+
+model Controller {
+  id                   String   @id
+  tenantId             String
+  roomId               String
+  tenant               Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  room                 Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  controller_type      String
+  friendly_name        String
+  description          String?
+  hardware_type        String?
+  hardware_version     String?
+  firmware_version     String?
+  ip_address           String?
+  mac_address          String?
+  heartbeat_interval_ms Int?
+  capability_manifest  Json?
+  device_count         Int?
+  pending_devices      Int?
+  last_seen            DateTime?
+  created_at           DateTime @default(now())
+  devices              Device[]
+
+  @@index([tenantId])
+  @@index([roomId])
+}
+
+model Device {
+  id             String   @id
+  controllerId   String
+  tenantId       String
+  roomId         String
+  controller     Controller @relation(fields: [controllerId], references: [id], onDelete: Cascade)
+  tenant         Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  room           Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  friendly_name  String
+  device_type    String
+  device_category String?
+  properties     Json?
+  last_seen      DateTime?
+  created_at     DateTime @default(now())
+  actions        DeviceAction[]
+
+  @@index([controllerId])
+  @@index([tenantId])
+  @@index([roomId])
+  @@unique([controllerId, id])
+}
+
+model DeviceAction {
+  id              String   @id @default(cuid())
+  deviceId        String
+  device          Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  action_id       String
+  friendly_name   String?
+  description     String?
+  mqtt_topic      String
+  safety_critical Boolean  @default(false)
+  duration_ms     Int?
+  created_at      DateTime @default(now())
+
+  @@unique([deviceId, action_id])
+  @@index([deviceId])
+}
