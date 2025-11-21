@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { Eye, Cpu, Boxes, Building2, Users, Layout } from 'lucide-react';
-import NeuralEyeLogo from '../NeuralEyeLogo';
+import { MiniSentientEye } from '../SentientEye/MiniSentientEye';
 import './DashboardLayout.css';
 
 export function DashboardLayout() {
@@ -12,7 +12,8 @@ export function DashboardLayout() {
       <aside className="sidebar">
         <div className="sidebar-header">
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-            <NeuralEyeLogo size="medium" />
+            {/* Sentient Eye Logo - Mini version with animation */}
+            <MiniSentientEye size={100} />
           </div>
           <h1 className="logo-text">SENTIENT</h1>
           <p className="logo-subtitle">Neural Engine</p>
