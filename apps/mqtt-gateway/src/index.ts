@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import Redis from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
 import { EventType } from '@sentient/core-domain';
-import { MqttTopicBuilder, MqttTopicParser, REDIS_CHANNELS } from '@sentient/shared-messaging';
+import { REDIS_CHANNELS } from '@sentient/shared-messaging';
 
 dotenv.config();
 
@@ -44,8 +44,8 @@ const client = mqtt.connect(MQTT_URL, {
 client.on('connect', () => {
   console.log('✅ Connected to MQTT broker');
 
-  // Subscribe to registration topics
-  const topics = [
+  // Subscribe to registration topics (new Sentient v4 format)
+  const sentientTopics = [
     'sentient/system/register/controller',
     'sentient/system/register/device',
     // Subscribe to all device state changes
@@ -56,7 +56,14 @@ client.on('connect', () => {
     'sentient/room/+/controller/+/status',
   ];
 
-  topics.forEach(topic => {
+  // Subscribe to legacy Paragon/Clockwork operational topics
+  const legacyTopics = [
+    'paragon/clockwork/status/#',    // All status messages (connection, heartbeat)
+    'paragon/clockwork/sensors/#',   // All sensor data
+    'paragon/clockwork/commands/#',  // All commands
+  ];
+
+  [...sentientTopics, ...legacyTopics].forEach(topic => {
     client.subscribe(topic, { qos: 1 }, (err) => {
       if (err) {
         console.error(`❌ Failed to subscribe to ${topic}:`, err);
@@ -79,26 +86,105 @@ client.on('message', async (topic, message) => {
   try {
     const payload = JSON.parse(message.toString());
 
+    // Handle Sentient v4 registration topics
     if (topic === 'sentient/system/register/controller') {
       console.log(`📥 Controller registration:`, JSON.stringify(payload, null, 2));
       await registerController(payload);
     } else if (topic === 'sentient/system/register/device') {
       console.log(`📥 Device registration:`, JSON.stringify(payload, null, 2));
       await registerDevice(payload);
-    } else if (topic.includes('/device/') && topic.endsWith('/state')) {
+    }
+    // Handle Sentient v4 operational topics
+    else if (topic.startsWith('sentient/room/') && topic.includes('/device/') && topic.endsWith('/state')) {
       console.log(`📥 Device state change on ${topic}`);
       await handleDeviceStateChange(topic, payload);
-    } else if (topic.endsWith('/heartbeat')) {
+    } else if (topic.startsWith('sentient/room/') && topic.endsWith('/heartbeat')) {
       console.log(`💓 Controller heartbeat on ${topic}`);
       await handleControllerHeartbeat(topic, payload);
-    } else if (topic.endsWith('/status')) {
+    } else if (topic.startsWith('sentient/room/') && topic.endsWith('/status')) {
       console.log(`📊 Controller status on ${topic}`);
       await handleControllerStatus(topic, payload);
+    }
+    // Handle legacy Paragon/Clockwork topics
+    else if (topic.startsWith('paragon/clockwork/')) {
+      await handleLegacyTopic(topic, payload);
     }
   } catch (error) {
     console.error(`❌ Error processing message from ${topic}:`, error);
   }
 });
+
+async function handleLegacyTopic(topic: string, payload: any): Promise<void> {
+  try {
+    // Parse legacy topic: paragon/clockwork/{type}/{puzzle_id}/{device_id}/{message_type}
+    const topicParts = topic.split('/');
+
+    if (topicParts.length < 5) {
+      return; // Skip malformed topics
+    }
+
+    const tenant = topicParts[0];      // 'paragon'
+    const room_id = topicParts[1];     // 'clockwork'
+    const messageCategory = topicParts[2]; // 'status' or 'sensors'
+    const puzzle_id = topicParts[3];   // e.g., 'riddle', 'clock', 'gear'
+    const device_id = topicParts[4];   // e.g., 'riddle', 'clock', device name
+    const messageType = topicParts[5]; // e.g., 'connection', 'heartbeat', 'button_1'
+
+    // Map puzzle_id to controller_id (they're often the same in legacy format)
+    const controller_id = puzzle_id;
+
+    let eventType: EventType | null = null;
+    let eventPayload: any = payload;
+
+    // Determine event type based on topic structure
+    if (messageCategory === 'status') {
+      if (messageType === 'heartbeat') {
+        eventType = EventType.CONTROLLER_HEARTBEAT;
+        console.log(`💓 Legacy heartbeat: ${controller_id}`);
+      } else if (messageType === 'connection') {
+        // Connection status indicates online/offline
+        eventType = payload.state === 'online' ? EventType.CONTROLLER_ONLINE : EventType.CONTROLLER_OFFLINE;
+        console.log(`📡 Legacy connection status: ${controller_id} -> ${payload.state}`);
+      }
+    } else if (messageCategory === 'sensors') {
+      // Sensor data = device state change
+      eventType = EventType.DEVICE_STATE_CHANGED;
+      console.log(`📊 Legacy sensor data: ${device_id}/${messageType}`);
+
+      // Reformat payload to match new structure
+      eventPayload = {
+        previous_state: null,
+        new_state: payload,
+        raw_mqtt_payload: payload,
+      };
+    }
+
+    // Only publish events we recognize
+    if (eventType) {
+      const domainEvent = {
+        event_id: uuidv4(),
+        type: eventType,
+        tenant_id: tenant,
+        room_id: room_id,
+        controller_id: controller_id,
+        device_id: device_id,
+        puzzle_id: puzzle_id,
+        payload: eventPayload,
+        timestamp: new Date(payload.timestamp || Date.now()),
+        metadata: {
+          source: 'mqtt-gateway',
+          mqtt_topic: topic,
+          legacy_format: true,
+        },
+      };
+
+      await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
+      console.log(`✅ Published legacy event: ${eventType} for ${controller_id}/${device_id}`);
+    }
+  } catch (error) {
+    console.error('❌ Error handling legacy topic:', error);
+  }
+}
 
 async function handleDeviceStateChange(topic: string, payload: any): Promise<void> {
   try {
@@ -220,7 +306,7 @@ async function registerController(data: any) {
 
 async function registerDevice(data: any) {
   try {
-    const response = await axios.post(
+    await axios.post(
       `${API_URL}/internal/devices/register`,
       data,
       {

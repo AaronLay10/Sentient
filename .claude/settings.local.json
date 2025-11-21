@@ -19,7 +19,10 @@
       "Bash(docker logs:*)",
       "Bash(curl:*)",
       "Bash(npm run build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd GM Console with real-time monitoring and enhance MQTT Gateway with Redis event publishing\n\nMajor additions:\n- GM Console page with device monitoring, event feed, and session controls\n- Enhanced MQTT Gateway to publish domain events to Redis for device state changes, controller heartbeats, and status updates\n- Added new admin dashboard components (DeviceMonitor, EventFeed, SessionControls)\n- Device simulators app for testing\n- Shared type definitions for GM Console\n\nTechnical improvements:\n- Updated SYSTEM_ARCHITECTURE_v4.md to reflect unified Sentient UI and correct service names\n- Fixed MQTT Gateway Dockerfile for proper multi-stage build with shared packages\n- Added ignoreDeprecations flag to all tsconfig files\n- Added npx tsc to auto-approved bash commands\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(ping:*)",
+      "Bash(nc:*)"
     ],
     "deny": [],
     "ask": []
