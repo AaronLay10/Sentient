@@ -17,7 +17,8 @@
       "Bash(pnpm list:*)",
       "Bash(ls:*)",
       "Bash(docker logs:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
