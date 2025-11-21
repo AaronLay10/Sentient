@@ -25,5 +25,8 @@ COPY --from=build /app/pnpm-workspace.yaml ./
 COPY --from=build /app/packages ./packages
 COPY --from=build /app/apps/orchestrator-service/dist ./apps/orchestrator-service/dist
 COPY --from=build /app/apps/orchestrator-service/package.json ./apps/orchestrator-service/
+COPY --from=build /app/apps/api-service/package.json ./apps/api-service/
+COPY --from=build /app/apps/api-service/prisma ./apps/api-service/prisma
 RUN pnpm install --prod --frozen-lockfile
+RUN cd apps/api-service && pnpm prisma:generate
 CMD ["node", "apps/orchestrator-service/dist/main.js"]
