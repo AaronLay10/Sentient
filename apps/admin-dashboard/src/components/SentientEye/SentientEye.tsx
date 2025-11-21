@@ -226,122 +226,31 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                     strokeWidth={isLarge ? "2" : "1"}
                   />
                 );
-              })}
-
-              {/* Crosshairs */}
-              <line x1="250" y1="50" x2="250" y2="230" stroke="rgba(0, 217, 255, 0.3)" strokeWidth="1" />
-              <line x1="250" y1="270" x2="250" y2="450" stroke="rgba(0, 217, 255, 0.3)" strokeWidth="1" />
-              <line x1="50" y1="250" x2="230" y2="250" stroke="rgba(0, 217, 255, 0.3)" strokeWidth="1" />
-              <line x1="270" y1="250" x2="450" y2="250" stroke="rgba(0, 217, 255, 0.3)" strokeWidth="1" />
-
-              
+              })}              
             </svg>
 
-            {/* Combined rotating glow and ring - renders BEFORE eye so it appears behind */}
-            <svg viewBox="0 0 300 300" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px', pointerEvents: 'none', overflow: 'visible' }}>
-              <defs>
-                {/* Radial gradient from center of eye - orange with subtle glow */}
-                <radialGradient id="orangeGlow" cx="150" cy="150" r="150" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="transparent" />
-                  <stop offset="70%" stopColor="transparent" />
-                  <stop offset="80%" stopColor="rgba(255, 170, 50, 0.3)" />
-                  <stop offset="85%" stopColor="rgba(255, 170, 50, 0.5)" />
-                  <stop offset="90%" stopColor="rgba(255, 170, 50, 0.3)" />
-                  <stop offset="95%" stopColor="rgba(255, 170, 50, 0.1)" />
-                  <stop offset="100%" stopColor="transparent" />
-                </radialGradient>
-                {/* Radial gradient from center of eye - cyan with subtle glow */}
-                <radialGradient id="cyanGlow" cx="150" cy="150" r="150" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="transparent" />
-                  <stop offset="70%" stopColor="transparent" />
-                  <stop offset="80%" stopColor="rgba(0, 217, 255, 0.3)" />
-                  <stop offset="85%" stopColor="rgba(0, 217, 255, 0.5)" />
-                  <stop offset="90%" stopColor="rgba(0, 217, 255, 0.3)" />
-                  <stop offset="95%" stopColor="rgba(0, 217, 255, 0.1)" />
-                  <stop offset="100%" stopColor="transparent" />
-                </radialGradient>
-
-                {/* Opacity gradient for swirling orange ring - fades from full to transparent */}
-                <linearGradient id="orangeOpacityGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopOpacity="0" />
-                  <stop offset="25%" stopOpacity="1" />
-                  <stop offset="75%" stopOpacity="1" />
-                  <stop offset="100%" stopOpacity="0" />
-                </linearGradient>
-
-                {/* Mask for orange glow segments - creates 4 wedge-shaped sections */}
-                <mask id="orangeGlowMask">
-                  {/* 4 white wedges at 0°, 90°, 180°, 270° - white = visible */}
-                  {[0, 90, 180, 270].map((angle, i) => {
-                    const wedgeWidth = 45;
-                    const outerRadius = 170;
-
-                    const startAngle = (angle - wedgeWidth / 2 - 90) * Math.PI / 180;
-                    const endAngle = (angle + wedgeWidth / 2 - 90) * Math.PI / 180;
-
-                    const x1 = 150 + outerRadius * Math.cos(startAngle);
-                    const y1 = 150 + outerRadius * Math.sin(startAngle);
-                    const x2 = 150 + outerRadius * Math.cos(endAngle);
-                    const y2 = 150 + outerRadius * Math.sin(endAngle);
-
-                    const wedgePath = `
-                      M 150 150
-                      L ${x1} ${y1}
-                      A ${outerRadius} ${outerRadius} 0 0 1 ${x2} ${y2}
-                      Z
-                    `;
-
-                    return (
-                      <path
-                        key={`mask-${i}`}
-                        d={wedgePath}
-                        fill="white"
-                      />
-                    );
-                  })}
-                </mask>
-              </defs>
-              {/* Static cyan glow - full circle, not rotating */}
+            {/* Rotating ring around eye - renders BEFORE eye so it appears behind */}
+            <svg viewBox="0 0 360 360" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '360px', height: '360px', pointerEvents: 'none', overflow: 'visible' }}>
+              {/* Static cyan ring - BRIGHT, not rotating */}
               <circle
-                cx="150"
-                cy="150"
+                cx="180"
+                cy="180"
                 r="150"
-                fill="url(#cyanGlow)"
-                opacity="0.5"
-              />
-
-              {/* Rotating orange glow on top - creates swirling effect */}
-              <g className="rotating-outer-ring">
-                <circle
-                  cx="150"
-                  cy="150"
-                  r="150"
-                  fill="url(#orangeGlow)"
-                  opacity="0.45"
-                  mask="url(#orangeGlowMask)"
-                />
-              </g>
-
-              {/* Static cyan ring - not rotating */}
-              <circle
-                cx="150"
-                cy="150"
-                r="125"
                 fill="none"
-                stroke="rgba(0, 217, 255, 0.8)"
-                strokeWidth="3"
+                stroke="rgba(0, 217, 255, 1.0)"
+                strokeWidth="4"
               />
 
-              {/* Rotating orange ring on top with opacity fade - creates swirling effect */}
+              {/* Rotating orange ring on top - BRIGHT - creates swirling effect */}
               <g className="rotating-outer-ring">
                 <circle
-                  cx="150"
-                  cy="150"
-                  r="125"
+                  cx="180"
+                  cy="180"
+                  r="150"
                   fill="none"
-                  stroke="rgba(255, 170, 50, 0.9)"
-                  strokeWidth="3"
-                  opacity="0.7"
+                  stroke="rgba(255, 170, 50, 1.0)"
+                  strokeWidth="4"
+                  opacity="1.0"
                   strokeDasharray="96 192"
                 />
               </g>
@@ -379,13 +288,6 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                       <stop offset="0%" stopColor="rgba(255, 170, 50, 0.3)" />
                       <stop offset="100%" stopColor="rgba(255, 170, 50, 0.05)" />
                     </linearGradient>
-                    <filter id="circuitGlow">
-                      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
-                      <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                      </feMerge>
-                    </filter>
                   </defs>
 
                   {/* Generate circuit traces radiating outward in a circle with random spacing and colors */}
@@ -451,7 +353,6 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                           stroke={strokeColor}
                           strokeWidth={brightness === 'bright' ? "1.5" : "1"}
                           fill="none"
-                          filter="url(#circuitGlow)"
                           strokeLinecap="round"
                         />
                         <circle
@@ -459,7 +360,6 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                           cy={endY}
                           r="1.5"
                           fill={fillColor}
-                          filter="url(#circuitGlow)"
                         />
                         {hasKink && (
                           <>
@@ -479,7 +379,7 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                         )}
                         {/* Traveling beam dot for bright traces - cyan goes IN, orange goes OUT */}
                         {brightness === 'bright' && (
-                          <circle r="1.5" fill={isOrange ? 'rgba(255, 170, 50, 1)' : 'rgba(0, 217, 255, 1)'} filter="url(#circuitGlow)">
+                          <circle r="1.5" fill={isOrange ? 'rgba(255, 170, 50, 1)' : 'rgba(0, 217, 255, 1)'}>
                             <animateMotion dur={animationDuration} repeatCount="indefinite" begin={delay} keyPoints={isOrange ? "0;1" : "1;0"} keyTimes="0;1" calcMode="linear">
                               <mpath href={`#path-${i}`} />
                             </animateMotion>
@@ -500,13 +400,6 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                 }}>
                   {/* Segmented iris pattern like circuit board */}
                   <svg className="iris-circuits" viewBox="0 0 120 120">
-                    <defs>
-                      <radialGradient id="irisGlow" cx="50%" cy="50%">
-                        <stop offset="0%" stopColor="rgba(255, 255, 255, 0.3)" />
-                        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
-                      </radialGradient>
-                    </defs>
-
                     {/* Concentric segmented rings */}
                     {[28, 35, 42, 49, 56].map((radius, ringIdx) => (
                       <g key={`ring-${ringIdx}`}>
@@ -579,9 +472,6 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                         />
                       );
                     })}
-
-                    {/* Inner glow */}
-                    <circle cx="60" cy="60" r="28" fill="url(#irisGlow)" />
                   </svg>
 
                   {/* Iris texture details */}

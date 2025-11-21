@@ -193,8 +193,8 @@
 /* Realistic Eye Styling */
 .realistic-eye {
   position: absolute;
-  width: 250px;
-  height: 250px;
+  width: 300px;
+  height: 300px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -205,23 +205,9 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background:
-    /* Strong spherical highlight - simulates glossy surface */
-    radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 15%, transparent 40%),
-    /* Mid-tone gradient for sphere curvature */
-    radial-gradient(circle at 50% 50%, #0f1419 0%, #0a0e14 40%, #060810 70%, #030408 100%);
+  background: #0a0e14;
   position: relative;
-  box-shadow:
-    /* Strong directional shadows for 3D sphere effect */
-    inset 25px 25px 60px rgba(0, 0, 0, 0.8),
-    inset -20px -20px 50px rgba(0, 0, 0, 0.6),
-    /* Edge darkening for sphere curvature */
-    inset 0 0 100px rgba(0, 0, 0, 0.5),
-    /* Subtle cyan inner glow */
-    inset 0 0 60px rgba(0, 217, 255, 0.08),
-    /* Strong outer shadow for depth */
-    0 15px 40px rgba(0, 0, 0, 0.7),
-    0 5px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -233,16 +219,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  box-shadow:
-    /* Strong 3D spherical shading - top-left light source */
-    inset 15px 15px 35px rgba(0, 0, 0, 0.7),
-    inset -12px -12px 30px rgba(0, 0, 0, 0.5),
-    /* Deep rim shadow for curvature */
-    inset 0 0 60px rgba(0, 0, 0, 0.6),
-    /* Outer glow */
-    0 0 30px rgba(0, 217, 255, 0.3),
-    /* Bright highlight on bottom-right edge for sphere effect */
-    inset -3px -3px 12px rgba(255, 255, 255, 0.15);
+  box-shadow: none;
   overflow: hidden;
   animation: iris-analyzing 20s ease-in-out infinite;
 }
@@ -303,35 +280,6 @@
       rgba(255, 170, 50, 0.12) 7px,
       transparent 8px,
       transparent 15px
-    ),
-    /* Inner digital burst with cyan glow */
-    radial-gradient(
-      circle at 48% 48%,
-      rgba(200, 255, 255, 0.5) 0%,
-      rgba(0, 217, 255, 0.3) 15%,
-      transparent 35%
-    ),
-    /* Orange accent zone */
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 35%,
-      rgba(255, 170, 50, 0.08) 50%,
-      transparent 65%
-    ),
-    /* Cyan mid-layer */
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 40%,
-      rgba(0, 180, 220, 0.15) 60%,
-      transparent 75%
-    ),
-    /* Dark outer limbus with tech edge */
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 50%,
-      rgba(0, 100, 150, 0.25) 75%,
-      rgba(0, 60, 100, 0.5) 88%,
-      rgba(0, 30, 60, 0.75) 100%
     );
   opacity: 0.3;
   mix-blend-mode: screen;
