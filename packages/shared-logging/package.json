@@ -1,0 +1,34 @@
+{
+  "name": "@sentient/shared-logging",
+  "version": "1.0.0",
+  "description": "Sentient Engine - Shared Logging Utilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["sentient", "logging", "winston"],
+  "license": "MIT",
+  "dependencies": {
+    "winston": "^3.11.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "rxjs": "^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": true
+    },
+    "rxjs": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "rxjs": "^7.8.1",
+    "typescript": "^5.2.2"
+  }
+}

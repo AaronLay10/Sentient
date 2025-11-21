@@ -1,0 +1,17 @@
+{
+  "name": "@sentient/core-domain",
+  "version": "1.0.0",
+  "description": "Sentient Engine - Core Domain Models",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["sentient", "domain", "models"],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.2.2"
+  }
+}

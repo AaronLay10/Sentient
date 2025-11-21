@@ -85,26 +85,22 @@ services:
       - sentient_net
     command: sh -c "pnpm prisma:db:push && pnpm start:prod"
 
-  # orchestrator-service:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/orchestrator-service/Dockerfile
-  #   container_name: sentient_orchestrator
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     NODE_ENV: development
-  #     DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient_dev}
-  #     REDIS_URL: redis://redis:6379
-  #   depends_on:
-  #     - postgres
-  #     - redis
-  #     - mqtt
-  #   volumes:
-  #     - ./apps/orchestrator-service:/app:cached
-  #   networks:
-  #     - sentient_net
+  orchestrator-service:
+    build:
+      context: .
+      dockerfile: apps/orchestrator-service/Dockerfile
+    container_name: sentient_orchestrator
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      - redis
+    networks:
+      - sentient_net
 
   mqtt-gateway:
     build:
@@ -127,26 +123,25 @@ services:
     networks:
       - sentient_net
 
-  # realtime-gateway-service:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/realtime-gateway-service/Dockerfile
-  #   container_name: sentient_realtime_gateway
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     NODE_ENV: development
-  #     REDIS_URL: redis://redis:6379
-  #     WS_PORT: 3002
-  #   depends_on:
-  #     - redis
-  #   ports:
-  #     - "3002:3002"
-  #   volumes:
-  #     - ./apps/realtime-gateway-service:/app:cached
-  #   networks:
-  #     - sentient_net
+  realtime-gateway:
+    build:
+      context: .
+      dockerfile: apps/realtime-gateway/Dockerfile
+    container_name: sentient_realtime_gateway
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      REDIS_URL: redis://redis:6379
+      WS_PORT: 3002
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      - redis
+    ports:
+      - "3002:3002"
+    networks:
+      - sentient_net
 
   # jobs-service:
   #   build:

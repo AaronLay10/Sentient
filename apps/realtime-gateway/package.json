@@ -1,0 +1,31 @@
+{
+  "name": "realtime-gateway",
+  "version": "1.0.0",
+  "description": "Sentient Engine - Realtime WebSocket Gateway",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["sentient", "websocket", "realtime"],
+  "license": "MIT",
+  "dependencies": {
+    "@sentient/core-domain": "workspace:*",
+    "@sentient/shared-types": "workspace:*",
+    "@sentient/shared-config": "workspace:*",
+    "@sentient/shared-logging": "workspace:*",
+    "@sentient/shared-messaging": "workspace:*",
+    "ws": "^8.16.0",
+    "ioredis": "^5.3.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/ws": "^8.5.10",
+    "@types/uuid": "^9.0.7",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2"
+  }
+}

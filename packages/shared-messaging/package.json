@@ -1,0 +1,20 @@
+{
+  "name": "@sentient/shared-messaging",
+  "version": "1.0.0",
+  "description": "Sentient Engine - Shared Messaging Utilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["sentient", "messaging", "mqtt", "redis"],
+  "license": "MIT",
+  "dependencies": {
+    "@sentient/core-domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.2.2"
+  }
+}
