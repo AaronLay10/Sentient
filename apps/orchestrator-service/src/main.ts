@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { loadOrchestratorConfig } from './config/env.config';
 import { createLogger } from '@sentient/shared-logging';
 import { RedisClient } from './infrastructure/redis/redis-client';
 import { RedisSubscriberAdapter } from './infrastructure/redis/redis-adapter';
-import { EventPublisher, EventSubscriber } from '@sentient/shared-messaging';
+import { EventPublisher, EventSubscriber, RedisChannelBuilder } from '@sentient/shared-messaging';
 import { InMemorySessionRepository } from './infrastructure/persistence/in-memory-session.repository';
 import { PuzzleEvaluatorService } from './domain/services/puzzle-evaluator.service';
 import { OrchestratorService } from './application/services/orchestrator.service';
@@ -24,18 +23,6 @@ async function bootstrap() {
     redis_url: config.REDIS_URL,
   });
 
-  // Initialize Prisma (for future use - DB schema needs GameSession table)
-  const prisma = new PrismaClient({
-    log: config.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  });
-
-  try {
-    await prisma.$connect();
-    logger.info('Connected to PostgreSQL (ready for future GameSession persistence)');
-  } catch (error) {
-    logger.warn('PostgreSQL connection failed - continuing with in-memory storage', { error: (error as Error).message });
-  }
-
   // Initialize infrastructure
   const redisClient = new RedisClient(config.REDIS_URL, logger);
   const publisher = redisClient.getPublisher();
@@ -44,7 +31,7 @@ async function bootstrap() {
   const eventPublisher = new EventPublisher(publisher);
   const eventSubscriber = new EventSubscriber(subscriberAdapter);
 
-  // Initialize repositories (using in-memory for now until GameSession table is added to schema)
+  // Initialize repositories
   const sessionRepository = new InMemorySessionRepository();
 
   // Initialize services
@@ -71,13 +58,12 @@ async function bootstrap() {
     }
   });
 
-  logger.info('Orchestrator Service started successfully - ready to process events');
+  logger.info('Orchestrator Service started successfully');
 
   // Graceful shutdown
   const shutdown = async () => {
     logger.info('Shutting down Orchestrator Service');
     await redisClient.disconnect();
-    await prisma.$disconnect();
     process.exit(0);
   };
 

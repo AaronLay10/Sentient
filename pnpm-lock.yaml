@@ -194,9 +194,6 @@ importers:
 
   apps/orchestrator-service:
     dependencies:
-      '@prisma/client':
-        specifier: ^5.22.0
-        version: 5.22.0(prisma@5.22.0)
       '@sentient/core-domain':
         specifier: workspace:*
         version: link:../../packages/core-domain
@@ -225,9 +222,6 @@ importers:
       '@types/uuid':
         specifier: ^9.0.7
         version: 9.0.8
-      prisma:
-        specifier: ^5.22.0
-        version: 5.22.0
       ts-node-dev:
         specifier: ^2.0.0
         version: 2.0.0(@types/node@20.19.25)(typescript@5.9.3)

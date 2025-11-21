@@ -7,11 +7,8 @@ FROM base AS build
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages
-COPY apps/api-service/prisma ./apps/api-service/prisma
-COPY apps/api-service/package.json ./apps/api-service/
 COPY apps/orchestrator-service ./apps/orchestrator-service
 RUN pnpm install --frozen-lockfile
-RUN cd apps/api-service && pnpm prisma:generate
 RUN pnpm -r --filter "@sentient/*" build
 RUN pnpm -r --filter orchestrator-service build
 
@@ -26,5 +23,4 @@ COPY --from=build /app/packages ./packages
 COPY --from=build /app/apps/orchestrator-service/dist ./apps/orchestrator-service/dist
 COPY --from=build /app/apps/orchestrator-service/package.json ./apps/orchestrator-service/
 RUN pnpm install --prod --frozen-lockfile
-COPY --from=build /app/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma ./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma
 CMD ["node", "apps/orchestrator-service/dist/main.js"]
