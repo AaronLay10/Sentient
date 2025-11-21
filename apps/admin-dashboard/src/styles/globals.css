@@ -1,21 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Neural/Medical AI Color Palette */
+  /* Sentient Eye Color Palette - Inspired by the Sentient Eye logo */
   --bg-primary: #0a0e1a;
   --bg-secondary: #0f1419;
   --bg-tertiary: #151b26;
   --bg-card: #1a2332;
 
-  /* Accent Colors - Cyan/Electric Blue (Neural connections) */
-  --accent-primary: #00d9ff;
+  /* Primary Sentient Eye Colors */
+  --accent-cyan: #00d9ff;        /* Primary cyan from eye */
+  --accent-orange: #ffaa32;      /* Orange from eye */
+  --accent-yellow: #ffcc44;      /* Yellow highlights */
+  --accent-green: #00ff88;       /* Green for success */
+  --accent-red: #ff3355;         /* Red for critical */
+
+  /* Legacy mappings for backward compatibility */
+  --accent-primary: var(--accent-cyan);
   --accent-secondary: #0099cc;
   --accent-glow: rgba(0, 217, 255, 0.3);
 
-  /* Health Status Colors */
-  --status-healthy: #00ff88;
-  --status-warning: #ffaa00;
-  --status-critical: #ff3355;
+  /* Health Status Colors - Using Sentient Eye palette */
+  --status-healthy: var(--accent-green);
+  --status-warning: var(--accent-orange);
+  --status-critical: var(--accent-red);
   --status-offline: #666677;
   --status-unknown: #8888aa;
 
@@ -28,14 +35,20 @@
   --border-color: rgba(0, 217, 255, 0.15);
   --border-glow: rgba(0, 217, 255, 0.4);
 
-  /* Shadows & Glows */
+  /* Shadows & Glows - Sentient Eye inspired */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.8);
-  --glow-cyan: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow);
-  --glow-health: 0 0 20px rgba(0, 255, 136, 0.3);
-  --glow-warning: 0 0 20px rgba(255, 170, 0, 0.3);
-  --glow-critical: 0 0 20px rgba(255, 51, 85, 0.3);
+  --glow-cyan: 0 0 20px rgba(0, 217, 255, 0.3), 0 0 40px rgba(0, 217, 255, 0.15);
+  --glow-orange: 0 0 20px rgba(255, 170, 50, 0.3), 0 0 40px rgba(255, 170, 50, 0.15);
+  --glow-yellow: 0 0 20px rgba(255, 204, 68, 0.3), 0 0 40px rgba(255, 204, 68, 0.15);
+  --glow-green: 0 0 20px rgba(0, 255, 136, 0.3), 0 0 40px rgba(0, 255, 136, 0.15);
+  --glow-red: 0 0 20px rgba(255, 51, 85, 0.3), 0 0 40px rgba(255, 51, 85, 0.15);
+
+  /* Legacy glow mappings */
+  --glow-health: var(--glow-green);
+  --glow-warning: var(--glow-orange);
+  --glow-critical: var(--glow-red);
 
   /* Animations */
   --pulse-duration: 2s;
@@ -73,7 +86,7 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 2.5rem;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-orange), var(--accent-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
