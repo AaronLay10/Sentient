@@ -1,179 +1,14 @@
-/* HUD Container */
-.hud-container {
+/* Sentient Eye Container */
+.sentient-eye-container {
+  position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  font-family: 'Rajdhani', monospace;
-  color: var(--text-primary);
-}
-
-/* Header Bar */
-.hud-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background: rgba(15, 20, 25, 0.8);
-  border: 1px solid var(--border-color);
-  border-radius: 2px;
-}
-
-.hud-header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.hud-header h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  letter-spacing: 0.1em;
-  color: var(--accent-primary);
-}
-
-.hud-version {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-family: 'Courier New', monospace;
-  padding: 0.25rem 0.5rem;
-  background: rgba(0, 217, 255, 0.1);
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  border-radius: 2px;
-}
-
-.hud-header-right {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  font-family: 'Courier New', monospace;
-}
-
-.hud-timestamp {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--accent-primary);
-  letter-spacing: 0.05em;
-}
-
-.hud-date {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-/* Main Grid Layout */
-.hud-main-grid {
-  display: grid;
-  grid-template-columns: 280px 1fr 280px;
-  gap: 1.5rem;
-  flex: 1;
-  min-height: 0;
-}
-
-/* Panels */
-.hud-panel {
-  background: rgba(15, 20, 25, 0.6);
-  border: 1px solid var(--border-color);
-  border-radius: 2px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  overflow-y: auto;
-}
-
-.panel-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--accent-primary);
-  text-transform: uppercase;
-}
-
-.alert-badge {
-  margin-left: auto;
-  background: var(--status-critical);
-  color: var(--bg-primary);
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.125rem 0.375rem;
-  border-radius: 2px;
-}
-
-/* Metric Groups */
-.metric-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.metric-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.375rem 0;
-  border-bottom: 1px solid rgba(0, 217, 255, 0.05);
-}
-
-.metric-label {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 500;
-}
-
-.metric-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-family: 'Courier New', monospace;
-  color: var(--text-primary);
-}
-
-/* Progress Bars */
-.progress-metric {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background: rgba(0, 217, 255, 0.1);
-  border: 1px solid rgba(0, 217, 255, 0.2);
-  border-radius: 1px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
-  transition: width 0.3s ease;
-  box-shadow: 0 0 8px var(--accent-primary);
-}
-
-/* Center HUD Circle */
-.hud-center {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
 }
 
+/* Eye Container */
 .hud-eye-container {
   position: relative;
   width: 100%;
@@ -373,51 +208,6 @@
   pointer-events: none;
 }
 
-.targeting-overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* HUD Overlay Text */
-.hud-overlay-text {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  z-index: 4;
-}
-
-.status-indicator {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  text-shadow: 0 0 10px currentColor;
-  margin-bottom: 0.75rem;
-}
-
-.metrics-overlay {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.metric-item {
-  padding: 0.25rem 0.5rem;
-  background: rgba(0, 217, 255, 0.05);
-  border: 1px solid rgba(0, 217, 255, 0.2);
-  border-radius: 2px;
-}
-
 /* Scan Line Effect */
 .scan-line {
   position: absolute;
@@ -478,15 +268,6 @@
   }
   96%, 100% {
     transform: translate(-24%, -70%);
-  }
-}
-
-@keyframes iris-breathe {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.05);
   }
 }
 
@@ -702,15 +483,6 @@
   }
 }
 
-@keyframes pupil-dilate {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-}
-
 @keyframes scan-vertical {
   0% {
     top: 0;
@@ -728,23 +500,6 @@
   }
 }
 
-.rotating-ring {
-  animation: rotate 8s linear infinite;
-}
-
-.rotating-reticle {
-  animation: rotate 6s linear infinite;
-}
-
-.rotating-reticle-reverse {
-  animation: rotate 4s linear infinite reverse;
-}
-
-.scanning-arc {
-  animation: rotate 3s linear infinite;
-  transform-origin: center;
-}
-
 .rotating-outer-ring {
   animation: rotate 9s linear infinite;
   transform-origin: center;
@@ -760,238 +515,11 @@
   animation: rotate 3s linear infinite;
 }
 
-/* The Watchful Pupil */
-.neural-pupil {
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, rgba(0, 217, 255, 0.3), #000000 60%);
-  box-shadow: inset 0 0 10px rgba(0, 217, 255, 0.5), 0 0 6px rgba(0, 217, 255, 0.3);
-  animation: pupil-watch 12s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-  z-index: 4;
-}
-
-/* Watchful sentinel movement - organic, alive surveillance */
-@keyframes pupil-watch {
-  0%, 8% {
-    transform: translate(-50%, -50%);
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
   }
-  8.5%, 9% {
-    transform: translate(-20%, -75%);
+  to {
+    transform: rotate(360deg);
   }
-  9%, 18% {
-    transform: translate(-20%, -75%);
-  }
-  18.2%, 18.8% {
-    transform: translate(-72%, -35%);
-  }
-  18.8%, 28% {
-    transform: translate(-72%, -35%);
-  }
-  28.5%, 29% {
-    transform: translate(-55%, -82%);
-  }
-  29%, 40% {
-    transform: translate(-55%, -82%);
-  }
-  40.3%, 40.9% {
-    transform: translate(-28%, -25%);
-  }
-  40.9%, 52% {
-    transform: translate(-28%, -25%);
-  }
-  52.4%, 53% {
-    transform: translate(-68%, -60%);
-  }
-  53%, 65% {
-    transform: translate(-68%, -60%);
-  }
-  65.3%, 65.8% {
-    transform: translate(-35%, -70%);
-  }
-  65.8%, 78% {
-    transform: translate(-35%, -70%);
-  }
-  78.2%, 78.7% {
-    transform: translate(-60%, -45%);
-  }
-  78.7%, 91% {
-    transform: translate(-60%, -45%);
-  }
-  91.5%, 92% {
-    transform: translate(-50%, -50%);
-  }
-  92%, 100% {
-    transform: translate(-50%, -50%);
-  }
-}
-
-/* Status text positioned below the eye */
-.hud-center-status {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  text-align: center;
-}
-
-.status-text {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.status-subtext {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-family: 'Courier New', monospace;
-}
-
-/* Alerts Container */
-.alerts-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.no-alerts {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
-  text-align: center;
-  color: var(--text-muted);
-  gap: 0.5rem;
-}
-
-.no-alerts-subtext {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  opacity: 0.7;
-}
-
-.alert-item {
-  background: rgba(10, 14, 26, 0.6);
-  border: 1px solid var(--border-color);
-  border-left-width: 3px;
-  border-radius: 2px;
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.alert-item:hover {
-  background: rgba(21, 27, 38, 0.8);
-  border-color: var(--accent-primary);
-  transform: translateX(3px);
-}
-
-.alert-item.alert-warning {
-  border-left-color: var(--status-warning);
-}
-
-.alert-item.alert-critical {
-  border-left-color: var(--status-critical);
-}
-
-.alert-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.375rem;
-}
-
-.alert-severity {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 0.125rem 0.375rem;
-  border-radius: 2px;
-  background: rgba(255, 170, 0, 0.2);
-  color: var(--status-warning);
-}
-
-.alert-item.alert-critical .alert-severity {
-  background: rgba(255, 51, 85, 0.2);
-  color: var(--status-critical);
-}
-
-.alert-time {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  font-family: 'Courier New', monospace;
-}
-
-.alert-message {
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  margin-bottom: 0.25rem;
-  line-height: 1.4;
-}
-
-.alert-source {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  font-family: 'Courier New', monospace;
-}
-
-/* Responsive Design */
-@media (max-width: 1400px) {
-  .hud-main-grid {
-    grid-template-columns: 240px 1fr 240px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .hud-main-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-  }
-
-  .hud-left-panel {
-    order: 2;
-  }
-
-  .hud-center {
-    order: 1;
-  }
-
-  .hud-right-panel {
-    order: 3;
-  }
-}
-
-/* Scrollbar Styling for Panels */
-.hud-panel::-webkit-scrollbar,
-.alerts-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.hud-panel::-webkit-scrollbar-track,
-.alerts-container::-webkit-scrollbar-track {
-  background: rgba(0, 217, 255, 0.05);
-}
-
-.hud-panel::-webkit-scrollbar-thumb,
-.alerts-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 217, 255, 0.3);
-  border-radius: 3px;
-}
-
-.hud-panel::-webkit-scrollbar-thumb:hover,
-.alerts-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 217, 255, 0.5);
 }
