@@ -166,10 +166,16 @@ jobs:
           EOF
           chmod 600 ~/.ssh/config
 
+      - name: Stop existing containers and clean deployment directory
+        run: |
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+            sudo docker ps -a --format '{{.Names}}' | grep -E 'sentient|mqtt|postgres|redis|nginx' | xargs -r sudo docker rm -f 2>/dev/null || echo 'No containers to remove' &&
+            sudo rm -rf ~/sentient-deploy 2>/dev/null || echo 'No directory to clean'
+          "
+
       - name: Create deployment directory structure
         run: |
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
-            sudo rm -rf ~/sentient-deploy &&
             mkdir -p ~/sentient-deploy/nginx/sites ~/sentient-deploy/mosquitto/config ~/sentient-deploy/mosquitto/data ~/sentient-deploy/mosquitto/log &&
             chmod -R 755 ~/sentient-deploy
           "
@@ -215,11 +221,6 @@ jobs:
         run: |
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
             sudo docker compose -f docker-compose.prod.yml pull"
-
-      - name: Stop and remove existing containers
-        run: |
-          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} \
-            "sudo docker ps -a --format '{{.Names}}' | grep -E 'sentient|mqtt|postgres|redis|nginx' | xargs -r sudo docker rm -f || echo 'No containers to remove'"
 
       - name: Run database migrations
         run: |
