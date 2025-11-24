@@ -222,11 +222,31 @@ jobs:
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
             sudo docker compose -f docker-compose.prod.yml pull"
 
+      - name: Prepare data directories
+        run: |
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+            sudo mkdir -p /srv/sentient/data/postgres /srv/sentient/data/redis /srv/sentient/logs/mqtt /srv/sentient/logs/nginx &&
+            sudo chown -R 999:999 /srv/sentient/data/postgres &&
+            sudo chmod -R 755 /srv/sentient/data
+          "
+
+      - name: Start infrastructure services
+        run: |
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
+            sudo docker compose -f docker-compose.prod.yml up -d postgres redis mqtt && \
+            echo 'Waiting for PostgreSQL to be ready...' && \
+            for i in {1..30}; do
+              if sudo docker exec sentient_postgres pg_isready -U sentient 2>/dev/null; then
+                echo 'PostgreSQL is ready!'
+                break
+              fi
+              echo \"Attempt \$i: PostgreSQL not ready yet...\"
+              sleep 2
+            done"
+
       - name: Run database migrations
         run: |
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
-            sudo docker compose -f docker-compose.prod.yml up -d postgres redis && \
-            sleep 10 && \
             sudo docker compose -f docker-compose.prod.yml run --rm api-service pnpm prisma:db:push || echo 'Migration may have already run'"
 
       - name: Deploy services
