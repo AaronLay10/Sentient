@@ -7,7 +7,7 @@ import {
   addEdge,
   ReactFlowProvider
 } from '@xyflow/react';
-import type { Node as FlowNode, Connection, Edge } from '@xyflow/react';
+import type { Node as FlowNode, Connection } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { NodePalette } from '../components/SceneEditor/NodePalette';
 import { PropertiesPanel } from '../components/SceneEditor/PropertiesPanel';
