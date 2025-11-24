@@ -201,6 +201,11 @@ jobs:
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
             sed -i 's|ghcr.io/yourusername|${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}|g' docker-compose.prod.yml"
 
+      - name: Login to GHCR on production server
+        run: |
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} \
+            "echo ${{ secrets.GHCR_PAT }} | sudo docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin"
+
       - name: Pull latest images
         run: |
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
