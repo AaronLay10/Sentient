@@ -168,13 +168,14 @@ jobs:
 
       - name: Create deployment directory structure
         run: |
-          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "mkdir -p ~/sentient-deploy/nginx/conf.d ~/sentient-deploy/mosquitto/config ~/sentient-deploy/mosquitto/data ~/sentient-deploy/mosquitto/log"
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "mkdir -p ~/sentient-deploy/nginx/sites ~/sentient-deploy/mosquitto/config ~/sentient-deploy/mosquitto/data ~/sentient-deploy/mosquitto/log"
 
       - name: Copy deployment files
         run: |
           scp docker-compose.prod.yml ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/
-          scp nginx/conf.d/* ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/nginx/conf.d/
-          scp mosquitto/config/* ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/mosquitto/config/
+          scp nginx/nginx.conf ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/nginx/
+          scp nginx/sites/sentient.conf ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/nginx/sites/
+          scp mosquitto/config/mosquitto.conf ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/mosquitto/config/
 
       - name: Create .env.production on server
         run: |
