@@ -170,8 +170,8 @@ export function Overview() {
         friendly_name: controller.friendly_name,
         controller_type: controller.controller_type as ControllerNodeData['controller_type'],
         status,
-        device_count: controller.assigned_devices,
-        last_heartbeat: controller.last_heartbeat || undefined,
+        device_count: controller.device_count,
+        last_heartbeat: controller.last_seen || undefined,
         angle,
         radius,
         x,
@@ -267,7 +267,7 @@ export function Overview() {
   const devicesTotal = devicesData?.length || 0;
 
   // Mock active sessions for now - will be replaced with real data
-  const activeSessions = [];
+  const activeSessions: unknown[] = [];
 
   // Convert issues to alerts format
   const alerts = health?.issues.map(issue => ({

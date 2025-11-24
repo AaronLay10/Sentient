@@ -32,23 +32,6 @@ interface SentientEyeProps {
 export function SentientEye({ health }: SentientEyeProps) {
   const effectiveHealth = health?.overall || 'offline';
 
-  const getHealthColor = (status: SystemHealth['overall']) => {
-    switch (status) {
-      case 'healthy':
-        return 'var(--status-healthy)';
-      case 'warning':
-        return 'var(--status-warning)';
-      case 'critical':
-        return 'var(--status-critical)';
-      case 'offline':
-        return 'var(--status-offline)';
-      default:
-        return 'var(--status-unknown)';
-    }
-  };
-
-  const healthColor = getHealthColor(effectiveHealth);
-
   return (
     <div className="sentient-eye-container">
 

@@ -107,14 +107,14 @@ const NETWORK_DEFINITION = [
   },
 ];
 
-export function NetworkCanvas({ controllers: propControllers, devices: propDevices, onNodesUpdate }: NetworkCanvasProps) {
+export function NetworkCanvas({ onNodesUpdate }: NetworkCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [controllers, setControllers] = useState<NetworkNode[]>([]);
   const [devices, setDevices] = useState<NetworkNode[]>([]);
   const [pulses, setPulses] = useState<Pulse[]>([]);
   const [hoveredNode, setHoveredNode] = useState<NetworkNode | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>();
 
   useEffect(() => {
     if (!canvasRef.current) return;

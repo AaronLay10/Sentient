@@ -77,7 +77,7 @@ export function PropertiesPanel({ selectedNode, sceneInfo, onSceneInfoChange, on
             <>
               <div className={styles.row}>
                 <label className={styles.label}>Node Type</label>
-                <div className={styles.value}>{selectedNode.data.label}</div>
+                <div className={styles.value}>{String(selectedNode.data.label)}</div>
               </div>
 
               <div className={styles.row}>
@@ -91,7 +91,7 @@ export function PropertiesPanel({ selectedNode, sceneInfo, onSceneInfoChange, on
                     <label className={styles.label}>Device</label>
                     <select
                       className={styles.select}
-                      value={selectedNode.data.config?.device || ''}
+                      value={(selectedNode.data.config as { device?: string })?.device || ''}
                       onChange={(e) =>
                         onNodeConfigChange(selectedNode.id, { device: e.target.value })
                       }
@@ -123,7 +123,7 @@ export function PropertiesPanel({ selectedNode, sceneInfo, onSceneInfoChange, on
                     type="number"
                     className={styles.input}
                     placeholder="5"
-                    value={selectedNode.data.config?.duration || ''}
+                    value={(selectedNode.data.config as { duration?: string })?.duration || ''}
                     onChange={(e) =>
                       onNodeConfigChange(selectedNode.id, { duration: e.target.value })
                     }

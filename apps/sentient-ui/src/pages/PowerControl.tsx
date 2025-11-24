@@ -180,7 +180,7 @@ export function PowerControl() {
     }
   }, [events]);
 
-  const handleToggleDevice = async (controllerId: string, deviceId: string, currentState: boolean) => {
+  const handleToggleDevice = async (_controllerId: string, deviceId: string, currentState: boolean) => {
     const newState = !currentState;
 
     // Send command to API (DO NOT optimistically update - wait for controller acknowledgment)

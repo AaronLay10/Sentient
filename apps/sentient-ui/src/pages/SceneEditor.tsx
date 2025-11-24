@@ -87,7 +87,7 @@ export function SceneEditor() {
       const edge = {
         ...connection,
         id: `e${connection.source}-${connection.target}`,
-        type: 'default',
+        type: 'default' as const,
         animated: true,
         style: { stroke: '#6366f1', strokeWidth: 2 },
       };
@@ -124,13 +124,13 @@ export function SceneEditor() {
     []
   );
 
-  const updateNodeConfig = useCallback((nodeId: string, config: any) => {
+  const updateNodeConfig = useCallback((nodeId: string, config: Record<string, unknown>) => {
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === nodeId) {
           return {
             ...node,
-            data: { ...node.data, config: { ...node.data.config, ...config } },
+            data: { ...node.data, config: { ...(node.data.config as Record<string, unknown> || {}), ...config } },
           };
         }
         return node;
