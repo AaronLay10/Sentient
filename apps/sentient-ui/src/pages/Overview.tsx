@@ -267,7 +267,7 @@ export function Overview() {
   const devicesTotal = devicesData?.length || 0;
 
   // Mock active sessions for now - will be replaced with real data
-  const activeSessions: unknown[] = [];
+  const activeSessions: Array<{ id: string; room: string; duration: number; status: 'active' | 'paused' | 'completed'; progress: number }> = [];
 
   // Convert issues to alerts format
   const alerts = health?.issues.map(issue => ({

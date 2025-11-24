@@ -34,11 +34,11 @@ const initialNodes: FlowNode[] = [
   },
 ];
 
-const initialEdges: Edge[] = [];
+const initialEdges: Array<{ id: string; type: 'default'; animated: boolean; style: { stroke: string; strokeWidth: number }; source: string; target: string; sourceHandle: string | null; targetHandle: string | null }> = [];
 
 export function SceneEditor() {
   const [nodes, setNodes] = useState<FlowNode[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const [edges, setEdges] = useState<Array<{ id: string; type: 'default'; animated: boolean; style: { stroke: string; strokeWidth: number }; source: string; target: string; sourceHandle: string | null; targetHandle: string | null }>>(initialEdges);
   const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
   const [sceneInfo, setSceneInfo] = useState({
     name: 'Opening Sequence',

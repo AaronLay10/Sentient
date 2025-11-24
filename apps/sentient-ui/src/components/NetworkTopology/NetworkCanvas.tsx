@@ -114,7 +114,7 @@ export function NetworkCanvas({ onNodesUpdate }: NetworkCanvasProps) {
   const [pulses, setPulses] = useState<Pulse[]>([]);
   const [hoveredNode, setHoveredNode] = useState<NetworkNode | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const animationFrameRef = useRef<number | undefined>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (!canvasRef.current) return;
