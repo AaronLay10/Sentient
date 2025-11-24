@@ -69,7 +69,7 @@ jobs:
         run: pnpm test || echo "No tests configured yet"
 
       - name: Build shared packages
-        run: pnpm build --filter @sentient/*
+        run: pnpm --filter "@sentient/*" build
 
   # ==========================================
   # Job 2: Build and Push Docker Images
