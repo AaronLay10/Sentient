@@ -26,6 +26,7 @@ export interface SystemHealth {
 
 interface SentientEyeProps {
   health?: SystemHealth;
+  onIssueClick?: (issueId: string) => void;
 }
 
 export function SentientEye({ health }: SentientEyeProps) {

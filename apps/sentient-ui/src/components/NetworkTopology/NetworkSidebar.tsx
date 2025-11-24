@@ -1,4 +1,4 @@
-import type { RoomInfo } from '../../pages/NetworkTopology';
+import type { RoomInfo } from '../../pages/Overview';
 import styles from './NetworkSidebar.module.css';
 
 interface NetworkSidebarProps {

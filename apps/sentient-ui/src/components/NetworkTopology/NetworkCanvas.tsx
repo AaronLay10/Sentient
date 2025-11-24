@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { NetworkNode } from '../../pages/NetworkTopology';
+import type { NetworkNode } from '../../pages/Overview';
 import styles from './NetworkCanvas.module.css';
 
 interface NetworkCanvasProps {

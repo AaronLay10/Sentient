@@ -1,4 +1,5 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SentientEye } from '../components/SentientEye/SentientEye';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
@@ -68,7 +69,7 @@ export function Login() {
         {/* Sentient Eye Logo */}
         <div className={styles.logoContainer}>
           <div className={styles.eyeWrapper}>
-            <SentientEye size={120} />
+            <SentientEye />
           </div>
           <h1 className={styles.title}>Sentient Engine</h1>
           <p className={styles.subtitle}>Theatrical Control & Orchestration Platform</p>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { SentientEye, type SystemHealth } from '../components/SentientEye/SentientEye';
 import { ControllerNode, type ControllerNodeData } from '../components/NetworkTopology/ControllerNode';
@@ -33,18 +33,15 @@ export interface RoomInfo {
 }
 
 export function Overview() {
-  const [selectedController, setSelectedController] = useState<string | null>(null);
-  const [hoveredController, setHoveredController] = useState<string | null>(null);
-
   // Fetch controllers from the database
-  const { data: controllersData, isLoading: controllersLoading } = useQuery({
+  const { data: controllersData } = useQuery({
     queryKey: ['controllers'],
     queryFn: () => api.getControllers(),
     refetchInterval: 5000,
   });
 
   // Fetch devices from the database
-  const { data: devicesData, isLoading: devicesLoading } = useQuery({
+  const { data: devicesData } = useQuery({
     queryKey: ['devices'],
     queryFn: () => api.getDevices(),
     refetchInterval: 5000,
@@ -171,10 +168,10 @@ export function Overview() {
       return {
         id: controller.id,
         friendly_name: controller.friendly_name,
-        controller_type: controller.controller_type,
+        controller_type: controller.controller_type as ControllerNodeData['controller_type'],
         status,
         device_count: controller.assigned_devices,
-        last_heartbeat: controller.last_heartbeat,
+        last_heartbeat: controller.last_heartbeat || undefined,
         angle,
         radius,
         x,
@@ -240,8 +237,8 @@ export function Overview() {
           id: device.id,
           friendly_name: device.friendly_name,
           device_type: device.device_type,
-          device_category: device.device_category,
-          status: device.status,
+          device_category: device.device_category as DeviceNodeData['device_category'],
+          status: device.status as DeviceNodeData['status'],
           controller_id: device.controller_id,
           x,
           y,
@@ -303,8 +300,8 @@ export function Overview() {
             <ControllerNode
               key={node.id}
               data={node}
-              onClick={setSelectedController}
-              onHover={setHoveredController}
+              onClick={() => {}}
+              onHover={() => {}}
             />
           ))}
 
