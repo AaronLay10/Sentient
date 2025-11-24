@@ -155,11 +155,16 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          cat > ~/.ssh/id_rsa <<'EOF'
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          EOF
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          cat > ~/.ssh/config <<EOF
+          Host ${{ secrets.PRODUCTION_HOST }}
+            StrictHostKeyChecking no
+            UserKnownHostsFile=/dev/null
+          EOF
+          chmod 600 ~/.ssh/config
 
       - name: Create deployment directory
         run: |
