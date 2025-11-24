@@ -623,8 +623,8 @@ SentientMQTTConfig build_mqtt_config()
     cfg.password = mqtt_password;
     cfg.namespaceId = naming::CLIENT_ID;
     cfg.roomId = naming::ROOM_ID;
-    cfg.puzzleId = naming::CONTROLLER_ID;
-    cfg.deviceId = naming::CONTROLLER_ID;
+    cfg.controllerId = naming::CONTROLLER_ID;
+    cfg.deviceId = nullptr; // Controller-level messages don't have deviceId
     cfg.displayName = naming::CONTROLLER_FRIENDLY_NAME;
     cfg.publishJsonCapacity = 1536;
     cfg.heartbeatIntervalMs = 5000;

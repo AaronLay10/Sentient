@@ -1,0 +1,115 @@
+.controller-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.controller-node:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  z-index: 20;
+}
+
+/* Status ring */
+.controller-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 3px solid;
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.controller-node.waiting .controller-ring {
+  animation: waiting-pulse 2s ease-in-out infinite;
+}
+
+@keyframes waiting-pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.controller-node.offline .controller-ring {
+  animation: offline-blink 1s ease-in-out infinite;
+}
+
+@keyframes offline-blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.4;
+  }
+}
+
+/* Inner content */
+.controller-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Device count text inside node */
+.device-count-inner {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Label below node */
+.controller-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  white-space: nowrap;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.controller-node:hover .controller-label {
+  opacity: 1;
+}
+
+/* Connection line styles */
+.connection-line {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.controller-node:hover .connection-line {
+  opacity: 1;
+}
+
+.controller-node.online .connection-line line {
+  animation: data-flow 2s linear infinite;
+}
+
+@keyframes data-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 20;
+  }
+}

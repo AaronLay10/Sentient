@@ -9,18 +9,18 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 export class RoomsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async listByVenue(tenantId: string, venueId: string, query: ListRoomsDto) {
+  async listByVenue(clientId: string, venueId: string, query: ListRoomsDto) {
     return this.prisma.room.findMany({
-      where: { tenantId, venueId },
+      where: { clientId, venueId },
       orderBy: { created_at: 'desc' },
       take: query.take,
       skip: query.skip
     });
   }
 
-  async getById(tenantId: string, venueId: string, roomId: string) {
+  async getById(clientId: string, venueId: string, roomId: string) {
     const room = await this.prisma.room.findFirst({
-      where: { id: roomId, tenantId, venueId }
+      where: { id: roomId, clientId, venueId }
     });
     if (!room) {
       throw new NotFoundException('Room not found');
@@ -28,11 +28,11 @@ export class RoomsService {
     return room;
   }
 
-  async create(tenantId: string, venueId: string, dto: CreateRoomDto) {
+  async create(clientId: string, venueId: string, dto: CreateRoomDto) {
     try {
       return await this.prisma.room.create({
         data: {
-          tenantId,
+          clientId,
           venueId,
           name: dto.name
         }
@@ -43,19 +43,19 @@ export class RoomsService {
           throw new ConflictException('Room name must be unique per venue');
         }
         if (error.code === 'P2003') {
-          throw new BadRequestException('Tenant or venue not found');
+          throw new BadRequestException('Client or venue not found');
         }
       }
       throw error;
     }
   }
 
-  async update(tenantId: string, venueId: string, roomId: string, dto: UpdateRoomDto) {
+  async update(clientId: string, venueId: string, roomId: string, dto: UpdateRoomDto) {
     try {
       return await this.prisma.room.update({
         where: { id: roomId },
         data: { name: dto.name },
-        select: { id: true, name: true, tenantId: true, venueId: true, created_at: true }
+        select: { id: true, name: true, clientId: true, venueId: true, created_at: true }
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -70,7 +70,7 @@ export class RoomsService {
     }
   }
 
-  async remove(tenantId: string, venueId: string, roomId: string) {
+  async remove(clientId: string, venueId: string, roomId: string) {
     try {
       return await this.prisma.room.delete({
         where: { id: roomId },

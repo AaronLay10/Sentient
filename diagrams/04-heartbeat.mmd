@@ -1,0 +1,32 @@
+---
+id: 1405c6fc-a768-4cbb-bb11-182b43a25764
+---
+sequenceDiagram
+    participant TC as Teensy Controller
+    participant MQTT as MQTT Broker
+    participant GW as MQTT Gateway
+    participant Redis as Redis Pub/Sub
+    participant RTGW as Realtime Gateway
+    participant UI as Sentient UI
+
+    loop Every 30 seconds
+        TC->>TC: loop_diagnostics()
+        TC->>MQTT: PUBLISH paragon/clockwork/status/controller_id/heartbeat
+        Note over TC,MQTT: {<br/>  "controller_id": "...",<br/>  "uptime_ms": 123456,<br/>  "free_memory": 524288,<br/>  "timestamp": "..."<br/>}
+
+        MQTT->>GW: Message received
+        GW->>GW: Parse status topic
+        GW->>GW: Create CONTROLLER_HEARTBEAT event
+
+        GW->>Redis: PUBLISH sentient:domain_events
+        Note over GW,Redis: {<br/>  "event_id": "uuid",<br/>  "type": "controller_heartbeat",<br/>  "room_id": "clockwork",<br/>  "controller_id": "...",<br/>  "payload": {...},<br/>  "timestamp": "..."<br/>}
+
+        Redis->>RTGW: Domain event subscription
+        RTGW->>UI: WebSocket broadcast
+        UI->>UI: Update controller status<br/>Reset timeout timer
+    end
+
+    alt Heartbeat timeout (>60 seconds)
+        UI->>UI: Mark controller OFFLINE
+        UI->>UI: Display warning indicator
+    end

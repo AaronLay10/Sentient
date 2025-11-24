@@ -1,0 +1,48 @@
+---
+id: 16986f57-6958-4fd7-8270-48a76d93be86
+---
+sequenceDiagram
+    participant DEV as Physical Device
+    participant TC as Teensy Controller
+    participant MQTT as MQTT Broker
+    participant GW as MQTT Gateway
+    participant Redis as Redis Pub/Sub
+    participant ORCH as Orchestrator
+    participant RTGW as Realtime Gateway
+    participant UI as Sentient UI
+
+    DEV->>TC: Physical state change
+    Note over DEV,TC: GPIO pin state change
+    
+    TC->>TC: Read sensor in loop_hardware()
+    TC->>MQTT: PUBLISH paragon/clockwork/sensors/controller_id/device_id/state
+    Note over TC,MQTT: {<br/>  "v": 1,<br/>  "controller_id": "...",<br/>  "device_id": "...",<br/>  "state": { "button_pressed": true },<br/>  "timestamp": "2025-01-22T..."<br/>}
+
+    MQTT->>GW: Message received on topic
+    GW->>GW: Parse category-first topic
+    Note over GW: Extract: tenant, room_id,<br/>category, controller_id, device_id
+
+    GW->>GW: Create domain event
+    Note over GW: EventType.DEVICE_STATE_CHANGED
+
+    GW->>Redis: PUBLISH sentient:domain_events
+    Note over GW,Redis: {<br/>  "event_id": "uuid",<br/>  "type": "device_state_changed",<br/>  "room_id": "clockwork",<br/>  "controller_id": "...",<br/>  "device_id": "...",<br/>  "payload": {...},<br/>  "timestamp": "..."<br/>}
+
+    Redis->>ORCH: Domain event subscription
+    ORCH->>ORCH: Process event through<br/>puzzle evaluator
+    
+    alt Puzzle Solved
+        ORCH->>Redis: PUBLISH puzzle_solved event
+        Redis->>RTGW: Forward event
+        RTGW->>UI: WebSocket broadcast
+        UI->>UI: Update puzzle status
+    else State Updated Only
+        ORCH->>Redis: PUBLISH state_updated event
+        Redis->>RTGW: Forward event
+        RTGW->>UI: WebSocket broadcast
+        UI->>UI: Update device indicator
+    end
+
+    Redis->>RTGW: Original device_state_changed
+    RTGW->>UI: WebSocket broadcast
+    UI->>UI: Update device state in real-time

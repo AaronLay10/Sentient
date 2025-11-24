@@ -31,6 +31,12 @@ if [ $# -eq 0 ]; then
 fi
 
 INO_FILE="$1"
+
+# Strip 'hardware/' prefix if present (from VS Code tasks)
+if [[ "$INO_FILE" == hardware/* ]]; then
+    INO_FILE="${INO_FILE#hardware/}"
+fi
+
 INO_PATH="${PROJECT_ROOT}/hardware/${INO_FILE}"
 
 # Check if file exists
@@ -45,12 +51,12 @@ CONTROLLER_NAME=$(basename "${CONTROLLER_DIR}")
 OUTPUT_DIR="${CONTROLLER_DIR}/build"
 
 # Version bump logic
-VERSION_FILE="$(dirname "${INO_PATH}")/version.h"
-if [ -f "${VERSION_FILE}" ]; then
-    # Read current version
-    CURRENT_VERSION=$(grep '#define FIRMWARE_VERSION' "${VERSION_FILE}" | sed 's/.*"\(.*\)".*/\1/')
+METADATA_FILE="$(dirname "${INO_PATH}")/FirmwareMetadata.h"
+if [ -f "${METADATA_FILE}" ]; then
+    # Read current version from FirmwareMetadata.h
+    CURRENT_VERSION=$(grep 'constexpr const char \*VERSION' "${METADATA_FILE}" | sed 's/.*"\(.*\)".*/\1/')
     
-    # Parse version components (e.g., "2.0.1" -> 2 0 1)
+    # Parse version components (e.g., "2.3.0" -> 2 3 0)
     IFS='.' read -ra VERSION_PARTS <<< "${CURRENT_VERSION}"
     MAJOR="${VERSION_PARTS[0]}"
     MINOR="${VERSION_PARTS[1]}"
@@ -60,13 +66,13 @@ if [ -f "${VERSION_FILE}" ]; then
     PATCH=$((PATCH + 1))
     NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
     
-    # Update version.h
-    sed -i.bak "s/#define FIRMWARE_VERSION \".*\"/#define FIRMWARE_VERSION \"${NEW_VERSION}\"/" "${VERSION_FILE}"
-    rm "${VERSION_FILE}.bak"
+    # Update FirmwareMetadata.h
+    sed -i.bak "s/constexpr const char \*VERSION = \".*\";/constexpr const char *VERSION = \"${NEW_VERSION}\";/" "${METADATA_FILE}"
+    rm "${METADATA_FILE}.bak"
     
     echo -e "${YELLOW}Version bumped: ${CURRENT_VERSION} → ${NEW_VERSION}${NC}"
 else
-    echo -e "${YELLOW}Warning: version.h not found at ${VERSION_FILE}${NC}"
+    echo -e "${YELLOW}Warning: FirmwareMetadata.h not found at ${METADATA_FILE}${NC}"
     NEW_VERSION="unknown"
 fi
 

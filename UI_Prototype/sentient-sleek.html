@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTIENT — Neural Orchestration Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-dark: #0d0d12;
+            --bg-card: rgba(18, 18, 24, 0.9);
+            --bg-card-solid: #121218;
+            --bg-hover: rgba(255, 255, 255, 0.03);
+            
+            --accent-orange: #ff8c42;
+            --accent-orange-glow: rgba(255, 140, 66, 0.4);
+            --accent-blue: #6366f1;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-pink: #f472b6;
+            --accent-purple: #a78bfa;
+            --accent-red: #f87171;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-light: rgba(255, 255, 255, 0.1);
+            
+            --font-sans: 'DM Sans', 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-dark);
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+        }
+        
+        /* Subtle gradient background */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 50% 50%, rgba(255, 140, 66, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 40%),
+                radial-gradient(ellipse at 20% 80%, rgba(34, 211, 238, 0.03) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        
+        .dashboard {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            height: 56px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-subtle);
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffb347 0%, #ff8c42 40%, #e85d04 100%);
+            box-shadow: 0 0 20px var(--accent-orange-glow);
+        }
+        
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-primary);
+        }
+        
+        .top-nav {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-dark);
+            padding: 4px;
+            border-radius: 10px;
+        }
+        
+        .nav-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            color: var(--text-secondary);
+            background: var(--bg-hover);
+        }
+        
+        .nav-btn.active {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+        
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(34, 211, 238, 0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent-cyan);
+        }
+        
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+        
+        .time-display {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden;
+        }
+        
+        /* Side Panels */
+        .side-panel {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--accent-cyan);
+        }
+        
+        /* Room Items */
+        .room-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: var(--bg-hover);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .room-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .room-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .room-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .room-indicator.live {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+        
+        .room-indicator.standby {
+            background: var(--accent-orange);
+        }
+        
+        .room-indicator.offline {
+            background: var(--text-muted);
+        }
+        
+        .room-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .room-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .room-status {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .room-timer {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .room-timer.inactive {
+            color: var(--text-muted);
+        }
+        
+        /* Metrics */
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .metric-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .metric-value.good {
+            color: var(--accent-green);
+        }
+        
+        .metric-value.warning {
+            color: var(--accent-orange);
+        }
+        
+        /* Big Stat */
+        .big-stat {
+            text-align: center;
+            padding: 8px 0;
+        }
+        
+        .big-stat-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        
+        .big-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        
+        .big-stat-sub {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        
+        .big-stat-item {
+            text-align: center;
+        }
+        
+        .big-stat-item-value {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .big-stat-item-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        /* Mini Bars */
+        .mini-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 40px;
+            padding: 8px 0;
+        }
+        
+        .mini-bar {
+            flex: 1;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+            opacity: 0.7;
+            transition: height 0.3s ease;
+        }
+        
+        /* Center Network Area */
+        .center-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #network-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: var(--bg-card-solid);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .tooltip-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 3px 0;
+        }
+        
+        .tooltip-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .tooltip-value {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <div class="dashboard">
+        <header class="top-bar">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">Sentient</div>
+            </div>
+            
+            <nav class="top-nav">
+                <button class="nav-btn active">Overview</button>
+                <button class="nav-btn">Rooms</button>
+                <button class="nav-btn">Scenes</button>
+                <button class="nav-btn">Puzzles</button>
+                <button class="nav-btn">Effects</button>
+                <button class="nav-btn">Settings</button>
+            </nav>
+            
+            <div class="top-right">
+                <div class="status-pill">
+                    <span class="dot"></span>
+                    All systems operational
+                </div>
+                <div class="time-display" id="time-display">14:32:07</div>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <!-- Left Panel -->
+            <aside class="side-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Active Rooms</span>
+                        <span class="card-badge">2 Live</span>
+                    </div>
+                    
+                    <div class="room-item">
+                        <div class="room-indicator live"></div>
+                        <div class="room-info">
+                            <div class="room-name">Return of the Pharaohs</div>
+                            <div class="room-status">In progress • 7/11 puzzles</div>
+                        </div>
+                        <div class="room-timer">32:47</div>
+                    </div>
+                    
+                    <div class="room-item">
+                        <div class="room-indicator live"></div>
+                        <div class="room-info">
+                            <div class="room-name">Clockwork Corridor</div>
+                            <div class="room-status">In progress • 4/12 puzzles</div>
+                        </div>
+                        <div class="room-timer">48:12</div>
+                    </div>
+                    
+                    <div class="room-item">
+                        <div class="room-indicator standby"></div>
+                        <div class="room-info">
+                            <div class="room-name">Quantum Breach</div>
+                            <div class="room-status">Standby • Next: 3:30 PM</div>
+                        </div>
+                        <div class="room-timer inactive">--:--</div>
+                    </div>
+                    
+                    <div class="room-item">
+                        <div class="room-indicator offline"></div>
+                        <div class="room-info">
+                            <div class="room-name">The Haunting</div>
+                            <div class="room-status">Resetting • 80%</div>
+                        </div>
+                        <div class="room-timer inactive">--:--</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Node Status</span>
+                    </div>
+                    <div class="big-stat">
+                        <div class="big-stat-value">59</div>
+                        <div class="big-stat-label">Nodes Online</div>
+                        <div class="big-stat-sub">
+                            <div class="big-stat-item">
+                                <div class="big-stat-item-value" style="color: var(--accent-cyan);">12</div>
+                                <div class="big-stat-item-label">Controllers</div>
+                            </div>
+                            <div class="big-stat-item">
+                                <div class="big-stat-item-value" style="color: var(--accent-purple);">47</div>
+                                <div class="big-stat-item-label">Devices</div>
+                            </div>
+                            <div class="big-stat-item">
+                                <div class="big-stat-item-value" style="color: var(--accent-green);">0</div>
+                                <div class="big-stat-item-label">Warnings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Center Network -->
+            <div class="center-area">
+                <canvas id="network-canvas"></canvas>
+            </div>
+            
+            <!-- Right Panel -->
+            <aside class="side-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">System Metrics</span>
+                    </div>
+                    
+                    <div class="metric-row">
+                        <span class="metric-label">Latency</span>
+                        <span class="metric-value good">12ms</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">CPU Load</span>
+                        <span class="metric-value">23%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Memory</span>
+                        <span class="metric-value warning">67%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">MQTT Clients</span>
+                        <span class="metric-value">47</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Topics</span>
+                        <span class="metric-value">312</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Message Throughput</span>
+                        <span class="card-badge">14.2/s avg</span>
+                    </div>
+                    <div class="mini-bars" id="throughput-bars"></div>
+                    <div class="metric-row" style="padding-top: 12px;">
+                        <span class="metric-label">Peak (60s)</span>
+                        <span class="metric-value">31/s</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Audio Zones</span>
+                        <span class="card-badge">14 Active</span>
+                    </div>
+                    <div class="mini-bars" id="audio-bars" style="height: 50px;"></div>
+                </div>
+            </aside>
+        </main>
+    </div>
+    
+    <div class="tooltip" id="tooltip">
+        <div class="tooltip-name" id="tooltip-name">Device</div>
+        <div class="tooltip-row">
+            <span class="tooltip-label">Type</span>
+            <span class="tooltip-value" id="tooltip-type">-</span>
+        </div>
+        <div class="tooltip-row">
+            <span class="tooltip-label">Room</span>
+            <span class="tooltip-value" id="tooltip-room">-</span>
+        </div>
+        <div class="tooltip-row">
+            <span class="tooltip-label">Status</span>
+            <span class="tooltip-value" id="tooltip-status">Online</span>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        
+        let width, height, centerX, centerY, circleRadius;
+        let controllers = [];
+        let devices = [];
+        let pulses = [];
+        let hoveredNode = null;
+        let time = 0;
+        
+        const colors = {
+            ring: 'rgba(255, 140, 66, 0.6)',
+            ringDim: 'rgba(255, 140, 66, 0.15)',
+            ringGlow: 'rgba(255, 140, 66, 0.08)',
+            nodeDefault: '#6366f1',
+            connection: 'rgba(255, 255, 255, 0.08)'
+        };
+        
+        const roomColors = {
+            'Infrastructure': '#34d399',
+            'Pharaohs': '#22d3ee',
+            'Clockwork': '#f59e0b',
+            'Quantum': '#a78bfa',
+            'Haunting': '#f472b6'
+        };
+        
+        const networkDef = [
+            { id: 'MQTT', name: 'MQTT Broker', type: 'Server', room: 'Infrastructure', devices: [
+                { id: 'MQTT-WS', name: 'WebSocket', type: 'Service' },
+                { id: 'MQTT-LOG', name: 'Logger', type: 'Service' }
+            ]},
+            { id: 'NRED', name: 'Node-RED', type: 'Flow Engine', room: 'Infrastructure', devices: [
+                { id: 'NR-FLOW', name: 'Flows', type: 'Runtime' },
+                { id: 'NR-UI', name: 'Dashboard', type: 'UI' }
+            ]},
+            { id: 'AUDIO', name: 'Audio Master', type: 'Server', room: 'Infrastructure', devices: [
+                { id: 'AUD-MIX', name: 'Mixer', type: 'DSP' },
+                { id: 'AUD-SYNC', name: 'Sync', type: 'Service' }
+            ]},
+            { id: 'PHR-M', name: 'Pharaohs Main', type: 'Teensy 4.1', room: 'Pharaohs', devices: [
+                { id: 'PHR-SARC', name: 'Sarcophagus', type: 'Servo' },
+                { id: 'PHR-T1', name: 'Torch 1', type: 'LED' },
+                { id: 'PHR-T2', name: 'Torch 2', type: 'LED' },
+                { id: 'PHR-DOOR', name: 'Door', type: 'Lock' }
+            ]},
+            { id: 'PHR-J', name: 'Canopic Jars', type: 'Teensy 4.0', room: 'Pharaohs', devices: [
+                { id: 'PHR-J1', name: 'Jar 1', type: 'Scale' },
+                { id: 'PHR-J2', name: 'Jar 2', type: 'Scale' },
+                { id: 'PHR-J3', name: 'Jar 3', type: 'Scale' },
+                { id: 'PHR-J4', name: 'Jar 4', type: 'Scale' }
+            ]},
+            { id: 'PHR-D', name: 'Pharaohs Display', type: 'RPi 5', room: 'Pharaohs', devices: [
+                { id: 'PHR-VID', name: 'Video', type: 'Display' },
+                { id: 'PHR-AUD', name: 'Audio', type: 'Amp' }
+            ]},
+            { id: 'CLK-M', name: 'Clockwork Main', type: 'Teensy 4.1', room: 'Clockwork', devices: [
+                { id: 'CLK-G1', name: 'Gear 1', type: 'Stepper' },
+                { id: 'CLK-G2', name: 'Gear 2', type: 'Stepper' },
+                { id: 'CLK-PEN', name: 'Pendulum', type: 'Servo' }
+            ]},
+            { id: 'CLK-B', name: 'Buttons', type: 'Teensy 4.0', room: 'Clockwork', devices: [
+                { id: 'CLK-D1', name: 'Dial 1', type: 'Encoder' },
+                { id: 'CLK-D2', name: 'Dial 2', type: 'Encoder' },
+                { id: 'CLK-KEY', name: 'Keypad', type: 'Matrix' }
+            ]},
+            { id: 'CLK-D', name: 'Clockwork Display', type: 'RPi 5', room: 'Clockwork', devices: [
+                { id: 'CLK-VID', name: 'Video', type: 'Display' },
+                { id: 'CLK-NIX', name: 'Nixie', type: 'Display' }
+            ]},
+            { id: 'QTM-M', name: 'Quantum Main', type: 'Teensy 4.1', room: 'Quantum', devices: [
+                { id: 'QTM-L1', name: 'Laser A', type: 'Array' },
+                { id: 'QTM-L2', name: 'Laser B', type: 'Array' },
+                { id: 'QTM-POR', name: 'Portal', type: 'LED' }
+            ]},
+            { id: 'QTM-S', name: 'Quantum Sensors', type: 'Teensy 4.0', room: 'Quantum', devices: [
+                { id: 'QTM-PIR1', name: 'Motion 1', type: 'PIR' },
+                { id: 'QTM-PIR2', name: 'Motion 2', type: 'PIR' }
+            ]},
+            { id: 'HNT-M', name: 'Haunting Main', type: 'Teensy 4.1', room: 'Haunting', devices: [
+                { id: 'HNT-FOG', name: 'Fog', type: 'Relay' },
+                { id: 'HNT-STR', name: 'Strobe', type: 'DMX' },
+                { id: 'HNT-GHO', name: 'Ghost', type: 'Servo' }
+            ]},
+            { id: 'HNT-A', name: 'Animatronics', type: 'Teensy 4.0', room: 'Haunting', devices: [
+                { id: 'HNT-HEAD', name: 'Head', type: 'Servo' },
+                { id: 'HNT-HAND', name: 'Hand', type: 'Pneumatic' },
+                { id: 'HNT-EYES', name: 'Eyes', type: 'Servo' }
+            ]}
+        ];
+        
+        let throughputData = Array(30).fill(0).map(() => Math.random() * 0.7 + 0.2);
+        let audioLevels = Array(14).fill(0).map(() => Math.random() * 0.7 + 0.2);
+        
+        function initBars() {
+            // Throughput bars
+            const throughputContainer = document.getElementById('throughput-bars');
+            throughputContainer.innerHTML = '';
+            for (let i = 0; i < 30; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'mini-bar';
+                bar.style.height = (throughputData[i] * 100) + '%';
+                bar.style.background = `rgba(34, 211, 238, ${0.4 + throughputData[i] * 0.6})`;
+                throughputContainer.appendChild(bar);
+            }
+            
+            // Audio bars
+            const audioContainer = document.getElementById('audio-bars');
+            audioContainer.innerHTML = '';
+            for (let i = 0; i < 14; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'mini-bar';
+                bar.style.height = (audioLevels[i] * 100) + '%';
+                bar.style.background = audioLevels[i] > 0.8 ? 'rgba(249, 115, 22, 0.8)' : `rgba(167, 139, 250, ${0.5 + audioLevels[i] * 0.5})`;
+                audioContainer.appendChild(bar);
+            }
+        }
+        
+        function updateBars() {
+            // Update throughput
+            throughputData.shift();
+            throughputData.push(Math.random() * 0.7 + 0.2);
+            const throughputBars = document.querySelectorAll('#throughput-bars .mini-bar');
+            throughputBars.forEach((bar, i) => {
+                bar.style.height = (throughputData[i] * 100) + '%';
+                bar.style.background = `rgba(34, 211, 238, ${0.4 + throughputData[i] * 0.6})`;
+            });
+            
+            // Update audio
+            audioLevels = audioLevels.map(l => Math.max(0.1, Math.min(1, l + (Math.random() - 0.5) * 0.1)));
+            const audioBars = document.querySelectorAll('#audio-bars .mini-bar');
+            audioBars.forEach((bar, i) => {
+                bar.style.height = (audioLevels[i] * 100) + '%';
+                bar.style.background = audioLevels[i] > 0.8 ? 'rgba(249, 115, 22, 0.8)' : `rgba(167, 139, 250, ${0.5 + audioLevels[i] * 0.5})`;
+            });
+        }
+        
+        function resize() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            width = canvas.width;
+            height = canvas.height;
+            centerX = width / 2;
+            centerY = height / 2;
+            // Circle fills the vertical space with small padding
+            circleRadius = (height / 2) - 20;
+            initNetwork();
+        }
+        
+        function initNetwork() {
+            controllers = [];
+            devices = [];
+            
+            const count = networkDef.length;
+            networkDef.forEach((ctrl, i) => {
+                const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+                const r = circleRadius * 0.65;
+                
+                const controller = {
+                    ...ctrl,
+                    x: centerX + Math.cos(angle) * r,
+                    y: centerY + Math.sin(angle) * r,
+                    radius: Math.max(10, circleRadius * 0.035),
+                    isController: true,
+                    pulseIntensity: 0,
+                    angle,
+                    deviceNodes: []
+                };
+                controllers.push(controller);
+                
+                const devCount = ctrl.devices.length;
+                const devRadius = circleRadius * 0.18 + devCount * 4;
+                ctrl.devices.forEach((dev, j) => {
+                    const spread = Math.PI * 0.35;
+                    const devAngle = devCount === 1 ? angle : angle - spread/2 + (j/(devCount-1)) * spread;
+                    
+                    const device = {
+                        ...dev,
+                        room: ctrl.room,
+                        controllerId: ctrl.id,
+                        x: controller.x + Math.cos(devAngle) * devRadius,
+                        y: controller.y + Math.sin(devAngle) * devRadius,
+                        radius: Math.max(4, circleRadius * 0.015),
+                        isController: false,
+                        pulseIntensity: 0
+                    };
+                    devices.push(device);
+                    controller.deviceNodes.push(device);
+                });
+            });
+        }
+        
+        function createPulse(node, type = 'heartbeat') {
+            const pulseColors = { 
+                heartbeat: '#34d399', 
+                sensor: '#f59e0b', 
+                command: '#6366f1', 
+                warning: '#f87171' 
+            };
+            
+            if (node.isController) {
+                pulses.push({ x: node.x, y: node.y, tx: centerX, ty: centerY, progress: 0, color: pulseColors[type] });
+            } else {
+                const ctrl = controllers.find(c => c.id === node.controllerId);
+                if (ctrl) {
+                    pulses.push({ x: node.x, y: node.y, tx: ctrl.x, ty: ctrl.y, progress: 0, color: pulseColors[type], chain: ctrl });
+                }
+            }
+            node.pulseIntensity = 1;
+        }
+        
+        function drawNetwork() {
+            // Outer glow ring
+            const glowGrad = ctx.createRadialGradient(centerX, centerY, circleRadius * 0.8, centerX, centerY, circleRadius * 1.1);
+            glowGrad.addColorStop(0, 'transparent');
+            glowGrad.addColorStop(0.5, colors.ringGlow);
+            glowGrad.addColorStop(1, 'transparent');
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius * 1.05, 0, Math.PI * 2);
+            ctx.fillStyle = glowGrad;
+            ctx.fill();
+            
+            // Main ring
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = colors.ring;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Inner rings
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius * 0.5, 0, Math.PI * 2);
+            ctx.strokeStyle = colors.ringDim;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius * 0.25, 0, Math.PI * 2);
+            ctx.strokeStyle = colors.ringDim;
+            ctx.setLineDash([4, 8]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Connections
+            controllers.forEach(ctrl => {
+                const color = roomColors[ctrl.room] || colors.nodeDefault;
+                
+                // To center
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(ctrl.x, ctrl.y);
+                ctx.strokeStyle = color;
+                ctx.globalAlpha = 0.1 + ctrl.pulseIntensity * 0.4;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+                
+                // To devices
+                ctrl.deviceNodes.forEach(dev => {
+                    ctx.beginPath();
+                    ctx.moveTo(ctrl.x, ctrl.y);
+                    ctx.lineTo(dev.x, dev.y);
+                    ctx.strokeStyle = color;
+                    ctx.globalAlpha = 0.06 + dev.pulseIntensity * 0.3;
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                });
+            });
+            
+            // Pulses
+            pulses.forEach(p => {
+                const px = p.x + (p.tx - p.x) * p.progress;
+                const py = p.y + (p.ty - p.y) * p.progress;
+                const grad = ctx.createRadialGradient(px, py, 0, px, py, 8);
+                grad.addColorStop(0, p.color);
+                grad.addColorStop(1, p.color + '00');
+                ctx.beginPath();
+                ctx.arc(px, py, 8, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+            });
+            
+            // Devices
+            devices.forEach(dev => {
+                const color = roomColors[dev.room] || colors.nodeDefault;
+                const hovered = hoveredNode === dev;
+                
+                if (dev.pulseIntensity > 0) {
+                    ctx.beginPath();
+                    ctx.arc(dev.x, dev.y, dev.radius * (2 + dev.pulseIntensity * 2), 0, Math.PI * 2);
+                    ctx.fillStyle = color + '30';
+                    ctx.fill();
+                }
+                
+                ctx.beginPath();
+                ctx.arc(dev.x, dev.y, dev.radius * (hovered ? 1.4 : 1), 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+            });
+            
+            // Controllers
+            controllers.forEach(ctrl => {
+                const color = roomColors[ctrl.room] || colors.nodeDefault;
+                const hovered = hoveredNode === ctrl;
+                
+                if (ctrl.pulseIntensity > 0) {
+                    ctx.beginPath();
+                    ctx.arc(ctrl.x, ctrl.y, ctrl.radius * (1.8 + ctrl.pulseIntensity), 0, Math.PI * 2);
+                    ctx.fillStyle = color + '25';
+                    ctx.fill();
+                }
+                
+                // Outer ring
+                ctx.beginPath();
+                ctx.arc(ctrl.x, ctrl.y, ctrl.radius + 4, 0, Math.PI * 2);
+                ctx.strokeStyle = color + '40';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Main node
+                ctx.beginPath();
+                ctx.arc(ctrl.x, ctrl.y, ctrl.radius * (hovered ? 1.1 : 1), 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                
+                // Highlight
+                ctx.beginPath();
+                ctx.arc(ctrl.x - ctrl.radius * 0.3, ctrl.y - ctrl.radius * 0.3, ctrl.radius * 0.25, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.fill();
+            });
+            
+            // Center eye
+            const eyeGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, circleRadius * 0.18);
+            eyeGrad.addColorStop(0, 'rgba(255, 180, 100, 0.5)');
+            eyeGrad.addColorStop(0.4, 'rgba(255, 140, 66, 0.3)');
+            eyeGrad.addColorStop(1, 'transparent');
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius * 0.18, 0, Math.PI * 2);
+            ctx.fillStyle = eyeGrad;
+            ctx.fill();
+        }
+        
+        function update() {
+            time++;
+            
+            [...controllers, ...devices].forEach(n => {
+                n.pulseIntensity *= 0.92;
+                if (n.pulseIntensity < 0.01) n.pulseIntensity = 0;
+            });
+            
+            pulses = pulses.filter(p => {
+                p.progress += 0.035;
+                if (p.progress >= 1 && p.chain) {
+                    p.chain.pulseIntensity = 0.7;
+                    pulses.push({ x: p.chain.x, y: p.chain.y, tx: centerX, ty: centerY, progress: 0, color: p.color });
+                }
+                return p.progress < 1;
+            });
+            
+            if (Math.random() < 0.012) {
+                const ctrl = controllers[Math.floor(Math.random() * controllers.length)];
+                createPulse(ctrl, 'heartbeat');
+            }
+            if (Math.random() < 0.02) {
+                const dev = devices[Math.floor(Math.random() * devices.length)];
+                createPulse(dev, Math.random() < 0.7 ? 'sensor' : 'heartbeat');
+            }
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            drawNetwork();
+        }
+        
+        function animate() {
+            update();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        // Mouse
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+            
+            hoveredNode = null;
+            for (const c of controllers) {
+                if (Math.hypot(mx - c.x, my - c.y) < c.radius + 6) { hoveredNode = c; break; }
+            }
+            if (!hoveredNode) {
+                for (const d of devices) {
+                    if (Math.hypot(mx - d.x, my - d.y) < d.radius + 5) { hoveredNode = d; break; }
+                }
+            }
+            
+            if (hoveredNode) {
+                tooltip.style.display = 'block';
+                tooltip.style.left = (e.clientX + 12) + 'px';
+                tooltip.style.top = (e.clientY + 12) + 'px';
+                document.getElementById('tooltip-name').textContent = hoveredNode.name;
+                document.getElementById('tooltip-type').textContent = hoveredNode.type;
+                document.getElementById('tooltip-room').textContent = hoveredNode.room;
+                canvas.style.cursor = 'pointer';
+            } else {
+                tooltip.style.display = 'none';
+                canvas.style.cursor = 'default';
+            }
+        });
+        
+        canvas.addEventListener('click', () => { if (hoveredNode) createPulse(hoveredNode, 'command'); });
+        
+        // Time
+        setInterval(() => {
+            document.getElementById('time-display').textContent = new Date().toLocaleTimeString('en-US', {hour12:false});
+        }, 1000);
+        
+        // Bar updates
+        setInterval(updateBars, 500);
+        
+        // Init
+        resize();
+        initBars();
+        window.addEventListener('resize', resize);
+        animate();
+        
+        setTimeout(() => {
+            controllers.forEach((c, i) => setTimeout(() => createPulse(c, 'heartbeat'), i * 50));
+        }, 200);
+    </script>
+</body>
+</html>

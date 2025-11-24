@@ -19,10 +19,16 @@ export class AuthService {
     return safe;
   }
 
-  async login(user: { id: string; email: string; tenantId: string; role: string }) {
-    const payload = { sub: user.id, email: user.email, tenantId: user.tenantId, role: user.role };
+  async login(user: { id: string; email: string; clientId: string; role: string }) {
+    const payload = { sub: user.id, email: user.email, clientId: user.clientId, role: user.role };
     return {
-      access_token: this.jwtService.sign(payload)
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        clientId: user.clientId,
+        role: user.role
+      }
     };
   }
 }

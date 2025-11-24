@@ -6,10 +6,55 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class ControllersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAll() {
+    const controllers = await this.prisma.controller.findMany({
+      orderBy: { friendly_name: 'asc' }
+    });
+
+    // Compute status based on last_seen
+    const now = new Date();
+    return controllers.map(controller => {
+      let status: 'online' | 'offline' | 'warning' | 'error' = 'offline';
+
+      if (!controller.last_seen) {
+        // No last_seen = waiting (will be shown as grey in frontend)
+        status = 'offline'; // Frontend will convert null last_seen to 'waiting'
+      } else {
+        const timeSinceLastSeen = now.getTime() - controller.last_seen.getTime();
+        const heartbeatInterval = controller.heartbeat_interval_ms || 30000; // Default 30s
+
+        if (timeSinceLastSeen < heartbeatInterval * 2) {
+          status = 'online';
+        } else if (timeSinceLastSeen < heartbeatInterval * 5) {
+          status = 'warning';
+        } else {
+          status = 'offline';
+        }
+      }
+
+      return {
+        id: controller.id,
+        friendly_name: controller.friendly_name,
+        controller_type: controller.controller_type,
+        hardware_type: controller.hardware_type,
+        firmware_version: controller.firmware_version,
+        ip_address: controller.ip_address,
+        status,
+        device_count: controller.device_count,
+        pending_devices: controller.pending_devices,
+        heartbeat_interval_ms: controller.heartbeat_interval_ms,
+        last_seen: controller.last_seen?.toISOString(),
+        created_at: controller.created_at.toISOString(),
+        assigned_devices: controller.device_count || 0,
+        last_heartbeat: controller.last_seen?.toISOString(),
+      };
+    });
+  }
+
   async register(dto: RegisterControllerDto) {
     const room = await this.prisma.room.findUnique({
       where: { id: dto.room_id },
-      select: { id: true, tenantId: true }
+      select: { id: true, clientId: true }
     });
     if (!room) {
       throw new BadRequestException('Room not found');
@@ -27,13 +72,14 @@ export class ControllersService {
       heartbeat_interval_ms: dto.heartbeat_interval_ms,
       device_count: dto.device_count,
       pending_devices: dto.device_count ?? undefined,
-      capability_manifest: dto.capability_manifest as any ?? undefined
+      capability_manifest: dto.capability_manifest as any ?? undefined,
+      last_seen: new Date(), // Update last_seen on registration
     };
 
     const createData = {
       id: dto.controller_id,
       roomId: room.id,
-      tenantId: room.tenantId,
+      clientId: room.clientId,
       ...updateData
     };
 

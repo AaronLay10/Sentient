@@ -1,0 +1,32 @@
+---
+id: 10fc93a8-c2df-4748-a741-b6726baa4753
+---
+sequenceDiagram
+    participant TC as Teensy Controller
+    participant MQTT as MQTT Broker
+    participant GW as MQTT Gateway
+    participant API as API Service
+    participant DB as PostgreSQL
+
+    TC->>MQTT: PUBLISH sentient/system/register/controller
+    Note over TC,MQTT: {controller_id, controller_type,<br/>firmware_version, ip_address, room_id}
+    
+    MQTT->>GW: Message received
+    GW->>API: POST /internal/controllers/register
+    Note over GW,API: x-internal-token: <secret>
+    
+    API->>DB: UPSERT controller
+    DB-->>API: Controller record
+    API-->>GW: 200 OK {controller_id, status}
+    GW->>GW: Log success
+
+    loop For each device
+        TC->>MQTT: PUBLISH sentient/system/register/device
+        Note over TC,MQTT: {device_id, device_type,<br/>controller_id, mqtt_topics[]}
+        
+        MQTT->>GW: Message received
+        GW->>API: POST /internal/devices/register
+        API->>DB: UPSERT device + actions
+        DB-->>API: Device record
+        API-->>GW: 200 OK {device_id, status}
+    end

@@ -1,0 +1,96 @@
+.topology-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.topology-header {
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.6);
+  border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.header-content h1 {
+  margin: 0;
+  color: var(--color-cyan);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #888;
+}
+
+.status-indicator.connected {
+  background: #00ff00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  animation: pulse-indicator 2s ease-in-out infinite;
+}
+
+.status-indicator.disconnected {
+  background: #ff4444;
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+@keyframes pulse-indicator {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.status-text {
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+  color: var(--color-cyan);
+}
+
+.topology-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.graph-section {
+  flex: 1;
+  width: 70%;
+  border-right: 1px solid rgba(0, 255, 255, 0.3);
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar-section {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

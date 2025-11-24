@@ -1,0 +1,101 @@
+.device-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 8;
+}
+
+.device-node:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+  z-index: 15;
+}
+
+/* Device circle */
+.device-circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 2px solid;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+/* Animations for different states */
+.device-node.operational .device-circle {
+  animation: device-pulse 3s ease-in-out infinite;
+}
+
+@keyframes device-pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.device-node.offline .device-circle {
+  opacity: 0.4;
+}
+
+.device-node.warning .device-circle {
+  animation: warning-blink 2s ease-in-out infinite;
+}
+
+@keyframes warning-blink {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.device-node.error .device-circle {
+  animation: error-blink 1s ease-in-out infinite;
+}
+
+@keyframes error-blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.5;
+  }
+}
+
+/* Label below node */
+.device-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  white-space: nowrap;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.device-node:hover .device-label {
+  opacity: 1;
+}
+
+/* Connection line to controller */
+.device-connection-line {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.device-node:hover .device-connection-line {
+  opacity: 1;
+}

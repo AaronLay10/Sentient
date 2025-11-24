@@ -1,16 +1,4 @@
-/*
- * SentientMQTT - Modern MQTT client helper for Sentient controllers.
- *
- * Wraps PubSubClient with project conventions:
- * - Hierarchical topics: <namespace>/<room>/<puzzle>/<device>/<category>/<item>
- * - Command routing via /Commands/<CommandName>
- * - JSON helpers for sensors, metrics, events, state, and heartbeat
- * - Automatic connection + heartbeat publishing
- *
- * Supported platforms:
- *   - Teensy 4.1 (NativeEthernet)
- *   - ESP32 (Wi-Fi)
- */
+
 
 #ifndef SENTIENT_MQTT_H
 #define SENTIENT_MQTT_H
@@ -45,7 +33,7 @@ struct SentientMQTTConfig
 
   const char *namespaceId = "paragon";
   const char *roomId = nullptr;
-  const char *puzzleId = nullptr;
+  const char *controllerId = nullptr;
   const char *deviceId = nullptr;
   const char *displayName = nullptr;
   const char *hostnamePrefix = nullptr; // Optional prefix for network hostname (e.g., "CL" for Clockwork)

@@ -1,0 +1,43 @@
+---
+id: 24e1db12-9d4a-4fb9-8738-e3bda1d638ef
+---
+sequenceDiagram
+    participant UI as Sentient UI
+    participant API as API Service
+    participant ORCH as Orchestrator
+    participant Redis as Redis Pub/Sub
+    participant GW as MQTT Gateway
+    participant MQTT as MQTT Broker
+    participant TC1 as Controller 1
+    participant TC2 as Controller 2
+    participant TC3 as Controller 3
+
+    UI->>API: POST /scenes/{scene_id}/activate
+    API->>Redis: PUBLISH scene_activation_requested
+    Redis->>ORCH: Scene activation event
+
+    ORCH->>ORCH: Load scene definition from memory
+    Note over ORCH: Scene graph with:<br/>- Triggers<br/>- Actions<br/>- Timing<br/>- Logic nodes
+
+    loop For each action in scene
+        ORCH->>Redis: PUBLISH device_command event
+        Redis->>GW: Forward command
+
+        par Parallel device commands
+            GW->>MQTT: Publish to TC1
+            MQTT->>TC1: Execute action
+            GW->>MQTT: Publish to TC2
+            MQTT->>TC2: Execute action
+            GW->>MQTT: Publish to TC3
+            MQTT->>TC3: Execute action
+        end
+
+        alt Has delay node
+            ORCH->>ORCH: Wait specified duration
+        end
+    end
+
+    ORCH->>Redis: PUBLISH scene_completed event
+    Redis->>RTGW: Forward to UI
+    RTGW->>UI: WebSocket update
+    UI->>UI: Update scene status

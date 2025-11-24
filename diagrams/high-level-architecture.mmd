@@ -1,0 +1,81 @@
+---
+id: 89ac1be7-cdd4-4ed2-b62f-221cba7e608b
+---
+flowchart TB
+    subgraph Hardware["🔧 Hardware Layer"]
+        Teensy["Teensy 4.1 Controllers<br/>(I/O, Sensors, Actuators)"]
+        Pi["Raspberry Pi Controllers<br/>(Media, Complex Logic)"]
+        ESP["ESP32 Controllers<br/>(WiFi Devices)"]
+        Devices["Physical Devices<br/>(Locks, Lights, Sensors, Motors)"]
+    end
+
+    subgraph Messaging["📡 Messaging Infrastructure"]
+        MQTT["Mosquitto MQTT Broker<br/>Port 1883<br/>Category-First Topics"]
+        Redis["Redis Pub/Sub<br/>Port 6379<br/>Domain Events"]
+    end
+
+    subgraph Services["⚙️ Core Services"]
+        MQTTGW["MQTT Gateway<br/>Translation Layer"]
+        API["API Service<br/>REST + WebSocket<br/>Port 3001"]
+        ORCH["Orchestrator Service<br/>Game Logic Engine"]
+        RTGW["Realtime Gateway<br/>WebSocket Hub<br/>Port 3002"]
+    end
+
+    subgraph Data["💾 Data Layer"]
+        PG[("PostgreSQL<br/>Port 5432<br/>Source of Truth")]
+    end
+
+    subgraph UI["🖥️ User Interfaces"]
+        SentientUI["Sentient UI<br/>(React/Vite)<br/>Admin + GM Console"]
+    end
+
+    %% Hardware to MQTT
+    Teensy -->|"MQTT Publish<br/>sensors/*<br/>status/*"| MQTT
+    Pi -->|"MQTT Publish<br/>sensors/*<br/>status/*"| MQTT
+    ESP -->|"MQTT Publish<br/>sensors/*<br/>status/*"| MQTT
+    Devices -.->|Physical I/O| Teensy
+    Devices -.->|Physical I/O| Pi
+    Devices -.->|Physical I/O| ESP
+
+    %% MQTT to Services
+    MQTT <-->|"Subscribe/Publish<br/>All Topics"| MQTTGW
+
+    %% MQTT Gateway Flow
+    MQTTGW -->|"Publish<br/>Domain Events"| Redis
+    MQTTGW -->|"Register Controllers<br/>Register Devices"| API
+    Redis -->|"Subscribe<br/>Device Commands"| MQTTGW
+    MQTTGW -->|"MQTT Publish<br/>commands/*"| MQTT
+
+    %% Commands back to hardware
+    MQTT -->|"MQTT Subscribe<br/>commands/*"| Teensy
+    MQTT -->|"MQTT Subscribe<br/>commands/*"| Pi
+    MQTT -->|"MQTT Subscribe<br/>commands/*"| ESP
+
+    %% Orchestrator Flow
+    Redis <-->|"Subscribe/Publish<br/>Domain Events"| ORCH
+    ORCH <-->|"SQL Queries<br/>Game State"| PG
+
+    %% API Service Flow
+    API <-->|"CRUD Operations<br/>Prisma ORM"| PG
+    API -->|"Publish<br/>Commands"| Redis
+
+    %% Realtime Gateway Flow
+    Redis -->|"Subscribe<br/>Domain Events"| RTGW
+    RTGW -->|"WebSocket<br/>Broadcast"| SentientUI
+
+    %% UI Flow
+    SentientUI -->|"HTTP REST<br/>CRUD/Auth"| API
+    SentientUI <-->|"WebSocket<br/>Live Updates"| RTGW
+    SentientUI -->|"Device Commands"| API
+
+    classDef hardware fill:#2a3f5f,stroke:#00d9ff,stroke-width:2px,color:#fff
+    classDef messaging fill:#1a2332,stroke:#ffa832,stroke-width:2px,color:#fff
+    classDef services fill:#1a2332,stroke:#00d9ff,stroke-width:2px,color:#fff
+    classDef data fill:#2a1a32,stroke:#8b5cf6,stroke-width:2px,color:#fff
+    classDef ui fill:#1a2332,stroke:#00d9ff,stroke-width:3px,color:#fff
+
+    class Teensy,Pi,ESP,Devices hardware
+    class MQTT,Redis messaging
+    class MQTTGW,API,ORCH,RTGW services
+    class PG data
+    class SentientUI ui

@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTIENT — Scene Editor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-dark: #0d0d12;
+            --bg-card: rgba(18, 18, 24, 0.95);
+            --bg-card-solid: #121218;
+            --bg-hover: rgba(255, 255, 255, 0.03);
+            --bg-input: rgba(0, 0, 0, 0.3);
+            
+            --accent-orange: #ff8c42;
+            --accent-blue: #6366f1;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-pink: #f472b6;
+            --accent-purple: #a78bfa;
+            --accent-red: #f87171;
+            --accent-yellow: #fbbf24;
+            
+            --node-puzzle: #6366f1;
+            --node-effect: #f472b6;
+            --node-audio: #22d3ee;
+            --node-sensor: #34d399;
+            --node-timer: #fbbf24;
+            --node-logic: #a78bfa;
+            --node-trigger: #ff8c42;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-light: rgba(255, 255, 255, 0.1);
+            
+            --font-sans: 'DM Sans', 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-dark);
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+        }
+        
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            height: 56px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-subtle);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffb347 0%, #ff8c42 40%, #e85d04 100%);
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.4);
+        }
+        
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .top-nav {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-dark);
+            padding: 4px;
+            border-radius: 10px;
+        }
+        
+        .nav-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            color: var(--text-secondary);
+            background: var(--bg-hover);
+        }
+        
+        .nav-btn.active {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+        
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-hover);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+        
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5558e8;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Left Sidebar - Node Palette */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        .node-palette {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        
+        .palette-section {
+            margin-bottom: 20px;
+        }
+        
+        .palette-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            padding-left: 4px;
+        }
+        
+        .palette-node {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: grab;
+            transition: all 0.15s ease;
+        }
+        
+        .palette-node:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border-light);
+        }
+        
+        .palette-node:active {
+            cursor: grabbing;
+        }
+        
+        .palette-node-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .palette-node-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .palette-node-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .palette-node-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        /* Canvas Area */
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
+                var(--bg-dark);
+        }
+        
+        .canvas-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+        }
+        
+        #flow-canvas {
+            position: absolute;
+            inset: 0;
+        }
+        
+        .nodes-container {
+            position: absolute;
+            inset: 0;
+            overflow: visible;
+        }
+        
+        /* Flow Nodes */
+        .flow-node {
+            position: absolute;
+            min-width: 180px;
+            background: var(--bg-card-solid);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: move;
+            user-select: none;
+        }
+        
+        .flow-node.selected {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .flow-node-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-subtle);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .flow-node-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .flow-node-title {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .flow-node-menu {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .flow-node-menu:hover {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+        
+        .flow-node-body {
+            padding: 12px 14px;
+        }
+        
+        .flow-node-field {
+            margin-bottom: 10px;
+        }
+        
+        .flow-node-field:last-child {
+            margin-bottom: 0;
+        }
+        
+        .flow-node-label {
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        
+        .flow-node-value {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 6px 8px;
+            background: var(--bg-input);
+            border-radius: 4px;
+        }
+        
+        /* Connection Ports */
+        .flow-node-ports {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 14px 12px;
+        }
+        
+        .port-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .port {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        .port-input {
+            flex-direction: row;
+        }
+        
+        .port-output {
+            flex-direction: row-reverse;
+        }
+        
+        .port-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--bg-card-solid);
+            border: 2px solid var(--text-muted);
+            cursor: crosshair;
+            transition: all 0.15s ease;
+        }
+        
+        .port-dot:hover {
+            transform: scale(1.3);
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+        }
+        
+        .port-dot.connected {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+        
+        /* Right Panel - Properties */
+        .properties-panel {
+            width: 280px;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .properties-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .properties-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .properties-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        
+        .properties-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        
+        .property-group {
+            margin-bottom: 20px;
+        }
+        
+        .property-group-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        
+        .property-row {
+            margin-bottom: 12px;
+        }
+        
+        .property-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        .property-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+        }
+        
+        .property-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        .property-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        /* Scene Info */
+        .scene-info {
+            padding: 16px;
+            background: var(--bg-hover);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .scene-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .scene-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* Bottom Toolbar */
+        .canvas-toolbar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .toolbar-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        
+        .toolbar-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            background: var(--border-subtle);
+            margin: 4px 4px;
+        }
+        
+        .zoom-display {
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="top-bar">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">Sentient</div>
+            </div>
+            
+            <nav class="top-nav">
+                <button class="nav-btn">Overview</button>
+                <button class="nav-btn">Rooms</button>
+                <button class="nav-btn active">Scenes</button>
+                <button class="nav-btn">Puzzles</button>
+                <button class="nav-btn">Effects</button>
+                <button class="nav-btn">Settings</button>
+            </nav>
+            
+            <div class="top-actions">
+                <button class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Preview
+                </button>
+                <button class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                        <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Save Scene
+                </button>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <!-- Left Sidebar - Node Palette -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">Components</div>
+                    <input type="text" class="search-input" placeholder="Search components...">
+                </div>
+                
+                <div class="node-palette">
+                    <div class="palette-section">
+                        <div class="palette-section-title">Triggers</div>
+                        
+                        <div class="palette-node" draggable="true" data-type="trigger" data-subtype="scene-start">
+                            <div class="palette-node-icon" style="background: rgba(255, 140, 66, 0.2); color: var(--node-trigger);">▶</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Scene Start</div>
+                                <div class="palette-node-desc">Triggers when scene begins</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="sensor" data-subtype="button">
+                            <div class="palette-node-icon" style="background: rgba(52, 211, 153, 0.2); color: var(--node-sensor);">◉</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Button Press</div>
+                                <div class="palette-node-desc">Physical button trigger</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="sensor" data-subtype="rfid">
+                            <div class="palette-node-icon" style="background: rgba(52, 211, 153, 0.2); color: var(--node-sensor);">⊡</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">RFID Scan</div>
+                                <div class="palette-node-desc">RFID tag detection</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="sensor" data-subtype="weight">
+                            <div class="palette-node-icon" style="background: rgba(52, 211, 153, 0.2); color: var(--node-sensor);">⚖</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Weight Sensor</div>
+                                <div class="palette-node-desc">Load cell threshold</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="palette-section">
+                        <div class="palette-section-title">Puzzles</div>
+                        
+                        <div class="palette-node" draggable="true" data-type="puzzle" data-subtype="sequence">
+                            <div class="palette-node-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--node-puzzle);">⧉</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Sequence Check</div>
+                                <div class="palette-node-desc">Verify input sequence</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="puzzle" data-subtype="combination">
+                            <div class="palette-node-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--node-puzzle);">🔐</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Combination Lock</div>
+                                <div class="palette-node-desc">Code verification</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="puzzle" data-subtype="pattern">
+                            <div class="palette-node-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--node-puzzle);">◫</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Pattern Match</div>
+                                <div class="palette-node-desc">Compare pattern input</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="palette-section">
+                        <div class="palette-section-title">Effects</div>
+                        
+                        <div class="palette-node" draggable="true" data-type="effect" data-subtype="light">
+                            <div class="palette-node-icon" style="background: rgba(244, 114, 182, 0.2); color: var(--node-effect);">💡</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Lighting</div>
+                                <div class="palette-node-desc">Control lights/LEDs</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="effect" data-subtype="servo">
+                            <div class="palette-node-icon" style="background: rgba(244, 114, 182, 0.2); color: var(--node-effect);">⚙</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Servo/Motor</div>
+                                <div class="palette-node-desc">Mechanical movement</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="effect" data-subtype="fog">
+                            <div class="palette-node-icon" style="background: rgba(244, 114, 182, 0.2); color: var(--node-effect);">☁</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Fog Machine</div>
+                                <div class="palette-node-desc">Atmospheric effect</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="effect" data-subtype="maglock">
+                            <div class="palette-node-icon" style="background: rgba(244, 114, 182, 0.2); color: var(--node-effect);">🔓</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Mag Lock</div>
+                                <div class="palette-node-desc">Door/compartment lock</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="palette-section">
+                        <div class="palette-section-title">Audio</div>
+                        
+                        <div class="palette-node" draggable="true" data-type="audio" data-subtype="sfx">
+                            <div class="palette-node-icon" style="background: rgba(34, 211, 238, 0.2); color: var(--node-audio);">🔊</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Sound Effect</div>
+                                <div class="palette-node-desc">Play audio clip</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="audio" data-subtype="music">
+                            <div class="palette-node-icon" style="background: rgba(34, 211, 238, 0.2); color: var(--node-audio);">♫</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Background Music</div>
+                                <div class="palette-node-desc">Ambient/loop audio</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="audio" data-subtype="voice">
+                            <div class="palette-node-icon" style="background: rgba(34, 211, 238, 0.2); color: var(--node-audio);">🎤</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Voice Line</div>
+                                <div class="palette-node-desc">Narration/dialogue</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="palette-section">
+                        <div class="palette-section-title">Logic</div>
+                        
+                        <div class="palette-node" draggable="true" data-type="logic" data-subtype="delay">
+                            <div class="palette-node-icon" style="background: rgba(167, 139, 250, 0.2); color: var(--node-logic);">⏱</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Delay</div>
+                                <div class="palette-node-desc">Wait before continuing</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="logic" data-subtype="branch">
+                            <div class="palette-node-icon" style="background: rgba(167, 139, 250, 0.2); color: var(--node-logic);">⑂</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Branch</div>
+                                <div class="palette-node-desc">Conditional split</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="logic" data-subtype="loop">
+                            <div class="palette-node-icon" style="background: rgba(167, 139, 250, 0.2); color: var(--node-logic);">↻</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Loop</div>
+                                <div class="palette-node-desc">Repeat action</div>
+                            </div>
+                        </div>
+                        
+                        <div class="palette-node" draggable="true" data-type="timer" data-subtype="countdown">
+                            <div class="palette-node-icon" style="background: rgba(251, 191, 36, 0.2); color: var(--node-timer);">⏲</div>
+                            <div class="palette-node-info">
+                                <div class="palette-node-name">Timer</div>
+                                <div class="palette-node-desc">Countdown trigger</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Canvas Area -->
+            <div class="canvas-container" id="canvas-container">
+                <div class="canvas-grid"></div>
+                <svg id="flow-canvas"></svg>
+                <div class="nodes-container" id="nodes-container"></div>
+                
+                <div class="canvas-toolbar">
+                    <button class="toolbar-btn" title="Select">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
+                        </svg>
+                    </button>
+                    <button class="toolbar-btn" title="Pan">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 9l-3 3 3 3"/>
+                            <path d="M9 5l3-3 3 3"/>
+                            <path d="M15 19l-3 3-3-3"/>
+                            <path d="M19 9l3 3-3 3"/>
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                            <line x1="12" y1="2" x2="12" y2="22"/>
+                        </svg>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button class="toolbar-btn" title="Zoom In">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            <line x1="11" y1="8" x2="11" y2="14"/>
+                            <line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                    </button>
+                    <div class="zoom-display">100%</div>
+                    <button class="toolbar-btn" title="Zoom Out">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            <line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button class="toolbar-btn" title="Fit View">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                            <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                            <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                            <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                        </svg>
+                    </button>
+                    <button class="toolbar-btn" title="Delete Selected">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Panel - Properties -->
+            <aside class="properties-panel">
+                <div class="properties-header">
+                    <div class="properties-title">Scene Properties</div>
+                    <div class="properties-subtitle">Pharaohs - Opening Sequence</div>
+                </div>
+                
+                <div class="properties-body">
+                    <div class="scene-info">
+                        <div class="scene-name">Opening Sequence</div>
+                        <div class="scene-meta">Pharaohs Room • 8 nodes • 7 connections</div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <div class="property-group-title">Scene Settings</div>
+                        
+                        <div class="property-row">
+                            <div class="property-label">Scene Name</div>
+                            <input type="text" class="property-input" value="Opening Sequence">
+                        </div>
+                        
+                        <div class="property-row">
+                            <div class="property-label">Room</div>
+                            <select class="property-select">
+                                <option selected>Return of the Pharaohs</option>
+                                <option>Clockwork Corridor</option>
+                                <option>Quantum Breach</option>
+                                <option>The Haunting</option>
+                            </select>
+                        </div>
+                        
+                        <div class="property-row">
+                            <div class="property-label">Trigger Mode</div>
+                            <select class="property-select">
+                                <option selected>Manual Start</option>
+                                <option>Auto on Room Start</option>
+                                <option>Scheduled</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <div class="property-group-title">Selected Node</div>
+                        <div style="color: var(--text-muted); font-size: 12px; padding: 20px; text-align: center; background: var(--bg-hover); border-radius: 8px;">
+                            Select a node to edit its properties
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+    
+    <script>
+        // State
+        let nodes = [];
+        let connections = [];
+        let selectedNode = null;
+        let draggingNode = null;
+        let dragOffset = { x: 0, y: 0 };
+        let connectingFrom = null;
+        let nodeIdCounter = 0;
+        
+        const nodesContainer = document.getElementById('nodes-container');
+        const flowCanvas = document.getElementById('flow-canvas');
+        const canvasContainer = document.getElementById('canvas-container');
+        
+        // Node type configurations
+        const nodeConfigs = {
+            trigger: { color: '#ff8c42', icon: '▶', title: 'Scene Start' },
+            sensor: { color: '#34d399', icon: '◉', title: 'Sensor' },
+            puzzle: { color: '#6366f1', icon: '⧉', title: 'Puzzle' },
+            effect: { color: '#f472b6', icon: '💡', title: 'Effect' },
+            audio: { color: '#22d3ee', icon: '🔊', title: 'Audio' },
+            logic: { color: '#a78bfa', icon: '⑂', title: 'Logic' },
+            timer: { color: '#fbbf24', icon: '⏱', title: 'Timer' }
+        };
+        
+        const subtypeNames = {
+            'scene-start': 'Scene Start',
+            'button': 'Button Press',
+            'rfid': 'RFID Scan',
+            'weight': 'Weight Sensor',
+            'sequence': 'Sequence Check',
+            'combination': 'Combination Lock',
+            'pattern': 'Pattern Match',
+            'light': 'Lighting',
+            'servo': 'Servo/Motor',
+            'fog': 'Fog Machine',
+            'maglock': 'Mag Lock',
+            'sfx': 'Sound Effect',
+            'music': 'Background Music',
+            'voice': 'Voice Line',
+            'delay': 'Delay',
+            'branch': 'Branch',
+            'loop': 'Loop',
+            'countdown': 'Timer'
+        };
+        
+        const subtypeIcons = {
+            'scene-start': '▶',
+            'button': '◉',
+            'rfid': '⊡',
+            'weight': '⚖',
+            'sequence': '⧉',
+            'combination': '🔐',
+            'pattern': '◫',
+            'light': '💡',
+            'servo': '⚙',
+            'fog': '☁',
+            'maglock': '🔓',
+            'sfx': '🔊',
+            'music': '♫',
+            'voice': '🎤',
+            'delay': '⏱',
+            'branch': '⑂',
+            'loop': '↻',
+            'countdown': '⏲'
+        };
+        
+        // Create a flow node element
+        function createNodeElement(nodeData) {
+            const config = nodeConfigs[nodeData.type];
+            const el = document.createElement('div');
+            el.className = 'flow-node';
+            el.dataset.nodeId = nodeData.id;
+            el.style.left = nodeData.x + 'px';
+            el.style.top = nodeData.y + 'px';
+            
+            const icon = subtypeIcons[nodeData.subtype] || config.icon;
+            const title = subtypeNames[nodeData.subtype] || config.title;
+            
+            el.innerHTML = `
+                <div class="flow-node-header">
+                    <div class="flow-node-icon" style="background: ${config.color}22; color: ${config.color};">${icon}</div>
+                    <div class="flow-node-title">${title}</div>
+                    <div class="flow-node-menu">⋮</div>
+                </div>
+                <div class="flow-node-body">
+                    <div class="flow-node-field">
+                        <div class="flow-node-label">Status</div>
+                        <div class="flow-node-value">Ready</div>
+                    </div>
+                </div>
+                <div class="flow-node-ports">
+                    <div class="port-group">
+                        ${nodeData.type !== 'trigger' ? '<div class="port port-input"><div class="port-dot" data-port="input"></div><span>In</span></div>' : ''}
+                    </div>
+                    <div class="port-group">
+                        <div class="port port-output"><span>Out</span><div class="port-dot" data-port="output"></div></div>
+                        ${nodeData.type === 'logic' && nodeData.subtype === 'branch' ? '<div class="port port-output"><span>Else</span><div class="port-dot" data-port="else"></div></div>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Drag handling
+            el.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('port-dot')) return;
+                
+                selectNode(nodeData.id);
+                draggingNode = nodeData;
+                const rect = el.getBoundingClientRect();
+                dragOffset = {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+                e.preventDefault();
+            });
+            
+            // Port connection handling
+            el.querySelectorAll('.port-dot').forEach(port => {
+                port.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    const portType = port.dataset.port;
+                    if (portType === 'output' || portType === 'else') {
+                        connectingFrom = { nodeId: nodeData.id, port: portType };
+                    }
+                });
+                
+                port.addEventListener('mouseup', (e) => {
+                    const portType = port.dataset.port;
+                    if (connectingFrom && portType === 'input' && connectingFrom.nodeId !== nodeData.id) {
+                        addConnection(connectingFrom.nodeId, connectingFrom.port, nodeData.id, 'input');
+                    }
+                    connectingFrom = null;
+                });
+            });
+            
+            return el;
+        }
+        
+        // Add a node
+        function addNode(type, subtype, x, y) {
+            const nodeData = {
+                id: 'node-' + (++nodeIdCounter),
+                type,
+                subtype,
+                x,
+                y
+            };
+            nodes.push(nodeData);
+            
+            const el = createNodeElement(nodeData);
+            nodesContainer.appendChild(el);
+            
+            return nodeData;
+        }
+        
+        // Select a node
+        function selectNode(nodeId) {
+            document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('selected'));
+            selectedNode = nodeId;
+            if (nodeId) {
+                const el = document.querySelector(`[data-node-id="${nodeId}"]`);
+                if (el) el.classList.add('selected');
+            }
+        }
+        
+        // Add a connection
+        function addConnection(fromNodeId, fromPort, toNodeId, toPort) {
+            // Check if connection already exists
+            const exists = connections.some(c => 
+                c.from === fromNodeId && c.fromPort === fromPort && 
+                c.to === toNodeId && c.toPort === toPort
+            );
+            if (exists) return;
+            
+            connections.push({
+                from: fromNodeId,
+                fromPort,
+                to: toNodeId,
+                toPort
+            });
+            
+            // Mark ports as connected
+            const fromEl = document.querySelector(`[data-node-id="${fromNodeId}"] .port-dot[data-port="${fromPort}"]`);
+            const toEl = document.querySelector(`[data-node-id="${toNodeId}"] .port-dot[data-port="${toPort}"]`);
+            if (fromEl) fromEl.classList.add('connected');
+            if (toEl) toEl.classList.add('connected');
+            
+            drawConnections();
+        }
+        
+        // Draw all connections
+        function drawConnections() {
+            const containerRect = canvasContainer.getBoundingClientRect();
+            
+            let svg = `<svg width="100%" height="100%" style="position:absolute;top:0;left:0;pointer-events:none;">`;
+            
+            connections.forEach(conn => {
+                const fromNode = document.querySelector(`[data-node-id="${conn.from}"]`);
+                const toNode = document.querySelector(`[data-node-id="${conn.to}"]`);
+                
+                if (!fromNode || !toNode) return;
+                
+                const fromPort = fromNode.querySelector(`.port-dot[data-port="${conn.fromPort}"]`);
+                const toPort = toNode.querySelector(`.port-dot[data-port="${conn.toPort}"]`);
+                
+                if (!fromPort || !toPort) return;
+                
+                const fromRect = fromPort.getBoundingClientRect();
+                const toRect = toPort.getBoundingClientRect();
+                
+                const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
+                const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
+                const x2 = toRect.left + toRect.width / 2 - containerRect.left;
+                const y2 = toRect.top + toRect.height / 2 - containerRect.top;
+                
+                // Bezier curve
+                const dx = Math.abs(x2 - x1) * 0.5;
+                const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+                
+                svg += `<path d="${path}" fill="none" stroke="rgba(99, 102, 241, 0.5)" stroke-width="2"/>`;
+                svg += `<path d="${path}" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="6"/>`;
+            });
+            
+            svg += `</svg>`;
+            flowCanvas.outerHTML = svg.replace('<svg', '<svg id="flow-canvas"');
+        }
+        
+        // Mouse move handler
+        document.addEventListener('mousemove', (e) => {
+            if (draggingNode) {
+                const containerRect = canvasContainer.getBoundingClientRect();
+                const x = e.clientX - containerRect.left - dragOffset.x;
+                const y = e.clientY - containerRect.top - dragOffset.y;
+                
+                draggingNode.x = Math.max(0, x);
+                draggingNode.y = Math.max(0, y);
+                
+                const el = document.querySelector(`[data-node-id="${draggingNode.id}"]`);
+                if (el) {
+                    el.style.left = draggingNode.x + 'px';
+                    el.style.top = draggingNode.y + 'px';
+                }
+                
+                drawConnections();
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            draggingNode = null;
+            connectingFrom = null;
+        });
+        
+        // Palette drag and drop
+        document.querySelectorAll('.palette-node').forEach(paletteNode => {
+            paletteNode.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('nodeType', paletteNode.dataset.type);
+                e.dataTransfer.setData('nodeSubtype', paletteNode.dataset.subtype);
+            });
+        });
+        
+        canvasContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+        
+        canvasContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('nodeType');
+            const subtype = e.dataTransfer.getData('nodeSubtype');
+            
+            if (type) {
+                const containerRect = canvasContainer.getBoundingClientRect();
+                const x = e.clientX - containerRect.left - 90;
+                const y = e.clientY - containerRect.top - 40;
+                addNode(type, subtype, x, y);
+            }
+        });
+        
+        // Click to deselect
+        canvasContainer.addEventListener('click', (e) => {
+            if (e.target === canvasContainer || e.target.classList.contains('canvas-grid')) {
+                selectNode(null);
+            }
+        });
+        
+        // Initialize with some example nodes
+        function initExample() {
+            const startNode = addNode('trigger', 'scene-start', 80, 200);
+            const delayNode = addNode('logic', 'delay', 320, 120);
+            const audioNode = addNode('audio', 'voice', 320, 280);
+            const lightNode = addNode('effect', 'light', 560, 80);
+            const sensorNode = addNode('sensor', 'rfid', 560, 200);
+            const puzzleNode = addNode('puzzle', 'sequence', 560, 320);
+            const effectNode = addNode('effect', 'maglock', 800, 200);
+            
+            setTimeout(() => {
+                addConnection(startNode.id, 'output', delayNode.id, 'input');
+                addConnection(startNode.id, 'output', audioNode.id, 'input');
+                addConnection(delayNode.id, 'output', lightNode.id, 'input');
+                addConnection(delayNode.id, 'output', sensorNode.id, 'input');
+                addConnection(audioNode.id, 'output', puzzleNode.id, 'input');
+                addConnection(sensorNode.id, 'output', effectNode.id, 'input');
+                addConnection(puzzleNode.id, 'output', effectNode.id, 'input');
+            }, 100);
+        }
+        
+        initExample();
+    </script>
+</body>
+</html>

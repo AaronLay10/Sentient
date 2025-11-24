@@ -30,11 +30,11 @@ SentientMQTT::SentientMQTT(const SentientMQTTConfig &config)
 
 bool SentientMQTT::begin()
 {
-  // Either puzzleId (controller) or deviceId must be set for identification
-  if ((!_config.puzzleId || _config.puzzleId[0] == '\0') &&
+  // Either controllerId (controller) or deviceId must be set for identification
+  if ((!_config.controllerId || _config.controllerId[0] == '\0') &&
       (!_config.deviceId || _config.deviceId[0] == '\0'))
   {
-    Serial.println(F("[SentientMQTT] puzzleId (controller_id) or deviceId is required"));
+    Serial.println(F("[SentientMQTT] controllerId (controller_id) or deviceId is required"));
     return false;
   }
 
@@ -160,7 +160,7 @@ bool SentientMQTT::publishState(const char *state)
   {
     doc["deviceId"] = _config.deviceId;
   }
-  return publishJson("status", "state", doc, true);
+  return publishJson("status", "state", doc, false);
 }
 
 bool SentientMQTT::publishState(const char *state, const JsonDocument &extras)
@@ -178,7 +178,7 @@ bool SentientMQTT::publishState(const char *state, const JsonDocument &extras)
   {
     doc[kv.key()] = kv.value();
   }
-  return publishJson("status", "state", doc, true);
+  return publishJson("status", "state", doc, false);
 }
 
 bool SentientMQTT::publishEvent(const char *eventName, const JsonDocument &payload)
@@ -228,9 +228,9 @@ bool SentientMQTT::publishHeartbeat()
     {
       doc["roomId"] = _config.roomId;
     }
-    if (_config.puzzleId)
+    if (_config.controllerId)
     {
-      doc["puzzleId"] = _config.puzzleId;
+      doc["controllerId"] = _config.controllerId;
     }
   }
 
@@ -434,7 +434,7 @@ void SentientMQTT::ensureConnected()
         _onConnect(_onConnectContext);
       }
       String onlinePayload = buildConnectionPayload("online");
-      publishRaw(buildTopic("status", "connection"), onlinePayload.c_str(), true);
+      publishRaw(buildTopic("status", "connection"), onlinePayload.c_str(), false);
     }
     return;
   }
@@ -512,10 +512,10 @@ void SentientMQTT::ensureConnected()
       topic += _config.roomId;
     }
     topic += "/commands/";
-    // controller (puzzleId)
-    if (_config.puzzleId && _config.puzzleId[0] != '\0')
+    // controller (controllerId)
+    if (_config.controllerId && _config.controllerId[0] != '\0')
     {
-      topic += _config.puzzleId;
+      topic += _config.controllerId;
     }
     topic += "/#";
 
@@ -531,7 +531,7 @@ void SentientMQTT::ensureConnected()
 
   _wasConnected = true;
   _lastHeartbeat = millis();
-  publishRaw(willTopic, buildConnectionPayload("online").c_str(), true);
+  publishRaw(willTopic, buildConnectionPayload("online").c_str(), false);
 }
 
 void SentientMQTT::handleIncoming(char *topic, uint8_t *payload, unsigned int length)
@@ -620,7 +620,7 @@ String SentientMQTT::buildTopic(const char *category, const char *item) const
   appendSegment(_config.namespaceId ? _config.namespaceId : "paragon");
   appendSegment(_config.roomId);
   appendSegment(category);
-  appendSegment(_config.puzzleId); // This is controller_id
+  appendSegment(_config.controllerId);
   appendSegment(_config.deviceId);
   appendSegment(item);
 
@@ -630,10 +630,10 @@ String SentientMQTT::buildTopic(const char *category, const char *item) const
 String SentientMQTT::buildClientId() const
 {
   String clientId;
-  // Use puzzleId (controller_id) for client ID, not deviceId
-  if (_config.puzzleId)
+  // Use controllerId (controller_id) for client ID, not deviceId
+  if (_config.controllerId)
   {
-    clientId += _config.puzzleId;
+    clientId += _config.controllerId;
   }
   else if (_config.deviceId)
   {
@@ -661,9 +661,9 @@ String SentientMQTT::buildConnectionPayload(const char *state) const
   {
     doc["roomId"] = _config.roomId;
   }
-  if (_config.puzzleId)
+  if (_config.controllerId)
   {
-    doc["puzzleId"] = _config.puzzleId;
+    doc["controllerId"] = _config.controllerId;
   }
 
   String payload;

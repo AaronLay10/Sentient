@@ -44,26 +44,28 @@ const client = mqtt.connect(MQTT_URL, {
 client.on('connect', () => {
   console.log('✅ Connected to MQTT broker');
 
-  // Subscribe to registration topics (new Sentient v4 format)
-  const sentientTopics = [
+  // Subscribe to registration topics (Sentient v4 system-level)
+  const registrationTopics = [
     'sentient/system/register/controller',
     'sentient/system/register/device',
-    // Subscribe to all device state changes
-    'sentient/room/+/controller/+/device/+/state',
-    // Subscribe to all controller heartbeats
-    'sentient/room/+/controller/+/heartbeat',
-    // Subscribe to all controller status updates
-    'sentient/room/+/controller/+/status',
   ];
 
-  // Subscribe to legacy Paragon/Clockwork operational topics
-  const legacyTopics = [
-    'paragon/clockwork/status/#',    // All status messages (connection, heartbeat)
-    'paragon/clockwork/sensors/#',   // All sensor data
-    'paragon/clockwork/commands/#',  // All commands
+  // Subscribe to Sentient v4 operational topics (category-first structure)
+  // Pattern: <tenant>/<room_id>/<category>/<controller_id>/<device_id>/<action_or_sensor>
+  const sentientTopics = [
+    'sentient/+/commands/#',   // All commands across all Sentient rooms
+    'sentient/+/sensors/#',    // All sensor data across all Sentient rooms
+    'sentient/+/status/#',     // All status messages across all Sentient rooms
   ];
 
-  [...sentientTopics, ...legacyTopics].forEach(topic => {
+  // Subscribe to Paragon operational topics (uses same category-first structure)
+  const paragonTopics = [
+    'paragon/+/commands/#',    // All commands across all Paragon rooms
+    'paragon/+/sensors/#',     // All sensor data across all Paragon rooms
+    'paragon/+/status/#',      // All status messages across all Paragon rooms
+  ];
+
+  [...registrationTopics, ...sentientTopics, ...paragonTopics].forEach(topic => {
     client.subscribe(topic, { qos: 1 }, (err) => {
       if (err) {
         console.error(`❌ Failed to subscribe to ${topic}:`, err);
@@ -86,7 +88,7 @@ client.on('message', async (topic, message) => {
   try {
     const payload = JSON.parse(message.toString());
 
-    // Handle Sentient v4 registration topics
+    // Handle registration topics
     if (topic === 'sentient/system/register/controller') {
       console.log(`📥 Controller registration:`, JSON.stringify(payload, null, 2));
       await registerController(payload);
@@ -94,64 +96,66 @@ client.on('message', async (topic, message) => {
       console.log(`📥 Device registration:`, JSON.stringify(payload, null, 2));
       await registerDevice(payload);
     }
-    // Handle Sentient v4 operational topics
-    else if (topic.startsWith('sentient/room/') && topic.includes('/device/') && topic.endsWith('/state')) {
-      console.log(`📥 Device state change on ${topic}`);
-      await handleDeviceStateChange(topic, payload);
-    } else if (topic.startsWith('sentient/room/') && topic.endsWith('/heartbeat')) {
-      console.log(`💓 Controller heartbeat on ${topic}`);
-      await handleControllerHeartbeat(topic, payload);
-    } else if (topic.startsWith('sentient/room/') && topic.endsWith('/status')) {
-      console.log(`📊 Controller status on ${topic}`);
-      await handleControllerStatus(topic, payload);
-    }
-    // Handle legacy Paragon/Clockwork topics
-    else if (topic.startsWith('paragon/clockwork/')) {
-      await handleLegacyTopic(topic, payload);
+    // Handle category-first operational topics
+    // Pattern: <tenant>/<room_id>/<category>/<controller_id>/<device_id>/<action_or_sensor>
+    else if (topic.includes('/sensors/')) {
+      await handleCategoryFirstTopic(topic, payload, 'sensors');
+    } else if (topic.includes('/status/')) {
+      await handleCategoryFirstTopic(topic, payload, 'status');
+    } else if (topic.includes('/commands/')) {
+      // Commands are handled by controllers, not gateway (except for logging)
+      console.log(`📥 Command published on ${topic}:`, payload);
     }
   } catch (error) {
     console.error(`❌ Error processing message from ${topic}:`, error);
   }
 });
 
-async function handleLegacyTopic(topic: string, payload: any): Promise<void> {
+async function handleCategoryFirstTopic(topic: string, payload: any, category: string): Promise<void> {
   try {
-    // Parse legacy topic: paragon/clockwork/{type}/{puzzle_id}/{device_id}/{message_type}
+    // Parse category-first topic: <tenant>/<room_id>/<category>/<controller_id>/<device_id?>/<action_or_sensor?>
     const topicParts = topic.split('/');
 
-    if (topicParts.length < 5) {
+    if (topicParts.length < 4) {
       return; // Skip malformed topics
     }
 
-    const tenant = topicParts[0];      // 'paragon'
-    const room_id = topicParts[1];     // 'clockwork'
-    const messageCategory = topicParts[2]; // 'status' or 'sensors'
-    const puzzle_id = topicParts[3];   // e.g., 'riddle', 'clock', 'gear'
-    const device_id = topicParts[4];   // e.g., 'riddle', 'clock', device name
-    const messageType = topicParts[5]; // e.g., 'connection', 'heartbeat', 'button_1'
-
-    // Map puzzle_id to controller_id (they're often the same in legacy format)
-    const controller_id = puzzle_id;
+    const tenant = topicParts[0];           // 'paragon' or 'sentient'
+    const room_id = topicParts[1];          // 'clockwork', etc.
+    const messageCategory = topicParts[2];  // 'sensors', 'status', 'commands'
+    const controller_id = topicParts[3];    // 'power_control_upper_right', etc.
+    const device_id = topicParts[4];        // 'main_lighting_24v', etc. (optional for status)
+    const messageType = topicParts[5];      // 'state', 'heartbeat', 'connection', etc. (optional)
 
     let eventType: EventType | null = null;
     let eventPayload: any = payload;
 
-    // Determine event type based on topic structure
-    if (messageCategory === 'status') {
-      if (messageType === 'heartbeat') {
+    // Determine event type based on category
+    if (category === 'status') {
+      if (messageType === 'heartbeat' || topic.endsWith('/heartbeat')) {
         eventType = EventType.CONTROLLER_HEARTBEAT;
-        console.log(`💓 Legacy heartbeat: ${controller_id}`);
-      } else if (messageType === 'connection') {
-        // Connection status indicates online/offline
+        console.log(`💓 Heartbeat: ${controller_id}`);
+      } else if (messageType === 'connection' || topic.endsWith('/connection')) {
         eventType = payload.state === 'online' ? EventType.CONTROLLER_ONLINE : EventType.CONTROLLER_OFFLINE;
-        console.log(`📡 Legacy connection status: ${controller_id} -> ${payload.state}`);
+        console.log(`📡 Connection status: ${controller_id} -> ${payload.state}`);
+      } else if (messageType === 'state' || topic.endsWith('/state')) {
+        // Device state updates on status topics (from Teensy firmware acknowledgements)
+        eventType = EventType.DEVICE_STATE_CHANGED;
+        console.log(`📊 Device state update: ${controller_id}/${device_id}/${messageType || 'state'}`);
+
+        // Normalize payload structure
+        eventPayload = {
+          previous_state: null,
+          new_state: payload,
+          raw_mqtt_payload: payload,
+        };
       }
-    } else if (messageCategory === 'sensors') {
+    } else if (category === 'sensors') {
       // Sensor data = device state change
       eventType = EventType.DEVICE_STATE_CHANGED;
-      console.log(`📊 Legacy sensor data: ${device_id}/${messageType}`);
+      console.log(`📊 Sensor data: ${controller_id}/${device_id}/${messageType || 'state'}`);
 
-      // Reformat payload to match new structure
+      // Normalize payload structure
       eventPayload = {
         previous_state: null,
         new_state: payload,
@@ -167,115 +171,20 @@ async function handleLegacyTopic(topic: string, payload: any): Promise<void> {
         tenant_id: tenant,
         room_id: room_id,
         controller_id: controller_id,
-        device_id: device_id,
-        puzzle_id: puzzle_id,
+        device_id: device_id || controller_id, // Use controller_id if no device_id
         payload: eventPayload,
         timestamp: new Date(payload.timestamp || Date.now()),
         metadata: {
           source: 'mqtt-gateway',
           mqtt_topic: topic,
-          legacy_format: true,
         },
       };
 
       await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
-      console.log(`✅ Published legacy event: ${eventType} for ${controller_id}/${device_id}`);
+      console.log(`✅ Published event: ${eventType} for ${controller_id}${device_id ? '/' + device_id : ''}`);
     }
   } catch (error) {
-    console.error('❌ Error handling legacy topic:', error);
-  }
-}
-
-async function handleDeviceStateChange(topic: string, payload: any): Promise<void> {
-  try {
-    // Parse topic to extract room_id, controller_id, device_id
-    const topicParts = topic.split('/');
-    const room_id = topicParts[2];
-    const controller_id = topicParts[4];
-    const device_id = topicParts[6];
-
-    // Create domain event
-    const domainEvent = {
-      event_id: uuidv4(),
-      type: EventType.DEVICE_STATE_CHANGED,
-      room_id,
-      controller_id,
-      device_id,
-      payload: {
-        previous_state: null, // We don't track previous state in this simple implementation
-        new_state: payload.state,
-        raw_mqtt_payload: payload,
-      },
-      timestamp: new Date(payload.timestamp || Date.now()),
-      metadata: {
-        source: 'mqtt-gateway',
-        mqtt_topic: topic,
-      },
-    };
-
-    // Publish to Redis domain events channel
-    await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
-
-    console.log(`✅ Published DEVICE_STATE_CHANGED event: ${device_id} in room ${room_id}`);
-  } catch (error) {
-    console.error('❌ Error handling device state change:', error);
-  }
-}
-
-async function handleControllerHeartbeat(topic: string, payload: any): Promise<void> {
-  try {
-    const topicParts = topic.split('/');
-    const room_id = topicParts[2];
-    const controller_id = topicParts[4];
-
-    const domainEvent = {
-      event_id: uuidv4(),
-      type: EventType.CONTROLLER_HEARTBEAT,
-      room_id,
-      controller_id,
-      payload: payload,
-      timestamp: new Date(payload.timestamp || Date.now()),
-      metadata: {
-        source: 'mqtt-gateway',
-        mqtt_topic: topic,
-      },
-    };
-
-    await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
-
-    console.log(`💓 Published CONTROLLER_HEARTBEAT event: ${controller_id} in room ${room_id}`);
-  } catch (error) {
-    console.error('❌ Error handling controller heartbeat:', error);
-  }
-}
-
-async function handleControllerStatus(topic: string, payload: any): Promise<void> {
-  try {
-    const topicParts = topic.split('/');
-    const room_id = topicParts[2];
-    const controller_id = topicParts[4];
-
-    // Determine if controller is online or offline based on status
-    const eventType = payload.online ? EventType.CONTROLLER_ONLINE : EventType.CONTROLLER_OFFLINE;
-
-    const domainEvent = {
-      event_id: uuidv4(),
-      type: eventType,
-      room_id,
-      controller_id,
-      payload: payload,
-      timestamp: new Date(payload.timestamp || Date.now()),
-      metadata: {
-        source: 'mqtt-gateway',
-        mqtt_topic: topic,
-      },
-    };
-
-    await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
-
-    console.log(`📊 Published ${eventType} event: ${controller_id} in room ${room_id}`);
-  } catch (error) {
-    console.error('❌ Error handling controller status:', error);
+    console.error('❌ Error handling category-first topic:', error);
   }
 }
 
@@ -343,5 +252,46 @@ const shutdown = async () => {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
+
+// Subscribe to device command events from Redis
+const redisSubscriber = new Redis(REDIS_URL);
+redisSubscriber.subscribe('sentient:commands:device', (err) => {
+  if (err) {
+    console.error('❌ Failed to subscribe to device commands channel:', err);
+  } else {
+    console.log('📬 Subscribed to Redis device commands channel');
+  }
+});
+
+redisSubscriber.on('message', async (channel, message) => {
+  if (channel === 'sentient:commands:device') {
+    try {
+      const commandEvent = JSON.parse(message);
+      console.log(`📤 Received device command:`, commandEvent);
+
+      const { controller_id, room_id, command } = commandEvent;
+
+      // Determine the action based on state (power_on or power_off)
+      const action = command.state ? 'power_on' : 'power_off';
+
+      // Publish to legacy Paragon MQTT topic matching Teensy firmware expectations
+      // Format: paragon/{room_id}/commands/{controller_id}/{device_id}/{action}
+      const topic = `paragon/${room_id}/commands/${controller_id}/${command.device_id}/${action}`;
+      const payload = {
+        device_id: command.device_id,
+      };
+
+      client.publish(topic, JSON.stringify(payload), { qos: 1, retain: false }, (err) => {
+        if (err) {
+          console.error(`❌ Failed to publish command to ${topic}:`, err);
+        } else {
+          console.log(`✅ Published command to ${topic}:`, payload);
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error processing device command:', error);
+    }
+  }
+});
 
 console.log('✅ MQTT Gateway ready and listening for messages');

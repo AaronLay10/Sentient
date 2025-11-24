@@ -6,48 +6,48 @@ import { UpdateVenueDto } from './dto/update-venue.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('tenants/:tenantId/venues')
+@Controller('clients/:clientId/venues')
 export class VenuesController {
   constructor(private readonly venuesService: VenuesService) {}
 
   @Get()
   async list(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Query() query: ListVenuesDto
   ) {
-    return this.venuesService.listByTenant(tenantId, query);
+    return this.venuesService.listByClient(clientId, query);
   }
 
   @Get(':id')
   async getOne(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('id') id: string
   ) {
-    return this.venuesService.getById(tenantId, id);
+    return this.venuesService.getById(clientId, id);
   }
 
   @Post()
   async create(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Body() body: CreateVenueDto
   ) {
-    return this.venuesService.create(tenantId, body);
+    return this.venuesService.create(clientId, body);
   }
 
   @Patch(':id')
   async update(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('id') id: string,
     @Body() body: UpdateVenueDto
   ) {
-    return this.venuesService.update(tenantId, id, body);
+    return this.venuesService.update(clientId, id, body);
   }
 
   @Delete(':id')
   async remove(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('id') id: string
   ) {
-    return this.venuesService.remove(tenantId, id);
+    return this.venuesService.remove(clientId, id);
   }
 }

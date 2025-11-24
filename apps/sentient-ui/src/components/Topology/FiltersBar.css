@@ -1,0 +1,97 @@
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.filters-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-icon {
+  color: var(--color-cyan);
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  color: var(--color-cyan);
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.filter-select {
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  color: var(--color-cyan);
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-select:hover {
+  border-color: var(--color-cyan);
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--color-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.filter-select option {
+  background: #000;
+  color: var(--color-cyan);
+}
+
+.controls-section {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  color: var(--color-cyan);
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-btn:hover {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: var(--color-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.control-btn.paused {
+  border-color: rgba(255, 165, 0, 0.5);
+  color: #ffa500;
+}
+
+.control-btn.paused:hover {
+  border-color: #ffa500;
+  background: rgba(255, 165, 0, 0.1);
+  box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+}
+
+.control-btn.clear:hover {
+  border-color: rgba(255, 100, 100, 0.7);
+  color: rgba(255, 100, 100, 0.9);
+  background: rgba(255, 100, 100, 0.1);
+}

@@ -1,0 +1,44 @@
+---
+id: 172bf925-b97f-40fd-8abd-0765b1f54644
+---
+sequenceDiagram
+    participant UI as Sentient UI
+    participant API as API Service
+    participant Redis as Redis Pub/Sub
+    participant GW as MQTT Gateway
+    participant MQTT as MQTT Broker
+    participant TC as Teensy Controller
+    participant DEV as Physical Device
+
+    UI->>API: PUT /devices/{device_id}/control
+    Note over UI,API: {<br/>  "state": true<br/>}
+    
+    API->>API: Look up device + controller
+    Note over API: Get room_id, controller_id<br/>from database
+
+    API->>Redis: PUBLISH sentient:commands:device
+    Note over API,Redis: {<br/>  "event_type": "device_command",<br/>  "controller_id": "...",<br/>  "device_id": "...",<br/>  "room_id": "clockwork",<br/>  "command": {<br/>    "device_id": "...",<br/>    "state": true<br/>  },<br/>  "timestamp": "..."<br/>}
+
+    API-->>UI: 200 OK {success: true}
+
+    Redis->>GW: Message on commands channel
+    GW->>GW: Determine action (power_on/power_off)
+    GW->>GW: Build MQTT topic
+    Note over GW: paragon/clockwork/commands/<br/>controller_id/device_id/power_on
+
+    GW->>MQTT: PUBLISH command topic
+    Note over GW,MQTT: {<br/>  "device_id": "..."<br/>}
+
+    MQTT->>TC: Message received on subscription
+    TC->>TC: Parse command in loop_mqtt()
+    TC->>TC: Apply command in loop_hardware()
+    TC->>DEV: Set relay/GPIO state
+    DEV->>DEV: Physical state change<br/>(relay closes, light turns on)
+
+    TC->>MQTT: PUBLISH status acknowledgement
+    Note over TC,MQTT: paragon/clockwork/status/<br/>controller_id/device_id/state
+    
+    MQTT->>GW: Acknowledgement received
+    GW->>Redis: PUBLISH device_state_changed
+    Redis->>RTGW: Forward to UI
+    RTGW->>UI: WebSocket update confirming state change

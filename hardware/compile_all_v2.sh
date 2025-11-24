@@ -1,13 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Compile all v2 controllers
 # Shows progress and summary at the end
 
 set +e  # Don't exit on errors, we want to continue through all controllers
 
-echo "========================================"
-echo "Compiling All V2 Controllers"
-echo "========================================"
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}Compiling All V2 Controllers${NC}"
+echo -e "${GREEN}========================================${NC}"
 echo ""
 
 SUCCESS_COUNT=0
@@ -17,29 +26,29 @@ SUCCESS_LIST=()
 FAILED_LIST=()
 
 # Find all v2 controller directories
-for controller_dir in "Controller Code Teensy"/*_v2; do
+for controller_dir in "${SCRIPT_DIR}/Controller Code Teensy"/*_v2; do
   if [ ! -d "$controller_dir" ]; then
     continue
   fi
   
   controller_name=$(basename "$controller_dir")
-  ino_file="$controller_dir/${controller_name}.ino"
+  ino_file="Controller Code Teensy/${controller_name}/${controller_name}.ino"
   
   # Skip if .ino file doesn't exist
-  if [ ! -f "$ino_file" ]; then
-    echo "⊘ SKIP: $controller_name (no .ino file)"
+  if [ ! -f "$controller_dir/${controller_name}.ino" ]; then
+    echo -e "${YELLOW}⊘ SKIP: $controller_name (no .ino file)${NC}"
     ((SKIPPED_COUNT++))
     continue
   fi
   
-  echo "=== Compiling $controller_name ==="
+  echo -e "${YELLOW}=== Compiling $controller_name ===${NC}"
   
-  if ./compile_teensy.sh "$ino_file" 2>&1 | grep -q "Built:"; then
-    echo "✓ SUCCESS: $controller_name"
+  if "${SCRIPT_DIR}/compile_teensy.sh" "$ino_file"; then
+    echo -e "${GREEN}✓ SUCCESS: $controller_name${NC}"
     ((SUCCESS_COUNT++))
     SUCCESS_LIST+=("$controller_name")
   else
-    echo "✗ FAILED: $controller_name"
+    echo -e "${RED}✗ FAILED: $controller_name${NC}"
     ((FAILED_COUNT++))
     FAILED_LIST+=("$controller_name")
   fi
@@ -47,31 +56,31 @@ for controller_dir in "Controller Code Teensy"/*_v2; do
   echo ""
 done
 
-echo "========================================"
-echo "Compilation Summary"
-echo "========================================"
-echo "✓ Successful: $SUCCESS_COUNT"
-echo "✗ Failed: $FAILED_COUNT"
-echo "⊘ Skipped: $SKIPPED_COUNT"
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}Compilation Summary${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}✓ Successful: $SUCCESS_COUNT${NC}"
+echo -e "${RED}✗ Failed: $FAILED_COUNT${NC}"
+echo -e "${YELLOW}⊘ Skipped: $SKIPPED_COUNT${NC}"
 echo ""
 
 if [ ${#SUCCESS_LIST[@]} -gt 0 ]; then
-  echo "Successfully compiled:"
+  echo -e "${GREEN}Successfully compiled:${NC}"
   for controller in "${SUCCESS_LIST[@]}"; do
-    echo "  ✓ $controller"
+    echo -e "  ${GREEN}✓${NC} $controller"
   done
   echo ""
 fi
 
 if [ ${#FAILED_LIST[@]} -gt 0 ]; then
-  echo "Failed to compile:"
+  echo -e "${RED}Failed to compile:${NC}"
   for controller in "${FAILED_LIST[@]}"; do
-    echo "  ✗ $controller"
+    echo -e "  ${RED}✗${NC} $controller"
   done
   echo ""
 fi
 
-echo "========================================"
+echo -e "${GREEN}========================================${NC}"
 
 # Exit with error code if any failed
 if [ $FAILED_COUNT -gt 0 ]; then

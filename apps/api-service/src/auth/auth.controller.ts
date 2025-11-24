@@ -12,7 +12,7 @@ export class AuthController {
     const token = await this.authService.login({
       id: req.user.id,
       email: req.user.email,
-      tenantId: req.user.tenantId,
+      clientId: req.user.clientId,
       role: req.user.role
     });
     return token;

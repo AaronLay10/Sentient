@@ -1,16 +1,47 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { RegisterDeviceDto } from './dto/register-device.dto';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
+import Redis from 'ioredis';
 
 @Injectable()
 export class DevicesService {
-  constructor(private readonly prisma: PrismaService) {}
+  private redisPublisher: Redis;
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {
+    const redisUrl = this.configService.get<string>('REDIS_URL');
+    this.redisPublisher = new Redis(redisUrl);
+  }
+
+  async findAll() {
+    const devices = await this.prisma.device.findMany({
+      include: {
+        actions: true,
+        controller: true
+      },
+      orderBy: { friendly_name: 'asc' }
+    });
+
+    return devices.map(device => ({
+      id: device.id,
+      friendly_name: device.friendly_name,
+      device_type: device.device_type,
+      device_category: device.device_category,
+      controller_id: device.controllerId,
+      status: 'operational' as const,
+      properties: device.properties,
+      created_at: device.created_at.toISOString(),
+    }));
+  }
 
   async register(dto: RegisterDeviceDto) {
     const controller = await this.prisma.controller.findUnique({
       where: { id: dto.controller_id },
-      select: { id: true, tenantId: true, roomId: true, pending_devices: true }
+      select: { id: true, clientId: true, roomId: true, pending_devices: true }
     });
     if (!controller) {
       throw new BadRequestException('Controller not found');
@@ -32,7 +63,7 @@ export class DevicesService {
       create: {
         id: dto.device_id,
         controllerId: controller.id,
-        tenantId: controller.tenantId,
+        clientId: controller.clientId,
         roomId: controller.roomId,
         friendly_name: dto.friendly_name ?? dto.device_id,
         device_type: dto.device_type,
@@ -97,5 +128,45 @@ export class DevicesService {
     }
 
     return device;
+  }
+
+  async controlDevice(deviceId: string, state: boolean) {
+    console.log(`🎮 Control command received: ${deviceId} -> ${state ? 'ON' : 'OFF'}`);
+
+    const device = await this.prisma.device.findUnique({
+      where: { id: deviceId },
+      include: {
+        controller: true,
+        actions: true
+      }
+    });
+
+    if (!device) {
+      throw new NotFoundException(`Device ${deviceId} not found`);
+    }
+
+    console.log(`📦 Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${device.roomId}`);
+
+    // Publish device command event to Redis
+    const commandEvent = {
+      event_type: 'device_command',
+      controller_id: device.controllerId,
+      device_id: deviceId,
+      room_id: device.roomId,
+      command: {
+        device_id: deviceId,
+        state: state
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    await this.redisPublisher.publish(
+      'sentient:commands:device',
+      JSON.stringify(commandEvent)
+    );
+
+    console.log(`✅ Published command to Redis: sentient:commands:device`);
+
+    return { success: true, device_id: deviceId, state };
   }
 }

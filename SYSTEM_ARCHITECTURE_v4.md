@@ -22,7 +22,7 @@ The platform coordinates:
   - relays, sensors, maglocks, lighting, audio, motors, stepper motors, actuators, etc.
 - **Room displays and AV** – Pi/browser-based displays, speakers, projectors
 - **Game logic and scene progression**
-- **Multi-tenant operations** across venues and rooms
+- **Multi-client operations** across venues and rooms
 - **Safety-critical operations** – e-stops, maglock release, sensor monitoring for safe motion
 - **Live director controls** for game masters
 
@@ -52,7 +52,7 @@ It is intentionally **prescriptive**: this is the design we optimize toward, eve
    - All story, puzzle, and scene logic lives centrally in Sentient services.
 
 2. **Single Source of Truth**  
-   - PostgreSQL is the canonical database for tenants, rooms, controllers, devices, scenes, sessions, and events.
+   - PostgreSQL is the canonical database for clients, rooms, controllers, devices, scenes, sessions, and events.
 
 3. **Event-Driven Real-Time**  
    - MQTT for controller/device communication.  
@@ -142,11 +142,11 @@ Sentient Engine uses a consistent domain model across controllers, services, and
 
 ### 4.1 Primary Entities
 
-- **Tenant**  
+- **Client**
   A customer account (e.g., Paragon Escape Games).
 
-- **Venue**  
-  A physical location belonging to a tenant (e.g., Paragon-Mesa).
+- **Venue**
+  A physical location belonging to a client (e.g., Paragon-Mesa).
 
 - **Room**  
   A specific escape room / attraction instance at a venue.
@@ -187,7 +187,7 @@ Sentient Engine uses a consistent domain model across controllers, services, and
 
 ### 4.2 Relationships
 
-- A **Tenant** has many **Venues**.  
+- A **Client** has many **Venues**.
 - A **Venue** has many **Rooms**.  
 - A **Room** has many **Controllers**.  
 - A **Controller** has many **Devices**.  
@@ -218,7 +218,7 @@ All core services are **TypeScript/Node.js** applications, containerized with Do
 
 **Responsibilities:**
 
-- Tenant & venue management  
+- Client & venue management
 - Room, controller, device, puzzle, and scene configuration  
 - User, role, and permission management  
 - GameSession lifecycle APIs (create, start, stop, pause, resume)  
@@ -235,7 +235,7 @@ All core services are **TypeScript/Node.js** applications, containerized with Do
 **Key Example Endpoints:**
 
 - `POST /api/v1/auth/login`  
-- `GET /api/v1/tenants/:tenant_id/rooms`  
+- `GET /api/v1/clients/:client_id/rooms`  
 - `GET /api/v1/rooms/:room_id/controllers`  
 - `GET /api/v1/controllers/:controller_id/devices`  
 - `POST /api/v1/rooms/:room_id/game_sessions`  
@@ -289,27 +289,52 @@ All core services are **TypeScript/Node.js** applications, containerized with Do
 - MQTT client library  
 - Redis pub/sub for communication with Orchestrator  
 
-**Topic Patterns (idealized):**
+**Topic Patterns (Sentient v4 Standard):**
 
-- Controller/device state:
-  - `sentient/room/<room_id>/controller/<controller_id>/device/<device_id>/state`
-- Controller/device command:
-  - `sentient/room/<room_id>/controller/<controller_id>/device/<device_id>/command`
-- Room broadcast:
-  - `sentient/room/<room_id>/broadcast/command`
+The category-first structure enables efficient MQTT broker filtering and system-wide monitoring:
 
-Example payload:
+- Device commands:
+  - `<tenant>/<room_id>/commands/<controller_id>/<device_id>/<action>`
+  - Example: `paragon/clockwork/commands/power_control_upper_right/main_lighting_24v/power_on`
+
+- Device state/sensors:
+  - `<tenant>/<room_id>/sensors/<controller_id>/<device_id>/<sensor_name>`
+  - Example: `paragon/clockwork/sensors/power_control_upper_right/main_lighting_24v/state`
+
+- Controller status (heartbeats, connection):
+  - `<tenant>/<room_id>/status/<controller_id>/<event_type>`
+  - Example: `paragon/clockwork/status/power_control_upper_right/heartbeat`
+
+- System registration (new controllers/devices):
+  - `sentient/system/register/controller`
+  - `sentient/system/register/device`
+
+**Rationale:**
+- **Category-first** enables efficient wildcard subscriptions: `paragon/+/commands/#` subscribes to all commands across all rooms
+- **Tenant scoping** (`paragon`, `sentient`) allows multi-tenancy on single broker
+- **Room isolation** prevents cross-room interference
+- **Action/sensor at end** makes wildcard filtering more powerful
+
+Example command payload:
+
+```json
+{
+  "device_id": "main_lighting_24v"
+}
+```
+
+Example sensor state payload:
 
 ```json
 {
   "v": 1,
-  "type": "device_state",
-  "controller_id": "ctrl_gearbox",
-  "device_id": "dev_gear_limit_switch",
+  "controller_id": "power_control_upper_right",
+  "device_id": "main_lighting_24v",
   "state": {
-    "closed": true
+    "on": true,
+    "relay_number": 1
   },
-  "timestamp": "2025-01-01T12:34:56.789Z"
+  "timestamp": "2025-01-22T12:34:56.789Z"
 }
 ```
 
@@ -322,11 +347,11 @@ Example payload:
 **Responsibilities:**
 
 - Accept WebSocket connections from:
-  - Sentient UI (admin-dashboard)
+  - Sentient UI
   - Any authorized clients
 - Authenticate clients using JWT on connection
-- Join clients to per-room / per-tenant channels
-  - e.g., `room:<room_id>`, `tenant:<tenant_id>`
+- Join clients to per-room / per-client channels
+  - e.g., `room:<room_id>`, `client:<client_id>`
 - Listen for domain events via Redis pub/sub and fan-out to connected sockets
 - Accept control commands from UIs (skip puzzle, trigger hint, force open lock) and forward them to Orchestrator/API  
 
@@ -362,7 +387,7 @@ Example payload:
 
 ### 5.6 Web Frontend (Sentient UI)
 
-#### 5.6.1 Sentient UI (`apps/admin-dashboard`)
+#### 5.6.1 Sentient UI (`apps/sentient-ui`)
 
 **Role:** Unified web interface for configuration, management, and live game master operations.
 
@@ -370,29 +395,48 @@ Example payload:
 
 **Features:**
 
+**Authentication:**
+- JWT-based login system with session persistence
+- Protected routes with automatic token validation and expiry handling
+
+**Network Visualization:**
+- Real-time network topology view with circular radial layout
+- Animated pulses showing controller/device communication
+- Room-based color coding and health status indicators
+- Live metrics sidebar with throughput graphs
+
+**Scene Editor:**
+- Flow-based visual programming interface using React Flow
+- Drag-and-drop node palette with 22+ component types:
+  - Triggers (scene start, timers)
+  - Sensors (buttons, RFID, weight sensors)
+  - Puzzles (sequences, combinations, patterns)
+  - Effects (lights, servos, fog, maglocks)
+  - Audio (SFX, music, voice)
+  - Logic (delays, branches, loops)
+- Properties panel for node/scene configuration
+
 **Configuration & Management:**
-- Tenant & venue management
-- Room configuration:
-  - Controllers and devices
-  - Scene graphs and puzzle definitions
-  - Puzzle → device mappings
-- User/role management
-- Future: pricing/scheduling hooks
+- Client & venue management (CRUD operations)
+- Room configuration with hierarchical client → venue → room structure
+- User management with role-based access control (OWNER, GM, TECH, VIEWER)
+- Controller and device inventory
+- Scene graphs and puzzle definitions
 
 **Live Game Master Operations:**
-- Multi-room overview dashboard:
-  - Timers
-  - Puzzle/scene states
-  - Controller/device health
-- Per-room detailed control view:
-  - Puzzles, scenes, hints, script notes
-  - Manual overrides (skip puzzles, force open, reset devices)
-- Visual event timeline
+- GM Console with real-time device monitoring
+- Event feed showing controller heartbeats and state changes
+- Session controls for active game rooms
+- Power control interface for room controllers
+- Multi-room overview dashboard
 
 **Tech:**
 
-- React + Vite (TypeScript)
-- Tailwind CSS + component library
+- React 19 + Vite 7 (TypeScript)
+- React Flow v12 for scene editor
+- TanStack React Query v5 for state management
+- Lucide React icons
+- Custom CSS with Sentient Eye branding (cyan/orange theme)
 - Communication:
   - REST (API Service) for config and history
   - WebSockets (Realtime Gateway) for live updates
@@ -481,7 +525,7 @@ Safety is enforced by both hardware and software layers:
 
 PostgreSQL holds all persistent data:
 
-- Tenants, venues, rooms  
+- Clients, venues, rooms  
 - Controllers, controller types, controller configs  
 - Devices, device types, device configs  
 - Puzzles, scenes, scene graphs  
@@ -513,17 +557,30 @@ Redis is used for:
 
 **Broker:** Mosquitto, running in Docker on the services VLAN.
 
-**Topic Standards (snake_case, hierarchical):**
+**Topic Standards (snake_case, hierarchical, category-first):**
 
-- Controller/device state:
-  - `sentient/room/<room_id>/controller/<controller_id>/device/<device_id>/state`
-- Controller/device command:
-  - `sentient/room/<room_id>/controller/<controller_id>/device/<device_id>/command`
-- Room broadcast command:
-  - `sentient/room/<room_id>/broadcast/command`
+All topics follow the pattern: `<tenant>/<room_id>/<category>/<controller_id>/<device_id>/<action_or_sensor>`
 
-**QoS:** Typically QoS 1 for commands and state.  
-**Auth:** Username/password, per-controller or per-room identities.  
+- Device commands:
+  - `<tenant>/<room_id>/commands/<controller_id>/<device_id>/<action>`
+  - Example: `paragon/clockwork/commands/power_control_upper_right/main_lighting_24v/power_on`
+
+- Device state/sensors:
+  - `<tenant>/<room_id>/sensors/<controller_id>/<device_id>/<sensor_name>`
+  - Example: `paragon/clockwork/sensors/power_control_upper_right/main_lighting_24v/state`
+
+- Controller status:
+  - `<tenant>/<room_id>/status/<controller_id>/<event_type>`
+  - Example: `paragon/clockwork/status/power_control_upper_right/heartbeat`
+
+**Benefits of category-first structure:**
+- System-wide monitoring: `paragon/+/commands/#` captures all commands across all rooms
+- Security/ACL by message type: Grant services access only to specific categories
+- Better MQTT broker performance with fewer subscription trees
+- Aligns with industrial IoT best practices (Sparkplug B, AWS IoT)
+
+**QoS:** Typically QoS 1 for commands and state.
+**Auth:** Username/password, per-controller or per-room identities.
 **TLS:** Enabled when controllers are on untrusted networks; otherwise VLAN + firewall isolation.
 
 ### 8.2 HTTP / WebSocket
@@ -532,8 +589,8 @@ Redis is used for:
 - Realtime Gateway exposes a WebSocket endpoint like:
   - `wss://sentientengine.local/ws`  
 - Clients:
-  - Authenticate using JWT on connection  
-  - Subscribe to room/tenant channels for live updates  
+  - Authenticate using JWT on connection
+  - Subscribe to room/client channels for live updates  
 
 ---
 
@@ -602,18 +659,18 @@ Primary target:
 
 ### 10.1 Authentication & Authorization
 
-- JWT-based auth for all UIs and API clients.  
-- Tokens include: `user_id`, `role`, `tenant_id`, `iat`, `exp`.  
+- JWT-based auth for all UIs and API clients.
+- Tokens include: `user_id`, `role`, `client_id`, `iat`, `exp`.  
 - Sessions tracked in DB for revocation and auditing.
 
 **Example roles:**
 
-- `OWNER` – Full tenant control.  
+- `OWNER` – Full client control.  
 - `GM` – Operate rooms and sessions.  
 - `TECH` – Configure controllers/devices/puzzles.  
 - `VIEWER` – Read-only access.
 
-Authorization enforced at the API layer, with all operations scoped by tenant and room.
+Authorization enforced at the API layer, with all operations scoped by client and room.
 
 ### 10.2 Secrets Management
 
@@ -728,7 +785,7 @@ apps/api-service/
       env.schema.ts
       index.ts
     modules/
-      tenants/
+      clients/
       venues/
       rooms/
       controllers/

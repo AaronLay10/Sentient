@@ -7,12 +7,15 @@ import { HealthService } from './health.service';
 import { DatabaseModule } from './database.module';
 import { RedisModule } from './redis.module';
 import { PrismaModule } from '../prisma/prisma.module';
-import { TenantsModule } from './tenants/tenants.module';
+import { ClientsModule } from './clients/clients.module';
 import { VenuesModule } from './venues/venues.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { AuthModule } from '../auth/auth.module';
 import { ControllersModule } from './controllers/controllers.module';
 import { DevicesModule } from './devices/devices.module';
+import { UsersModule } from './users/users.module';
+import { AdminModule } from './admin/admin.module';
+import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.service';
 
 @Module({
   imports: [
@@ -41,13 +44,15 @@ import { DevicesModule } from './devices/devices.module';
     AuthModule,
     DatabaseModule,
     RedisModule,
-    TenantsModule,
+    ClientsModule,
     VenuesModule,
     RoomsModule,
+    UsersModule,
     ControllersModule,
-    DevicesModule
+    DevicesModule,
+    AdminModule
   ],
   controllers: [HealthController],
-  providers: [HealthService],
+  providers: [HealthService, HeartbeatEventHandlerService],
 })
 export class AppModule {}

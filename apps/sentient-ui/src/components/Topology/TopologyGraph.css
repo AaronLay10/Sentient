@@ -1,0 +1,93 @@
+.topology-graph {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0, 20, 40, 0.4) 0%, rgba(0, 10, 20, 0.8) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.topology-graph svg {
+  display: block;
+}
+
+.edges-layer {
+  pointer-events: none;
+}
+
+.edge {
+  transition: stroke 0.3s, stroke-width 0.3s;
+}
+
+.edge.active {
+  animation: pulse-edge 1s ease-in-out infinite;
+}
+
+@keyframes pulse-edge {
+  0%, 100% {
+    stroke-opacity: 0.8;
+  }
+  50% {
+    stroke-opacity: 1;
+  }
+}
+
+.edge-label {
+  font-family: 'Courier New', monospace;
+  pointer-events: none;
+  user-select: none;
+}
+
+.nodes-layer {
+  cursor: pointer;
+}
+
+.node {
+  transition: all 0.2s;
+}
+
+.node:hover .node-circle {
+  r: 18;
+  filter: url(#glow);
+}
+
+.node.selected .node-circle {
+  filter: url(#glow);
+}
+
+.node-circle {
+  transition: all 0.2s;
+}
+
+.node-label {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  pointer-events: none;
+  user-select: none;
+}
+
+.node-type {
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Layer indicators */
+.topology-graph::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 16.666%,
+    rgba(0, 255, 255, 0.03) 16.666%,
+    rgba(0, 255, 255, 0.03) 16.667%
+  );
+  pointer-events: none;
+  z-index: 0;
+}

@@ -413,7 +413,7 @@ void setup()
           ready["version"] = firmware::VERSION;
           ready["timestamp_ms"] = millis();
           char rbuf[196]; serializeJson(ready, rbuf, sizeof(rbuf));
-          String rTopic = String(mqtt_namespace) + "/" + room_id + "/" + naming::CAT_EVENTS + "/" + controller_id + "/" + naming::DEV_CONTROLLER + "/shutdown_ready";
+          String rTopic = String(mqtt_namespace) + "/" + room_id + "/" + naming::CAT_EVENTS + "/" + controller_id + "/shutdown_ready";
           mqtt.get_client().publish(rTopic.c_str(), rbuf, false);
         }
       }
@@ -603,8 +603,8 @@ SentientMQTTConfig build_mqtt_config()
   cfg.password = mqtt_password;
   cfg.namespaceId = mqtt_namespace;
   cfg.roomId = room_id;
-  cfg.puzzleId = controller_id;
-  cfg.deviceId = controller_model;
+  cfg.controllerId = controller_id;
+  cfg.deviceId = nullptr; // Controller-level messages don't have deviceId
   cfg.displayName = controller_friendly_name;
   cfg.hostnamePrefix = "CL"; // Clockwork room prefix
   cfg.useDhcp = true;

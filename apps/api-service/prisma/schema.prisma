@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Tenant {
+model Client {
   id         String   @id @default(cuid())
   name       String   @unique
   created_at DateTime @default(now())
@@ -20,21 +20,21 @@ model Tenant {
 
 model Venue {
   id         String   @id @default(cuid())
-  tenantId   String
-  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   name       String
   created_at DateTime @default(now())
   rooms      Room[]
 
-  @@unique([tenantId, name])
-  @@index([tenantId])
+  @@unique([clientId, name])
+  @@index([clientId])
 }
 
 model Room {
   id         String   @id @default(cuid())
-  tenantId   String
+  clientId   String
   venueId    String
-  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   venue      Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
   name       String
   created_at DateTime @default(now())
@@ -42,7 +42,7 @@ model Room {
   devices     Device[]
 
   @@unique([venueId, name])
-  @@index([tenantId])
+  @@index([clientId])
   @@index([venueId])
 }
 
@@ -55,8 +55,8 @@ enum UserRole {
 
 model User {
   id            String   @id @default(cuid())
-  tenantId      String
-  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  clientId      String
+  client        Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   email         String   @unique
   password_hash String
   role          UserRole @default(GM)
@@ -65,9 +65,9 @@ model User {
 
 model Controller {
   id                   String   @id
-  tenantId             String
+  clientId             String
   roomId               String
-  tenant               Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client               Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   room                 Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   controller_type      String
   friendly_name        String
@@ -85,17 +85,17 @@ model Controller {
   created_at           DateTime @default(now())
   devices              Device[]
 
-  @@index([tenantId])
+  @@index([clientId])
   @@index([roomId])
 }
 
 model Device {
   id             String   @id
   controllerId   String
-  tenantId       String
+  clientId       String
   roomId         String
   controller     Controller @relation(fields: [controllerId], references: [id], onDelete: Cascade)
-  tenant         Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client         Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
   room           Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
   friendly_name  String
   device_type    String
@@ -106,7 +106,7 @@ model Device {
   actions        DeviceAction[]
 
   @@index([controllerId])
-  @@index([tenantId])
+  @@index([clientId])
   @@index([roomId])
   @@unique([controllerId, id])
 }

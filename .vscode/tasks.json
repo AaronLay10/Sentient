@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compile Active Teensy Controller",
+      "type": "shell",
+      "command": "./hardware/compile_teensy.sh",
+      "args": [
+        "${relativeFile}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false,
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Compile All Teensy Controllers",
+      "type": "shell",
+      "command": "${workspaceFolder}/hardware/compile_all_v2.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/hardware"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false,
+        "clear": true
+      },
+      "group": "build"
+    }
+  ]
+}

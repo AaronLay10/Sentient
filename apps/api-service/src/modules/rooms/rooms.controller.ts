@@ -6,53 +6,53 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('tenants/:tenantId/venues/:venueId/rooms')
+@Controller('clients/:clientId/venues/:venueId/rooms')
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Get()
   async list(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('venueId') venueId: string,
     @Query() query: ListRoomsDto
   ) {
-    return this.roomsService.listByVenue(tenantId, venueId, query);
+    return this.roomsService.listByVenue(clientId, venueId, query);
   }
 
   @Get(':id')
   async getOne(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('venueId') venueId: string,
     @Param('id') id: string
   ) {
-    return this.roomsService.getById(tenantId, venueId, id);
+    return this.roomsService.getById(clientId, venueId, id);
   }
 
   @Post()
   async create(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('venueId') venueId: string,
     @Body() body: CreateRoomDto
   ) {
-    return this.roomsService.create(tenantId, venueId, body);
+    return this.roomsService.create(clientId, venueId, body);
   }
 
   @Patch(':id')
   async update(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('venueId') venueId: string,
     @Param('id') id: string,
     @Body() body: UpdateRoomDto
   ) {
-    return this.roomsService.update(tenantId, venueId, id, body);
+    return this.roomsService.update(clientId, venueId, id, body);
   }
 
   @Delete(':id')
   async remove(
-    @Param('tenantId') tenantId: string,
+    @Param('clientId') clientId: string,
     @Param('venueId') venueId: string,
     @Param('id') id: string
   ) {
-    return this.roomsService.remove(tenantId, venueId, id);
+    return this.roomsService.remove(clientId, venueId, id);
   }
 }

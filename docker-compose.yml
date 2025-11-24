@@ -223,6 +223,32 @@ services:
   #   networks:
   #     - sentient_net
 
+  # =========================
+  # Sentient UI (Unified Admin & GM Console)
+  # =========================
+  # Uncomment for containerized UI deployment
+  # For development, run: cd apps/sentient-ui && pnpm dev
+
+  # sentient-ui:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/sentient-ui/Dockerfile
+  #   container_name: sentient_ui
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: development
+  #     VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+  #     VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:3002}
+  #   depends_on:
+  #     - api-service
+  #     - realtime-gateway
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - sentient_net
+
 networks:
   sentient_net:
     driver: bridge

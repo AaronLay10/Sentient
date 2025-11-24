@@ -1,0 +1,38 @@
+---
+id: b92477c1-9b7c-4328-a3d8-bffef5c23480
+---
+sequenceDiagram
+    participant Service as Any Service
+    participant Redis as Redis Pub/Sub
+    participant RTGW as Realtime Gateway
+    participant WS1 as WebSocket Client 1<br/>(Room: clockwork)
+    participant WS2 as WebSocket Client 2<br/>(Room: clockwork)
+    participant WS3 as WebSocket Client 3<br/>(Room: boiler)
+
+    Service->>Redis: PUBLISH sentient:domain_events
+    Note over Service,Redis: Event has room_id: "clockwork"
+
+    Redis->>RTGW: Domain event received
+
+    RTGW->>RTGW: Check event.room_id
+    
+    alt Has room_id
+        RTGW->>Redis: PUBLISH sentient:realtime:room:clockwork
+        Redis->>RTGW: Room-specific channel
+        
+        par Broadcast to room clients
+            RTGW->>WS1: Send event via WebSocket
+            RTGW->>WS2: Send event via WebSocket
+        end
+
+        Note over WS3: Not in room "clockwork",<br/>does not receive event
+    end
+
+    RTGW->>Redis: PUBLISH sentient:realtime:broadcast
+    Redis->>RTGW: Global channel
+
+    par Broadcast to all clients
+        RTGW->>WS1: Send event via WebSocket
+        RTGW->>WS2: Send event via WebSocket
+        RTGW->>WS3: Send event via WebSocket
+    end
