@@ -169,7 +169,7 @@ jobs:
       - name: Create deployment directory structure
         run: |
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
-            rm -rf ~/sentient-deploy &&
+            sudo rm -rf ~/sentient-deploy &&
             mkdir -p ~/sentient-deploy/nginx/sites ~/sentient-deploy/mosquitto/config ~/sentient-deploy/mosquitto/data ~/sentient-deploy/mosquitto/log &&
             chmod -R 755 ~/sentient-deploy
           "
