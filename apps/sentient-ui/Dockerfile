@@ -20,7 +20,8 @@ RUN pnpm install --frozen-lockfile
 # Build shared packages first
 RUN pnpm -r --filter "@sentient/*" build
 
-# Build Sentient UI
+# Build Sentient UI with production API URL
+ENV VITE_API_URL=/api
 RUN pnpm -r --filter sentient-ui build
 
 # Production stage with nginx
