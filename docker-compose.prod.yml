@@ -65,7 +65,7 @@ services:
     build:
       context: .
       dockerfile: apps/api-service/Dockerfile
-    image: ghcr.io/yourusername/sentient-api:latest
+    image: ghcr.io/aaronlay10/sentient-api:latest
     container_name: sentient_api
     restart: unless-stopped
     env_file:
@@ -94,7 +94,7 @@ services:
     build:
       context: .
       dockerfile: apps/orchestrator-service/Dockerfile
-    image: ghcr.io/yourusername/sentient-orchestrator:latest
+    image: ghcr.io/aaronlay10/sentient-orchestrator:latest
     container_name: sentient_orchestrator
     restart: unless-stopped
     env_file:
@@ -113,7 +113,7 @@ services:
     build:
       context: .
       dockerfile: apps/mqtt-gateway/Dockerfile
-    image: ghcr.io/yourusername/sentient-mqtt-gateway:latest
+    image: ghcr.io/aaronlay10/sentient-mqtt-gateway:latest
     container_name: sentient_mqtt_gateway
     restart: unless-stopped
     env_file:
@@ -134,7 +134,7 @@ services:
     build:
       context: .
       dockerfile: apps/realtime-gateway/Dockerfile
-    image: ghcr.io/yourusername/sentient-realtime:latest
+    image: ghcr.io/aaronlay10/sentient-realtime:latest
     container_name: sentient_realtime_gateway
     restart: unless-stopped
     env_file:
@@ -159,7 +159,7 @@ services:
     build:
       context: .
       dockerfile: apps/sentient-ui/Dockerfile
-    image: ghcr.io/yourusername/sentient-ui:latest
+    image: ghcr.io/aaronlay10/sentient-ui:latest
     container_name: sentient_ui
     restart: unless-stopped
     ports:

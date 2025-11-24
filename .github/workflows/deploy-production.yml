@@ -211,11 +211,6 @@ jobs:
           DOMAIN=${{ secrets.PRODUCTION_DOMAIN }}
           EOF
 
-      - name: Update docker-compose with correct image names
-        run: |
-          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
-            sed -i 's|ghcr.io/yourusername|${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}|g' docker-compose.prod.yml"
-
       - name: Login to GHCR on production server
         run: |
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} \
