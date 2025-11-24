@@ -168,7 +168,11 @@ jobs:
 
       - name: Create deployment directory structure
         run: |
-          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "mkdir -p ~/sentient-deploy/nginx/sites ~/sentient-deploy/mosquitto/config ~/sentient-deploy/mosquitto/data ~/sentient-deploy/mosquitto/log"
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "
+            rm -rf ~/sentient-deploy &&
+            mkdir -p ~/sentient-deploy/nginx/sites ~/sentient-deploy/mosquitto/config ~/sentient-deploy/mosquitto/data ~/sentient-deploy/mosquitto/log &&
+            chmod -R 755 ~/sentient-deploy
+          "
 
       - name: Copy deployment files
         run: |
