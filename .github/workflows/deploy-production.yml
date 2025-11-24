@@ -211,10 +211,10 @@ jobs:
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
             sudo docker compose -f docker-compose.prod.yml pull"
 
-      - name: Stop existing containers
+      - name: Stop and remove existing containers
         run: |
-          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
-            sudo docker compose -f docker-compose.prod.yml down || echo 'No containers to stop'"
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} \
+            "sudo docker ps -a --format '{{.Names}}' | grep -E 'sentient|mqtt|postgres|redis|nginx' | xargs -r sudo docker rm -f || echo 'No containers to remove'"
 
       - name: Run database migrations
         run: |
