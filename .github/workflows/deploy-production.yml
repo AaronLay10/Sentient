@@ -233,16 +233,22 @@ jobs:
       - name: Start infrastructure services
         run: |
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "cd ~/sentient-deploy && \
+            echo 'Starting PostgreSQL, Redis, and MQTT...' && \
             sudo docker compose -f docker-compose.prod.yml up -d postgres redis mqtt && \
+            echo 'Checking PostgreSQL logs...' && \
+            sudo docker logs sentient_postgres --tail 20 && \
             echo 'Waiting for PostgreSQL to be ready...' && \
             for i in {1..30}; do
-              if sudo docker exec sentient_postgres pg_isready -U sentient 2>/dev/null; then
+              if sudo docker exec sentient_postgres pg_isready 2>/dev/null; then
                 echo 'PostgreSQL is ready!'
                 break
               fi
-              echo \"Attempt \$i: PostgreSQL not ready yet...\"
+              echo \"Attempt \$i: PostgreSQL not ready yet, checking health...\"
+              sudo docker inspect sentient_postgres --format='{{.State.Health.Status}}' || echo 'No health status'
               sleep 2
-            done"
+            done && \
+            echo 'Final PostgreSQL status:' && \
+            sudo docker ps --filter name=sentient_postgres"
 
       - name: Run database migrations
         run: |

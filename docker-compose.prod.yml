@@ -81,12 +81,9 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      mqtt:
-        condition: service_started
+      - postgres
+      - redis
+      - mqtt
     ports:
       - "127.0.0.1:3001:3000"  # Only expose to localhost (nginx will proxy)
     networks:
@@ -117,8 +114,7 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
     networks:
       - sentient_net
     logging:
@@ -143,12 +139,9 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
     depends_on:
-      api-service:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      mqtt:
-        condition: service_started
+      - api-service
+      - redis
+      - mqtt
     networks:
       - sentient_net
     logging:
@@ -172,8 +165,7 @@ services:
       WS_PORT: 3002
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
     ports:
       - "127.0.0.1:3002:3002"  # Only expose to localhost (nginx will proxy)
     networks:
