@@ -11,10 +11,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "127.0.0.1:5432:5432"  # Only expose to localhost
     volumes:
@@ -32,7 +28,9 @@ services:
     image: redis:7-alpine
     container_name: sentient_redis
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    env_file:
+      - .env.production
+    command: sh -c 'redis-server --appendonly yes --requirepass "$${REDIS_PASSWORD}"'
     ports:
       - "127.0.0.1:6379:6379"  # Only expose to localhost
     volumes:
@@ -72,14 +70,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
-    environment:
-      NODE_ENV: production
-      API_PORT: 3000
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      MQTT_URL: mqtt://mqtt:1883
-      JWT_SECRET: ${JWT_SECRET}
-      INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
     depends_on:
       - postgres
       - redis
@@ -109,10 +99,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
-    environment:
-      NODE_ENV: production
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       - redis
     networks:
@@ -132,12 +118,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
-    environment:
-      NODE_ENV: production
-      MQTT_URL: mqtt://mqtt:1883
-      API_URL: http://api-service:3000
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
     depends_on:
       - api-service
       - redis
@@ -159,11 +139,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
-    environment:
-      NODE_ENV: production
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      WS_PORT: 3002
-      LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       - redis
     ports:
