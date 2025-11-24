@@ -166,15 +166,15 @@ jobs:
           EOF
           chmod 600 ~/.ssh/config
 
-      - name: Create deployment directory
+      - name: Create deployment directory structure
         run: |
-          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "mkdir -p ~/sentient-deploy"
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} "mkdir -p ~/sentient-deploy/nginx/conf.d ~/sentient-deploy/mosquitto/config ~/sentient-deploy/mosquitto/data ~/sentient-deploy/mosquitto/log"
 
       - name: Copy deployment files
         run: |
           scp docker-compose.prod.yml ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/
-          scp -r nginx ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/
-          scp -r mosquitto ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/
+          scp nginx/conf.d/* ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/nginx/conf.d/
+          scp mosquitto/config/* ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:~/sentient-deploy/mosquitto/config/
 
       - name: Create .env.production on server
         run: |
