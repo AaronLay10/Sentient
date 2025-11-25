@@ -11,11 +11,7 @@ services:
     restart: unless-stopped
     env_file:
       - .env.sentient
-    environment:
-      # Unified database name for dev and prod
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
-      POSTGRES_DB: ${POSTGRES_DB:-sentient}
+    # POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB come from .env.sentient
     ports:
       - "5432:5432"
     volumes:
@@ -53,10 +49,7 @@ services:
     environment:
       NODE_ENV: production
       API_PORT: 3000
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient}
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET}
-      INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
+      # DATABASE_URL, REDIS_URL, JWT_SECRET, INTERNAL_REG_TOKEN come from .env.sentient
     depends_on:
       postgres:
         condition: service_started

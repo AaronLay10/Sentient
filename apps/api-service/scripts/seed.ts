@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 async function run() {
   console.log('Seeding Paragon Escape Games data...');
 
-  // Simple password hash for development (in production, use bcrypt)
-  const passwordHash = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'; // 'password'
+  // bcrypt hash for 'password' - generated with bcryptjs
+  const passwordHash = '$2a$10$WFfq614P9lCsfE.yHtglUO3mbarJs7.7cfnbaz/.YYp2WKHr.qDaK'; // 'password'
 
   // Create the actual client
   const client = await prisma.client.upsert({
