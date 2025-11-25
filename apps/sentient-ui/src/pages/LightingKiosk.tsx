@@ -3,6 +3,7 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import { SentientEye } from '../components/SentientEye/SentientEye';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
 
 interface LightingDevice {
   id: string;
@@ -27,7 +28,7 @@ export function LightingKiosk() {
   const [devices, setDevices] = useState<LightingDevice[]>(LIGHTING_DEVICES);
   const [controllerOnline, setControllerOnline] = useState(false);
   const [pendingCommands, setPendingCommands] = useState<Set<string>>(new Set());
-  const { isConnected: wsConnected, events } = useWebSocket({ url: 'ws://localhost:3002' });
+  const { isConnected: wsConnected, events } = useWebSocket({ url: WS_URL });
 
   // Listen for WebSocket events
   useEffect(() => {
