@@ -15,6 +15,7 @@ import { ControllersModule } from './controllers/controllers.module';
 import { DevicesModule } from './devices/devices.module';
 import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
+import { KioskModule } from './kiosk/kiosk.module';
 import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.service';
 
 @Module({
@@ -50,7 +51,8 @@ import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.
     UsersModule,
     ControllersModule,
     DevicesModule,
-    AdminModule
+    AdminModule,
+    KioskModule
   ],
   controllers: [HealthController],
   providers: [HealthService, HeartbeatEventHandlerService],

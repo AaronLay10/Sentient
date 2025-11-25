@@ -380,11 +380,11 @@ process.on('SIGTERM', shutdown);
 
 // Subscribe to device command events from Redis
 const redisSubscriber = new Redis(REDIS_URL);
-redisSubscriber.subscribe('sentient:commands:device', 'sentient:commands:status_request', (err) => {
+redisSubscriber.subscribe('sentient:commands:device', 'sentient:commands:device_generic', 'sentient:commands:status_request', (err) => {
   if (err) {
     console.error('❌ Failed to subscribe to command channels:', err);
   } else {
-    console.log('📬 Subscribed to Redis device commands and status request channels');
+    console.log('📬 Subscribed to Redis device commands, generic commands, and status request channels');
   }
 });
 
@@ -415,6 +415,28 @@ redisSubscriber.on('message', async (channel, message) => {
       });
     } catch (error) {
       console.error('❌ Error processing device command:', error);
+    }
+  } else if (channel === 'sentient:commands:device_generic') {
+    // Handle generic device commands (lighting, brightness, color, etc.)
+    try {
+      const commandEvent = JSON.parse(message);
+      console.log(`📤 Received generic device command:`, commandEvent);
+
+      const { controller_id, device_id, room_id, command, payload: cmdPayload } = commandEvent;
+
+      // Publish to Paragon MQTT topic with device-specific command routing
+      // Format: paragon/{room_id}/commands/{controller_id}/{device_id}/{command}
+      const topic = `paragon/${room_id}/commands/${controller_id}/${device_id}/${command}`;
+
+      client.publish(topic, JSON.stringify(cmdPayload || {}), { qos: 1, retain: false }, (err) => {
+        if (err) {
+          console.error(`❌ Failed to publish generic command to ${topic}:`, err);
+        } else {
+          console.log(`✅ Published generic command to ${topic}:`, cmdPayload);
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error processing generic device command:', error);
     }
   } else if (channel === 'sentient:commands:status_request') {
     try {

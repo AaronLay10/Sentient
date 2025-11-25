@@ -12,6 +12,8 @@ import { Rooms } from './pages/Rooms';
 import { Clients } from './pages/Clients';
 import { Users } from './pages/Users';
 import { PowerControl } from './pages/PowerControl';
+import { LightingControl } from './pages/LightingControl';
+import { LightingKiosk } from './pages/LightingKiosk';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -28,8 +30,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          {/* Public Route */}
+          {/* Public Routes - No Auth Required */}
           <Route path="/login" element={<Login />} />
+          <Route path="/kiosk/lighting" element={<LightingKiosk />} />
 
           {/* Protected Routes */}
           <Route
@@ -45,6 +48,7 @@ function App() {
             <Route path="topology" element={<Topology />} />
             <Route path="scenes" element={<SceneEditor />} />
             <Route path="power-control" element={<PowerControl />} />
+            <Route path="lighting" element={<LightingControl />} />
             <Route path="controllers" element={<Controllers />} />
             <Route path="devices" element={<Devices />} />
             <Route path="rooms" element={<Rooms />} />

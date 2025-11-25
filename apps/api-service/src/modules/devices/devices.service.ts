@@ -172,4 +172,45 @@ export class DevicesService {
 
     return { success: true, device_id: deviceId, state };
   }
+
+  // Generic command sender for lighting and other advanced controls
+  async sendCommand(deviceId: string, command: string, payload?: Record<string, any>) {
+    console.log(`🎮 Send command: ${deviceId} -> ${command}`, payload);
+
+    const device = await this.prisma.device.findUnique({
+      where: { id: deviceId },
+      include: {
+        controller: true,
+        room: true
+      }
+    });
+
+    if (!device) {
+      throw new NotFoundException(`Device ${deviceId} not found`);
+    }
+
+    // Use room name (lowercase) for MQTT topic, not the UUID
+    const roomName = device.room?.name?.toLowerCase() || device.roomId;
+    console.log(`📦 Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${roomName}`);
+
+    // Publish generic command event to Redis
+    const commandEvent = {
+      event_type: 'device_command_generic',
+      controller_id: device.controllerId,
+      device_id: deviceId,
+      room_id: roomName,
+      command: command,
+      payload: payload || {},
+      timestamp: new Date().toISOString()
+    };
+
+    await this.redisPublisher.publish(
+      'sentient:commands:device_generic',
+      JSON.stringify(commandEvent)
+    );
+
+    console.log(`✅ Published generic command to Redis: sentient:commands:device_generic`);
+
+    return { success: true, device_id: deviceId, command, payload };
+  }
 }

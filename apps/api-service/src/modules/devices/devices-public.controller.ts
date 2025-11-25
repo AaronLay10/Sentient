@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { DevicesService } from './devices.service';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { ControlDeviceDto } from './dto/control-device.dto';
+import { ControlDeviceDto, SendCommandDto } from './dto/control-device.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('devices')
@@ -29,5 +29,14 @@ export class DevicesPublicController {
     @Body() dto: ControlDeviceDto
   ) {
     return this.devicesService.controlDevice(deviceId, dto.state);
+  }
+
+  // Generic command endpoint for lighting and advanced device controls
+  @Post(':deviceId/command')
+  async sendCommand(
+    @Param('deviceId') deviceId: string,
+    @Body() dto: SendCommandDto
+  ) {
+    return this.devicesService.sendCommand(deviceId, dto.command, dto.payload);
   }
 }

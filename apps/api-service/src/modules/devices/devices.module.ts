@@ -6,6 +6,7 @@ import { InternalAuthGuard } from '../../shared/internal-auth.guard';
 
 @Module({
   controllers: [DevicesController, DevicesPublicController],
-  providers: [DevicesService, InternalAuthGuard]
+  providers: [DevicesService, InternalAuthGuard],
+  exports: [DevicesService]
 })
 export class DevicesModule {}
