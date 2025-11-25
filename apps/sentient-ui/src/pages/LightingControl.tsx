@@ -115,6 +115,7 @@ export function LightingControl() {
     // Handle device state changes / acknowledgements
     if (latestEvent.type === 'device_state_changed' && latestEvent.controller_id === 'main_lighting') {
       const deviceId = latestEvent.device_id;
+      if (!deviceId) return;
 
       // Clear pending state on acknowledgement
       if (latestEvent.metadata?.is_acknowledgement) {

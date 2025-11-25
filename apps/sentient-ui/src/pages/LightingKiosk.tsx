@@ -45,6 +45,7 @@ export function LightingKiosk() {
 
     if (latestEvent.type === 'device_state_changed' && latestEvent.controller_id === 'main_lighting') {
       const deviceId = latestEvent.device_id;
+      if (!deviceId) return;
 
       if (latestEvent.metadata?.is_acknowledgement) {
         setPendingCommands(prev => { const n = new Set(prev); n.delete(deviceId); return n; });
