@@ -3,7 +3,22 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import { SentientEye } from '../components/SentientEye/SentientEye';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
+
+// Construct WebSocket URL - handle both relative paths and full URLs
+function getWebSocketUrl(): string {
+  const envUrl = import.meta.env.VITE_WS_URL;
+  if (!envUrl) return 'ws://localhost:3002';
+
+  // If it's a relative path like /ws, construct full URL from current location
+  if (envUrl.startsWith('/')) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}${envUrl}`;
+  }
+
+  return envUrl;
+}
+
+const WS_URL = getWebSocketUrl();
 
 interface LightingDevice {
   id: string;
