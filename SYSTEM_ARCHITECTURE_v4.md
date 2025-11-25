@@ -694,20 +694,39 @@ Primary target:
   - Docker + Docker Compose
   - Application data under `/opt/sentient`
 
+**Unified Environment Configuration:**
+
+Dev and production use the **same `docker-compose.yml`** with environment-specific values in `.env.sentient`:
+
+- **Single `.env.sentient` file** - Same structure for both environments, different values
+- **Single database name: `sentient`** - No separate dev/prod database names
+- **Single `docker-compose.yml`** - All services get config from `env_file: .env.sentient`
+
+```bash
+# Deploy to production
+./deploy.sh
+
+# Key commands
+docker compose up -d          # Start all services
+docker compose logs -f        # View logs
+docker compose down           # Stop all services
+```
+
 **Docker Compose stack includes:**
 
-- `sentient-postgres`
-- `sentient-redis`
-- `sentient-mosquitto`
-- `api-service`
-- `orchestrator-service`
-- `mqtt-gateway`
-- `realtime-gateway`
+- `sentient_postgres` - PostgreSQL 15
+- `sentient_redis` - Redis 7
+- `sentient_api` - API Service (NestJS)
+- `sentient_orchestrator` - Orchestrator Service
+- `sentient_mqtt_gateway` - MQTT Gateway (connects to external MQTT broker)
+- `sentient_realtime_gateway` - WebSocket Gateway
+- `sentient_ui` - Sentient UI (React/Vite)
 - `jobs-service` (future)
-- `admin-dashboard` (Sentient UI - typically run separately in dev)
 - Observability (future):
   - `prometheus`, `grafana`
   - `loki`, `promtail` (or similar)
+
+**Note:** MQTT broker runs externally at `sentientengine.ai:1883`. The mqtt-gateway uses `network_mode: "host"` to connect to it.
 
 ---
 
@@ -730,16 +749,17 @@ Authorization enforced at the API layer, with all operations scoped by client an
 
 ### 10.2 Secrets Management
 
-- No secrets in Git.  
-- `.env.example` committed as a template.  
-- `.env.production` exists only on the server.  
+- No secrets in Git.
+- `.env.sentient.example` committed as a template.
+- `.env.sentient` exists only on each machine (dev and server) - gitignored.
+- Both dev and production use the same file name, different values:
+  - Dev: local passwords, localhost URLs
+  - Production: secure passwords, production URLs
 - `/opt/sentient/secrets` directory holds:
   - `mosquitto.passwd`
   - TLS certs and keys
-  - Database credentials
-  - JWT signing keys  
 
-Secrets are mounted into containers as read-only volumes.
+Secrets are loaded via `env_file: .env.sentient` in docker-compose.yml.
 
 ---
 
@@ -795,35 +815,25 @@ Sentient/                      # repo root
     mqtt-gateway/
     realtime-gateway/
     jobs-service/              # (future)
-    admin-dashboard/           # Sentient UI
+    sentient-ui/               # Unified Admin & GM Console
     device-simulators/
   packages/
-    core-domain/
     shared-types/
-    shared-config/
-    shared-logging/
-    shared-messaging/
-  infra/
-    docker/
-      docker-compose.dev.yml
-      docker-compose.prod.yml
-      docker-compose.override.example.yml
-    migrations/
-      api-service/
-      orchestrator-service/
+  hardware/
+    Controller Code Teensy/    # Teensy firmware projects
+  nginx/
+    nginx.conf
+    sites/
+    ssl/
   docs/
     SYSTEM_ARCHITECTURE_v4.md
     NETWORK_DESIGN.md
     HARDWARE_STANDARDS.md
     OPERATIONS_RUNBOOK.md
-  scripts/
-    deploy/
-      deploy_prod.sh
-      restart_stack.sh
-    dev/
-      seed_db.ts
-      load_demo_data.ts
-  .env.example
+  .env.sentient.example        # Template for environment config
+  .env.sentient                # Actual config (gitignored)
+  docker-compose.yml           # Single unified compose file
+  deploy.sh                    # Production deployment script
   package.json
   pnpm-workspace.yaml
   tsconfig.base.json
