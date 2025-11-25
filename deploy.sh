@@ -44,15 +44,8 @@ git pull origin main
 echo -e "${GREEN}✓ Code updated${NC}"
 echo ""
 
-# Step 2: Install dependencies and build shared packages
-if [ "$SKIP_BUILD" = false ]; then
-  echo -e "${YELLOW}[2/5] Installing dependencies and building packages...${NC}"
-  pnpm install --frozen-lockfile
-  pnpm --filter "@sentient/*" build
-  echo -e "${GREEN}✓ Dependencies installed and packages built${NC}"
-else
-  echo -e "${YELLOW}[2/5] Skipping dependency install (--skip-build)${NC}"
-fi
+# Step 2: Skip local pnpm build (Docker handles this)
+echo -e "${YELLOW}[2/5] Skipping local pnpm build (Docker multi-stage handles this)${NC}"
 echo ""
 
 # Step 3: Build Docker images
