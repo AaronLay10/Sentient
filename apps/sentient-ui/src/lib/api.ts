@@ -100,30 +100,26 @@ export interface User {
 export const api = {
   // Controllers
   async getControllers(): Promise<Controller[]> {
-    try {
-      // For now, fetch from database via internal endpoint if available
-      // Otherwise return mock data for development
-      const response = await client.get('/internal/controllers');
-      return response.data;
-    } catch (error) {
-      console.warn('Failed to fetch controllers, using mock data', error);
-      // Return mock data for now
-      return [
-        {
-          id: 'boiler_room_subpanel',
-          friendly_name: 'Boiler Room Subpanel',
-          controller_type: 'microcontroller',
-          hardware_type: 'Teensy 4.1',
-          firmware_version: '2.3.0',
-          status: 'online',
-          device_count: 6,
-          pending_devices: 0,
-          heartbeat_interval_ms: 5000,
-          last_seen: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        },
-      ];
-    }
+    const response = await client.get('/controllers');
+    // Add status field based on last_seen
+    return response.data.map((controller: any) => {
+      const lastSeen = controller.last_seen ? new Date(controller.last_seen) : null;
+      const now = new Date();
+      const diffMs = lastSeen ? now.getTime() - lastSeen.getTime() : Infinity;
+      const diffSecs = diffMs / 1000;
+
+      let status = 'offline';
+      if (diffSecs < 30) {
+        status = 'online';
+      } else if (diffSecs < 120) {
+        status = 'warning';
+      }
+
+      return {
+        ...controller,
+        status,
+      };
+    });
   },
 
   async getController(id: string): Promise<Controller> {
