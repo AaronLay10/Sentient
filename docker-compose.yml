@@ -1,4 +1,4 @@
-name: sentient-dev
+name: sentient
 
 services:
   # =========================
@@ -10,16 +10,12 @@ services:
     container_name: sentient_postgres
     restart: unless-stopped
     env_file:
-      - .env
-    # These MUST exist in your .env file:
-    # POSTGRES_USER=postgres
-    # POSTGRES_PASSWORD=localdev
-    # POSTGRES_DB=sentient_dev
+      - .env.sentient.sentient
     environment:
-      # Fallbacks if .env is missing values (optional)
+      # Unified database name for dev and prod
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
-      POSTGRES_DB: ${POSTGRES_DB:-sentient_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-sentient}
     ports:
       - "5432:5432"
     volumes:
@@ -53,11 +49,11 @@ services:
     container_name: sentient_api
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.sentient.sentient
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       API_PORT: 3000
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient_dev}
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET}
       INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
@@ -79,7 +75,7 @@ services:
     container_name: sentient_orchestrator
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.sentient
     environment:
       NODE_ENV: production
       REDIS_URL: redis://redis:6379
@@ -96,7 +92,7 @@ services:
     container_name: sentient_mqtt_gateway
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.sentient
     environment:
       NODE_ENV: production
       MQTT_URL: mqtt://sentientengine.ai:1883  # Production MQTT broker
@@ -115,7 +111,7 @@ services:
     container_name: sentient_realtime_gateway
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.sentient
     environment:
       NODE_ENV: production
       REDIS_URL: redis://redis:6379
