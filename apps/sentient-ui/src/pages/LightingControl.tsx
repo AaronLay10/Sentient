@@ -36,7 +36,8 @@ export function LightingControl() {
   const [controller, setController] = useState<LightingController | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingCommands, setPendingCommands] = useState<Set<string>>(new Set());
-  const { isConnected: connected, events } = useWebSocket({ url: 'ws://localhost:3002' });
+  const wsUrl = window.location.protocol === 'https:' ? 'wss://sentientengine.ai/ws' : 'ws://sentientengine.ai/ws';
+  const { isConnected: connected, events } = useWebSocket({ url: wsUrl });
 
   // Fetch devices on mount
   useEffect(() => {
@@ -108,7 +109,7 @@ export function LightingControl() {
 
     // Handle controller online/offline
     if ((latestEvent.type === 'controller_online' || latestEvent.type === 'controller_offline') &&
-        latestEvent.controller_id === 'main_lighting') {
+      latestEvent.controller_id === 'main_lighting') {
       setController(prev => prev ? { ...prev, online: latestEvent.type === 'controller_online' } : null);
     }
 

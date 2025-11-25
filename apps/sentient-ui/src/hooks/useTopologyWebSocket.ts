@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTopologyStore } from './useTopologyStore';
 import type { TopologyEvent } from '../lib/topology/types';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://sentientengine.ai:3002';
 
 export function useTopologyWebSocket() {
   const addEvent = useTopologyStore((s) => s.addEvent);

@@ -36,7 +36,8 @@ interface ApiDevice {
 export function PowerControl() {
   const [powerControllers, setPowerControllers] = useState<Map<string, PowerController>>(new Map());
   const [loading, setLoading] = useState(true);
-  const { isConnected: connected, events } = useWebSocket({ url: 'ws://localhost:3002' });
+  const wsUrl = window.location.protocol === 'https:' ? 'wss://sentientengine.ai/ws' : 'ws://sentientengine.ai/ws';
+  const { isConnected: connected, events } = useWebSocket({ url: wsUrl });
 
   // Fetch devices and controller status from API on mount
   useEffect(() => {
@@ -257,75 +258,75 @@ export function PowerControl() {
         </div>
 
         {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#9ca3af' }}>
-          <p>Loading devices from database...</p>
-        </div>
-      ) : (
-        <div className="power-control-grid">
-          {Array.from(powerControllers.values()).map(controller => (
-          <div key={controller.controller_id} className="power-controller-card">
-            <div className="controller-header">
-              <div className="controller-info">
-                <Zap size={24} className={controller.online ? 'icon-online' : 'icon-offline'} />
-                <div>
-                  <h3 className="controller-name">{controller.name}</h3>
-                  <p className="controller-status">
-                    {controller.online ? (
-                      <span style={{ color: '#10b981' }}>● Online</span>
-                    ) : (
-                      <span style={{ color: '#ef4444' }}>○ Offline</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-              {controller.online && controller.lastHeartbeat && (
-                <div className="heartbeat-time">
-                  Last seen: {Math.floor((Date.now() - controller.lastHeartbeat) / 1000)}s ago
-                </div>
-              )}
-            </div>
-
-            {controller.devices.length === 0 ? (
-              <div className="no-devices">
-                <p>No devices registered yet</p>
-                <small>Waiting for controller to report devices...</small>
-              </div>
-            ) : (
-              <div className="device-grid-compact">
-                {controller.devices.map(device => (
-                  <div key={device.device_id} className={`device-row ${device.state ? 'state-on' : 'state-off'}`}>
-                    <div className={`state-indicator ${device.state ? 'on' : 'off'}`}>
-                      {device.state ? 'ON' : 'OFF'}
-                    </div>
-                    <div className="device-info-compact">
-                      <span className="device-name-compact">{device.name}</span>
-                    </div>
-                    <div className="button-pair">
-                      <button
-                        className={`btn-on ${device.state ? 'active' : ''}`}
-                        onClick={() => handleSetDeviceState(controller.controller_id, device.device_id, true)}
-                        disabled={!controller.online}
-                      >
-                        ON
-                      </button>
-                      <button
-                        className={`btn-off ${!device.state ? 'active' : ''}`}
-                        onClick={() => handleSetDeviceState(controller.controller_id, device.device_id, false)}
-                        disabled={!controller.online}
-                      >
-                        OFF
-                      </button>
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#9ca3af' }}>
+            <p>Loading devices from database...</p>
+          </div>
+        ) : (
+          <div className="power-control-grid">
+            {Array.from(powerControllers.values()).map(controller => (
+              <div key={controller.controller_id} className="power-controller-card">
+                <div className="controller-header">
+                  <div className="controller-info">
+                    <Zap size={24} className={controller.online ? 'icon-online' : 'icon-offline'} />
+                    <div>
+                      <h3 className="controller-name">{controller.name}</h3>
+                      <p className="controller-status">
+                        {controller.online ? (
+                          <span style={{ color: '#10b981' }}>● Online</span>
+                        ) : (
+                          <span style={{ color: '#ef4444' }}>○ Offline</span>
+                        )}
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-        </div>
-      )}
+                  {controller.online && controller.lastHeartbeat && (
+                    <div className="heartbeat-time">
+                      Last seen: {Math.floor((Date.now() - controller.lastHeartbeat) / 1000)}s ago
+                    </div>
+                  )}
+                </div>
 
-      <style>{`
+                {controller.devices.length === 0 ? (
+                  <div className="no-devices">
+                    <p>No devices registered yet</p>
+                    <small>Waiting for controller to report devices...</small>
+                  </div>
+                ) : (
+                  <div className="device-grid-compact">
+                    {controller.devices.map(device => (
+                      <div key={device.device_id} className={`device-row ${device.state ? 'state-on' : 'state-off'}`}>
+                        <div className={`state-indicator ${device.state ? 'on' : 'off'}`}>
+                          {device.state ? 'ON' : 'OFF'}
+                        </div>
+                        <div className="device-info-compact">
+                          <span className="device-name-compact">{device.name}</span>
+                        </div>
+                        <div className="button-pair">
+                          <button
+                            className={`btn-on ${device.state ? 'active' : ''}`}
+                            onClick={() => handleSetDeviceState(controller.controller_id, device.device_id, true)}
+                            disabled={!controller.online}
+                          >
+                            ON
+                          </button>
+                          <button
+                            className={`btn-off ${!device.state ? 'active' : ''}`}
+                            onClick={() => handleSetDeviceState(controller.controller_id, device.device_id, false)}
+                            disabled={!controller.online}
+                          >
+                            OFF
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <style>{`
         .power-control-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));

@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 // Construct WebSocket URL - handle both relative paths and full URLs
 function getWebSocketUrl(): string {
   const envUrl = import.meta.env.VITE_WS_URL;
-  if (!envUrl) return 'ws://localhost:3002';
+  if (!envUrl) return window.location.protocol === 'https:' ? 'wss://sentientengine.ai/ws' : 'ws://sentientengine.ai/ws';
 
   // If it's a relative path like /ws, construct full URL from current location
   if (envUrl.startsWith('/')) {
