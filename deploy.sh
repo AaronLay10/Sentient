@@ -52,9 +52,9 @@ echo ""
 if [ "$SKIP_BUILD" = false ]; then
   echo -e "${YELLOW}[3/5] Building Docker images...${NC}"
   if [ -n "$SINGLE_SERVICE" ]; then
-    docker compose -f docker-compose.prod.yml build "$SINGLE_SERVICE"
+    docker compose build "$SINGLE_SERVICE"
   else
-    docker compose -f docker-compose.prod.yml build
+    docker compose build
   fi
   echo -e "${GREEN}✓ Docker images built${NC}"
 else
@@ -65,7 +65,7 @@ echo ""
 # Step 4: Run database migrations (only if not single service or if service is api)
 if [ -z "$SINGLE_SERVICE" ] || [ "$SINGLE_SERVICE" = "api-service" ]; then
   echo -e "${YELLOW}[4/5] Running database migrations...${NC}"
-  docker compose -f docker-compose.prod.yml run --rm api-service pnpm prisma:db:push || echo "Migration may have already run"
+  docker compose run --rm api-service pnpm prisma:db:push || echo "Migration may have already run"
   echo -e "${GREEN}✓ Database migrations complete${NC}"
 else
   echo -e "${YELLOW}[4/5] Skipping migrations (not deploying api-service)${NC}"
@@ -75,9 +75,9 @@ echo ""
 # Step 5: Deploy services
 echo -e "${YELLOW}[5/5] Deploying services...${NC}"
 if [ -n "$SINGLE_SERVICE" ]; then
-  docker compose -f docker-compose.prod.yml up -d "$SINGLE_SERVICE"
+  docker compose up -d "$SINGLE_SERVICE"
 else
-  docker compose -f docker-compose.prod.yml up -d --remove-orphans
+  docker compose up -d --remove-orphans
 fi
 echo -e "${GREEN}✓ Services deployed${NC}"
 echo ""
@@ -88,13 +88,13 @@ sleep 10
 
 echo ""
 echo -e "${GREEN}=== Service Status ===${NC}"
-docker compose -f docker-compose.prod.yml ps
+docker compose ps
 echo ""
 
 echo -e "${GREEN}=== Deployment Complete ===${NC}"
 echo "Finished at: $(date)"
 echo ""
 echo "Quick commands:"
-echo "  View logs:     docker compose -f docker-compose.prod.yml logs -f [service]"
-echo "  Restart:       docker compose -f docker-compose.prod.yml restart [service]"
-echo "  Stop all:      docker compose -f docker-compose.prod.yml down"
+echo "  View logs:     docker compose logs -f [service]"
+echo "  Restart:       docker compose restart [service]"
+echo "  Stop all:      docker compose down"
