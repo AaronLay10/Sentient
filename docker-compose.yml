@@ -39,18 +39,8 @@ services:
     networks:
       - sentient_net
 
-  mqtt:
-    image: eclipse-mosquitto:2
-    container_name: sentient_mqtt
-    restart: unless-stopped
-    ports:
-      - "1883:1883"    # MQTT
-      - "9001:9001"    # MQTT over WebSockets (optional)
-    volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - mqttdata:/mosquitto/data
-    networks:
-      - sentient_net
+  # NOTE: Local MQTT broker removed - using production MQTT at 192.168.2.3:1883
+  # The mqtt-gateway connects directly to production broker via host network
 
   # =========================
   # Sentient Engine Services
@@ -69,15 +59,12 @@ services:
       API_PORT: 3000
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-sentient_dev}
       REDIS_URL: redis://redis:6379
-      MQTT_URL: mqtt://mqtt:1883
       JWT_SECRET: ${JWT_SECRET}
       INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
     depends_on:
       postgres:
         condition: service_started
       redis:
-        condition: service_started
-      mqtt:
         condition: service_started
     ports:
       - "3001:3000"  # container 3000 -> host 3001
@@ -256,4 +243,3 @@ networks:
 volumes:
   pgdata:
   redisdata:
-  mqttdata:

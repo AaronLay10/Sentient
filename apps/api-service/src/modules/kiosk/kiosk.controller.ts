@@ -1,10 +1,17 @@
 import { Controller, Post, Body } from '@nestjs/common';
+import { IsString, IsOptional, IsObject } from 'class-validator';
 import { DevicesService } from '../devices/devices.service';
 
 // DTO for kiosk lighting commands (no auth required - LAN only)
 class KioskLightingCommandDto {
+  @IsString()
   device_id: string;
+
+  @IsString()
   command: string;
+
+  @IsOptional()
+  @IsObject()
   payload?: Record<string, any>;
 }
 
