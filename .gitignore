@@ -4,3 +4,15 @@ dist
 .env.sentient
 !.env.sentient.example
 .DS_Store
+
+# Runtime data and logs
+mosquitto/data/
+mosquitto/log/
+mosquitto.backup.*/
+
+# SSL certificates and keys
+nginx/ssl/
+
+# Docker volumes
+postgres_data/
+redis_data/
