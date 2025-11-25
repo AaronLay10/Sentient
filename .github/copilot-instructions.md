@@ -56,7 +56,7 @@ A multi-service real-time orchestration system:
 - UDM Pro
 - VLAN segmentation
 - Docker & Docker Compose
-- CI/CD pipelines
+- GitHub for version control (no CI/CD - manual deploy via script)
 - Ubuntu servers
 
 ### Coding Preferences
@@ -134,7 +134,7 @@ ChatGPT should also help with:
 - System design diagrams
 - Scaling strategies
 - Folder structures
-- CI/CD workflows
+- Deployment scripts
 - Technical documentation
 - Business planning
 - Productivity optimization

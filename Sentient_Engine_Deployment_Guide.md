@@ -4,14 +4,14 @@ This guide describes how to set up and deploy the **Sentient Engine** full stack
 
 It covers:
 
-- OS choice and reasoning  
-- Disk layout and RAID 10  
-- Initial server and network setup (with UDM Pro)  
-- Docker + Docker Compose installation  
-- Running PostgreSQL, Redis, Mosquitto MQTT, and Sentient services via Compose  
-- Secrets and environment management  
-- GitHub Actions CI/CD for automatic deployment  
-- Optional monitoring stack (Prometheus, Grafana, Loki)  
+- OS choice and reasoning
+- Disk layout and RAID 10
+- Initial server and network setup (with UDM Pro)
+- Docker + Docker Compose installation
+- Running PostgreSQL, Redis, Mosquitto MQTT, and Sentient services via Compose
+- Secrets and environment management
+- Manual deployment via deploy script
+- Optional monitoring stack (Prometheus, Grafana, Loki)
 - Security hardening and safe update procedures  
 
 ---
@@ -467,7 +467,7 @@ Quick tests:
   ```
   If you see $SYS metrics, auth works.
 
-At this point the core infrastructure is up. Next, we hook deployment to GitHub.
+At this point the core infrastructure is up.
 
 ---
 
@@ -477,7 +477,7 @@ At this point the core infrastructure is up. Next, we hook deployment to GitHub.
 
 - Never commit real secrets to Git.
 - Use `.env` on the server for app secrets.
-- Use GitHub **Secrets** for CI/CD (server SSH key, registry auth, etc.).
+- Keep `.env.example` in the repo to document required variables.
 
 ### 6.1 `.env` Management
 
@@ -503,118 +503,108 @@ For TLS, JWT keys, etc.:
       - /opt/sentient/secrets/jwt.key:/run/secrets/jwt.key:ro
   ```
 
-### 6.3 GitHub Secrets (for CI/CD)
-
-In GitHub repo settings → Secrets and variables → Actions:
-
-Add:
-
-- `DEPLOY_HOST` – server IP or DNS.
-- `DEPLOY_USERNAME` – `deploy`.
-- `DEPLOY_KEY` – **private SSH key** for that user (PEM).
-- `REGISTRY_USER` / `REGISTRY_TOKEN` – if using Docker Hub.
-- If using GitHub Container Registry (GHCR), you can just use `GITHUB_TOKEN` inside the workflow.
-
-GitHub Secrets are encrypted and never stored in logs.
-
 ---
 
-## 7. GitHub Actions CI/CD: Automatic Deployment
+## 7. Deployment Workflow
 
-We want:
+We use **GitHub for version control only** (push/pull between Mac and server). Deployment is done manually via a deploy script on the server.
 
-1. On push to `main`, build a Docker image for `sentient-engine`.
-2. Push it to a registry (GHCR suggested).
-3. SSH into R710 and `docker compose pull && docker compose up -d`.
+### 7.1 Git Setup
 
-### 7.1 Example Workflow
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: CI-CD Deploy
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/sentient-engine:latest
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Copy docker-compose.yml to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: 22
-          source: "docker-compose.yml"
-          target: "/opt/sentient/docker-compose.yml"
-
-      - name: Deploy on server
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: 22
-          script: |
-            cd /opt/sentient
-            docker compose pull
-            docker compose up -d
+**On your Mac (development):**
+```bash
+git remote add origin git@github.com:AaronLay10/Sentient.git
+git push origin main
 ```
 
-**Notes:**
+**On the server:**
+```bash
+cd /opt/sentient
+git clone git@github.com:AaronLay10/Sentient.git .
+# Or if already cloned:
+git pull origin main
+```
 
-- `build` job:
-  - Uses GitHub’s `GITHUB_TOKEN` to push to GHCR under your account.
-  - Tags image as `ghcr.io/<owner>/sentient-engine:latest`.
+### 7.2 Deploy Script
 
-- `deploy` job:
-  - Copies `docker-compose.yml` to server (keeps it in sync).
-  - Deploys by pulling new image and doing `docker compose up -d`.
-  - Uses `DEPLOY_HOST`, `DEPLOY_USERNAME`, `DEPLOY_KEY` secrets.
+Create `/opt/sentient/deploy.sh`:
 
-**Initial Setup:**
+```bash
+#!/bin/bash
+set -e
 
-1. On server:
-   - Ensure `/opt/sentient/docker-compose.yml` and `.env` exist.
-   - Run `docker compose up -d` manually once to initialize stack.
+echo "=== Sentient Engine Deployment ==="
+echo "Started at: $(date)"
 
-2. In GitHub:
-   - Configure secrets.
-   - Push to `main` to trigger first build + deploy.
+cd /opt/sentient
 
-After that, **push = build + deploy**.
+# Pull latest code from GitHub
+echo "[1/5] Pulling latest code..."
+git pull origin main
+
+# Build shared packages
+echo "[2/5] Installing dependencies and building packages..."
+pnpm install --frozen-lockfile
+pnpm --filter "@sentient/*" build
+
+# Build Docker images locally
+echo "[3/5] Building Docker images..."
+docker compose -f docker-compose.prod.yml build
+
+# Run database migrations
+echo "[4/5] Running database migrations..."
+docker compose -f docker-compose.prod.yml run --rm api-service pnpm prisma:db:push
+
+# Deploy services
+echo "[5/5] Deploying services..."
+docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+# Health check
+echo "Waiting for services to start..."
+sleep 10
+docker compose -f docker-compose.prod.yml ps
+
+echo ""
+echo "=== Deployment Complete ==="
+echo "Finished at: $(date)"
+```
+
+Make it executable:
+```bash
+chmod +x /opt/sentient/deploy.sh
+```
+
+### 7.3 Deployment Process
+
+**From your Mac:**
+```bash
+# Commit and push changes
+git add .
+git commit -m "Your changes"
+git push origin main
+```
+
+**On the server:**
+```bash
+cd /opt/sentient
+./deploy.sh
+```
+
+### 7.4 Quick Deploy Commands
+
+For faster iteration, you can also run individual steps:
+
+```bash
+# Just pull and restart (no rebuild)
+git pull origin main && docker compose -f docker-compose.prod.yml up -d
+
+# Rebuild a single service
+docker compose -f docker-compose.prod.yml build api-service
+docker compose -f docker-compose.prod.yml up -d api-service
+
+# View logs
+docker compose -f docker-compose.prod.yml logs -f api-service
+```
 
 ---
 
@@ -767,12 +757,10 @@ For logs, you can later add **Loki** and **Promtail** to aggregate container log
 
 ## 10. Safe Updates and Restarts
 
-### 10.1 App Updates (via CI/CD)
+### 10.1 App Updates
 
-- Push to `main`:
-  - GitHub Actions builds new image.
-  - Pushes to GHCR.
-  - SSHes into server, runs `docker compose pull && docker compose up -d`.
+- Push changes to GitHub from your Mac
+- SSH to server and run `./deploy.sh`
 - Downtime is minimal (app container restart). Make sure clients can handle reconnects.
 
 ### 10.2 Service Updates (DB, Redis, Mosquitto)
@@ -833,8 +821,9 @@ You now have a full recipe for:
 - Configuring users, SSH, firewall, and VLAN networking with a UDM Pro.
 - Installing **Docker & Docker Compose**.
 - Running **PostgreSQL, Redis, Mosquitto MQTT, and the Sentient Engine** via a single `docker compose up -d`.
-- Managing secrets safely with `.env` and GitHub Secrets.
-- Automating deployments using **GitHub Actions** (build → push → deploy).
+- Managing secrets safely with `.env` files on the server.
+- Deploying manually via `deploy.sh` script (git pull → build → deploy).
+- Using GitHub for version control only (push/pull between Mac and server).
 - Optionally adding **Prometheus + Grafana** (and later Loki) for metrics and logs.
 - Hardening security and defining a safe update workflow.
 
@@ -844,4 +833,4 @@ From here, you can refine:
 - How Scenes/Puzzles map into services.
 - Advanced monitoring and alerting rules.
 
-But with this in place, you’ve got a solid, production-style foundation for Sentient on that R710. 
+But with this in place, you've got a solid, production-style foundation for Sentient on that R710. 
