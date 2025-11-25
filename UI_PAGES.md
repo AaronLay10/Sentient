@@ -418,7 +418,7 @@ box-shadow: 0 0 20px rgba(color, 0.1);
 
 ### Data Fetching
 - RESTful API: `http://localhost:3001`
-- WebSocket: `ws://localhost:3002`
+- WebSocket: `ws://sentientengine.ai:3002`
 - Bearer token authentication via `getAuthToken()`
 - Error handling with console logging (production needs improvement)
 

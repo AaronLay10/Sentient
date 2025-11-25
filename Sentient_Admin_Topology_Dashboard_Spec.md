@@ -102,7 +102,7 @@ The Admin UI uses this to construct initial nodes and edges.
 Admin UI connects to Realtime Gateway via WebSocket:
 
 - URL from env: `NEXT_PUBLIC_WS_URL`, e.g.:
-  - Dev: `ws://localhost:3002`
+  - Dev: `ws://sentientengine.ai:3002`
   - Prod: `wss://admin.sentientengine.com/ws`
 
 Incoming messages are JSON events:

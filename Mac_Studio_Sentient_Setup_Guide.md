@@ -101,7 +101,7 @@ MQTT_USERNAME=devuser
 MQTT_PASSWORD=devpass
 
 NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_WS_URL=ws://localhost:3002
+NEXT_PUBLIC_WS_URL=ws://sentientengine.ai:3002
 
 JWT_SECRET=devsecret123
 ```
