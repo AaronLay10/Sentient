@@ -31,8 +31,8 @@ services:
     networks:
       - sentient_net
 
-  # NOTE: Local MQTT broker removed - using production MQTT at sentientengine.ai:1883
-  # The mqtt-gateway connects directly to production broker via host network
+  # NOTE: MQTT broker runs externally at sentientengine.ai:1883
+  # mqtt-gateway uses host network to connect to it
 
   # =========================
   # Sentient Engine Services
@@ -88,14 +88,19 @@ services:
       - .env.sentient
     environment:
       NODE_ENV: production
-      MQTT_URL: mqtt://sentientengine.ai:1883  # Production MQTT broker
-      API_URL: http://localhost:3001  # API service exposed on host
-      REDIS_URL: redis://localhost:6379  # Redis exposed on host
-      INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
+      MQTT_URL: mqtt://sentientengine.ai:1883
+      API_URL: http://localhost:3001
+      REDIS_URL: redis://localhost:6379
     depends_on:
       api-service:
         condition: service_healthy
-    network_mode: "host"  # Use host network to access both production MQTT and local services
+    network_mode: "host"
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   realtime-gateway:
     build:
@@ -202,28 +207,23 @@ services:
   # =========================
   # Sentient UI (Unified Admin & GM Console)
   # =========================
-  # Uncomment for containerized UI deployment
-  # For development, run: cd apps/sentient-ui && pnpm dev
-
-  # sentient-ui:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/sentient-ui/Dockerfile
-  #   container_name: sentient_ui
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     NODE_ENV: development
-  #     VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
-  #     VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:3002}
-  #   depends_on:
-  #     - api-service
-  #     - realtime-gateway
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - sentient_net
+  sentient-ui:
+    build:
+      context: .
+      dockerfile: apps/sentient-ui/Dockerfile
+    container_name: sentient_ui
+    restart: unless-stopped
+    env_file:
+      - .env.sentient
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api-service
+      - realtime-gateway
+    ports:
+      - "3000:3000"
+    networks:
+      - sentient_net
 
 networks:
   sentient_net:
