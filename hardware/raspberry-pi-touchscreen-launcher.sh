@@ -32,4 +32,4 @@ chromium-browser \
   --allow-running-insecure-content \
   --window-size=1280,800 \
   --window-position=0,0 \
-  https://192.168.20.3/touchscreen
+  https://sentientengine.ai/kiosk

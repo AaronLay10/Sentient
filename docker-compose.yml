@@ -39,7 +39,7 @@ services:
     networks:
       - sentient_net
 
-  # NOTE: Local MQTT broker removed - using production MQTT at 192.168.2.3:1883
+  # NOTE: Local MQTT broker removed - using production MQTT at sentientengine.ai:1883
   # The mqtt-gateway connects directly to production broker via host network
 
   # =========================
@@ -99,7 +99,7 @@ services:
       - .env
     environment:
       NODE_ENV: production
-      MQTT_URL: mqtt://192.168.2.3:1883  # Production MQTT broker for dev testing
+      MQTT_URL: mqtt://sentientengine.ai:1883  # Production MQTT broker
       API_URL: http://localhost:3001  # API service exposed on host
       REDIS_URL: redis://localhost:6379  # Redis exposed on host
       INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
