@@ -20,10 +20,9 @@ RUN pnpm install --frozen-lockfile
 # Build shared packages first
 RUN pnpm -r --filter "@sentient/*" build
 
-# Build Sentient UI with production URLs
-# VITE_WS_URL=/ws will be resolved at runtime to ws:// or wss:// based on page protocol
-ENV VITE_API_URL=/api
-ENV VITE_WS_URL=/ws
+# Build Sentient UI with production URLs using sentientengine.ai domain
+ENV VITE_API_URL=https://sentientengine.ai/api
+ENV VITE_WS_URL=wss://sentientengine.ai/ws
 RUN pnpm -r --filter sentient-ui build
 
 # Production stage with nginx
