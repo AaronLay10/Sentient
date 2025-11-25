@@ -1,1 +1,2 @@
-delete from "User" where email = 'owner@demo.local';
+-- Reset admin user (for development)
+delete from "User" where email = 'admin@paragon.local';

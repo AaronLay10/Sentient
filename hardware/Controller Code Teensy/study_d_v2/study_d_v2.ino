@@ -107,6 +107,7 @@ SentientMQTT sentient(make_mqtt_config());
 SentientCapabilityManifest manifest;
 
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // DMX SETUP
@@ -334,6 +335,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             digitalWrite(motor_left.dir_pin_2, LOW);
             motor_left.direction = MOTOR_UP;
             Serial.println(F("[CMD] Motor Left: Up"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_DOWN) == 0)
         {
@@ -343,6 +345,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             digitalWrite(motor_left.dir_pin_2, HIGH);
             motor_left.direction = MOTOR_DOWN;
             Serial.println(F("[CMD] Motor Left: Down"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_STOP) == 0)
         {
@@ -352,6 +355,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
                 digitalWrite(PIN_MOTORS_ENABLE, HIGH);
             }
             Serial.println(F("[CMD] Motor Left: Stop"));
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
@@ -367,6 +371,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             digitalWrite(motor_right.dir_pin_2, LOW);
             motor_right.direction = MOTOR_UP;
             Serial.println(F("[CMD] Motor Right: Up"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_DOWN) == 0)
         {
@@ -376,6 +381,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             digitalWrite(motor_right.dir_pin_2, HIGH);
             motor_right.direction = MOTOR_DOWN;
             Serial.println(F("[CMD] Motor Right: Down"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_STOP) == 0)
         {
@@ -385,6 +391,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
                 digitalWrite(PIN_MOTORS_ENABLE, HIGH);
             }
             Serial.println(F("[CMD] Motor Right: Stop"));
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
@@ -398,6 +405,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             value = constrain(value, 0, 255);
             dmxTx.set(FOG_DMX_CHANNEL_VOLUME, value);
             Serial.printf("[CMD] Fog DMX: Volume = %d\n", value);
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_SET_TIMER) == 0 && payload["value"].is<int>())
         {
@@ -405,6 +413,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             value = constrain(value, 0, 255);
             dmxTx.set(FOG_DMX_CHANNEL_TIMER, value);
             Serial.printf("[CMD] Fog DMX: Timer = %d\n", value);
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_SET_FAN_SPEED) == 0 && payload["value"].is<int>())
         {
@@ -412,7 +421,38 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             value = constrain(value, 0, 255);
             dmxTx.set(FOG_DMX_CHANNEL_FAN_SPEED, value);
             Serial.printf("[CMD] Fog DMX: Fan Speed = %d\n", value);
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }

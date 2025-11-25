@@ -109,6 +109,9 @@ SentientMQTT sentient(build_mqtt_config());
 SentientCapabilityManifest manifest;
 SentientDeviceRegistry deviceRegistry;
 
+// Forward declaration for acknowledgement publishing
+void publish_command_acknowledgement(const char *device_id, const char *command);
+
 void build_capability_manifest()
 {
     manifest.set_controller_info(
@@ -1470,6 +1473,7 @@ void operatorMaglockHandler(const char *data)
 
     digitalWrite(OPERATOR_MAGLOCK, shouldOpen ? LOW : HIGH); // open=LOW, close=HIGH - Active High is Locked
     Serial.println("Operator Maglock " + String(shouldOpen ? "OPEN" : "CLOSED"));
+    publish_command_acknowledgement("operator_maglock", shouldOpen ? "open" : "close");
 }
 
 void woodDoorMaglockHandler(const char *data)
@@ -1494,6 +1498,7 @@ void woodDoorMaglockHandler(const char *data)
 
     digitalWrite(WOOD_DOOR_MAGLOCK, shouldOpen ? LOW : HIGH); // open=LOW, close=HIGH - Active High is Locked
     Serial.println("Wood Door Maglock " + String(shouldOpen ? "OPEN" : "CLOSED"));
+    publish_command_acknowledgement("wood_door_maglock", shouldOpen ? "open" : "close");
 }
 
 void exitDoorFWDHandler(const char *data)
@@ -1665,6 +1670,7 @@ void fogMachineHandler(const char *data)
 
     digitalWrite(CLOCKFOGPOWER, shouldTurnOn ? LOW : HIGH); // Active LOW: LOW = ON, HIGH = OFF
     Serial.println("Fog Machine " + String(shouldTurnOn ? "ON" : "OFF"));
+    publish_command_acknowledgement("fog_machine", shouldTurnOn ? "on" : "off");
 }
 
 void blacklightHandler(const char *data)
@@ -1689,6 +1695,7 @@ void blacklightHandler(const char *data)
 
     digitalWrite(BLACKLIGHT, shouldTurnOn ? HIGH : LOW); // Active HIGH: HIGH = ON, LOW = OFF
     Serial.println("Blacklight " + String(shouldTurnOn ? "ON" : "OFF"));
+    publish_command_acknowledgement("blacklights", shouldTurnOn ? "on" : "off");
 }
 
 void laserLightHandler(const char *data)
@@ -1712,4 +1719,35 @@ void laserLightHandler(const char *data)
 
     digitalWrite(LASER_LIGHT, shouldTurnOn ? HIGH : LOW); // Active HIGH: HIGH = ON, LOW = OFF
     Serial.println("Laser Lights " + String(shouldTurnOn ? "ON" : "OFF"));
+    publish_command_acknowledgement("laser_lights", shouldTurnOn ? "on" : "off");
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(CLIENT_ID) + "/" + String(ROOM_ID) + "/" +
+                      String(CAT_ACKNOWLEDGEMENT) + "/" + String(CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print("[ACK] -> ");
+    Serial.println(ackTopic);
 }

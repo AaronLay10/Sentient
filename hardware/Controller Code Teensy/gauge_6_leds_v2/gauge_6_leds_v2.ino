@@ -311,6 +311,7 @@ void set_flicker_mode_5();
 void set_flicker_mode_8();
 void update_gauge_flicker();
 String extract_command_value(const JsonDocument &payload);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // ============================================================================
 // MQTT OBJECTS
@@ -543,6 +544,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         gauges_active = true;
         Serial.println(F("[GAUGE 6] Activated - tracking valve position"));
         publish_hardware_status();
+        publish_command_acknowledgement(CONTROLLER_ID, command);
     }
     else if (cmd.equals(CMD_DEACTIVATE_GAUGES))
     {
@@ -550,6 +552,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         stepper_6.moveTo(gauge_min_steps);
         Serial.println(F("[GAUGE 6] Deactivated - moving to zero"));
         publish_hardware_status();
+        publish_command_acknowledgement(CONTROLLER_ID, command);
     }
     else if (cmd.equals(CMD_ADJUST_GAUGE_ZERO))
     {
@@ -596,21 +599,25 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
     {
         set_ceiling_off();
         Serial.println(F("[CEILING] All LEDs off"));
+        publish_command_acknowledgement(DEV_CEILING_LEDS, command);
     }
     else if (cmd.equals(CMD_CEILING_PATTERN_1))
     {
         set_ceiling_pattern_1();
         Serial.println(F("[CEILING] Pattern 1"));
+        publish_command_acknowledgement(DEV_CEILING_LEDS, command);
     }
     else if (cmd.equals(CMD_CEILING_PATTERN_2))
     {
         set_ceiling_pattern_2();
         Serial.println(F("[CEILING] Pattern 2"));
+        publish_command_acknowledgement(DEV_CEILING_LEDS, command);
     }
     else if (cmd.equals(CMD_CEILING_PATTERN_3))
     {
         set_ceiling_pattern_3();
         Serial.println(F("[CEILING] Pattern 3"));
+        publish_command_acknowledgement(DEV_CEILING_LEDS, command);
     }
 
     // =========================================
@@ -621,21 +628,25 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
     {
         set_flicker_off();
         Serial.println(F("[GAUGE LEDS] Flicker off"));
+        publish_command_acknowledgement(DEV_GAUGE_LEDS, command);
     }
     else if (cmd.equals(CMD_FLICKER_MODE_2))
     {
         set_flicker_mode_2();
         Serial.println(F("[GAUGE LEDS] Flicker mode 1"));
+        publish_command_acknowledgement(DEV_GAUGE_LEDS, command);
     }
     else if (cmd.equals(CMD_FLICKER_MODE_5))
     {
         set_flicker_mode_5();
         Serial.println(F("[GAUGE LEDS] Flicker mode 2"));
+        publish_command_acknowledgement(DEV_GAUGE_LEDS, command);
     }
     else if (cmd.equals(CMD_FLICKER_MODE_8))
     {
         set_flicker_mode_8();
         Serial.println(F("[GAUGE LEDS] Flicker mode 3"));
+        publish_command_acknowledgement(DEV_GAUGE_LEDS, command);
     }
     else if (cmd.equals(CMD_GAUGE_LEDS_ON))
     {
@@ -646,6 +657,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         }
         FastLED.show();
         Serial.println(F("[GAUGE LEDS] All ON (base color)"));
+        publish_command_acknowledgement(DEV_GAUGE_LEDS, command);
     }
     else if (cmd.equals(CMD_GAUGE_LEDS_OFF))
     {
@@ -656,6 +668,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         }
         FastLED.show();
         Serial.println(F("[GAUGE LEDS] All OFF"));
+        publish_command_acknowledgement(DEV_GAUGE_LEDS, command);
     }
     else
     {
@@ -1039,4 +1052,34 @@ String extract_command_value(const JsonDocument &payload)
         return payload["value"].as<String>();
     }
     return "";
+}
+
+// ============================================================================
+// COMMAND ACKNOWLEDGEMENT
+// ============================================================================
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!mqtt.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(CLIENT_ID) + "/" + String(ROOM_ID) + "/" +
+                      String(CAT_ACKNOWLEDGEMENT) + "/" + String(CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    mqtt.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }

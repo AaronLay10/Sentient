@@ -137,7 +137,8 @@ export class DevicesService {
       where: { id: deviceId },
       include: {
         controller: true,
-        actions: true
+        actions: true,
+        room: true
       }
     });
 
@@ -145,14 +146,16 @@ export class DevicesService {
       throw new NotFoundException(`Device ${deviceId} not found`);
     }
 
-    console.log(`📦 Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${device.roomId}`);
+    // Use room name (lowercase) for MQTT topic, not the UUID
+    const roomName = device.room?.name?.toLowerCase() || device.roomId;
+    console.log(`📦 Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${roomName}`);
 
     // Publish device command event to Redis
     const commandEvent = {
       event_type: 'device_command',
       controller_id: device.controllerId,
       device_id: deviceId,
-      room_id: device.roomId,
+      room_id: roomName,
       command: {
         device_id: deviceId,
         state: state

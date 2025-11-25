@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
 import { ControllersService } from './controllers.service';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
@@ -10,5 +10,10 @@ export class ControllersPublicController {
   @Get()
   async findAll() {
     return this.controllersService.findAll();
+  }
+
+  @Post(':controllerId/request-status')
+  async requestStatus(@Param('controllerId') controllerId: string) {
+    return this.controllersService.requestStatus(controllerId);
   }
 }

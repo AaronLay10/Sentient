@@ -262,5 +262,33 @@ void handleCommand(const char *command, const JsonDocument &payload, void *conte
         counterB = 0;
         telemetryInitialized = false; // Force telemetry update
         Serial.println("  Wheel counter reset to 0");
+        publish_command_acknowledgement(CONTROLLER_ID, command);
     }
+}
+
+// ------------------- COMMAND ACKNOWLEDGEMENT -------------------
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(CLIENT_ID) + "/" + String(ROOM_ID) + "/" +
+                      String(CAT_ACKNOWLEDGEMENT) + "/" + String(CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { getAuthToken } from '../components/ProtectedRoute';
-import { Power, Zap, ZapOff } from 'lucide-react';
+import { Power, Zap } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -27,6 +27,8 @@ interface ApiDevice {
   device_type: string;
   device_category: string;
   properties?: any;
+  current_state: boolean;
+  state_updated_at?: string;
   created_at: string;
   actions?: any[];
 }
@@ -85,7 +87,7 @@ export function PowerControl() {
               devices: apiDevices.map(d => ({
                 device_id: d.id,
                 name: d.friendly_name,
-                state: false, // Default state, will be updated by WebSocket
+                state: d.current_state ?? false, // Use persisted state from database
               })),
             });
           } else {
@@ -111,6 +113,23 @@ export function PowerControl() {
 
       setPowerControllers(initialControllers);
       setLoading(false);
+
+      // Request current status from each online controller
+      for (const controllerId of controllerIds) {
+        if (controllerStatuses.get(controllerId)) {
+          try {
+            await fetch(`${API_URL}/controllers/${controllerId}/request-status`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            console.log(`📋 Requested status from ${controllerId}`);
+          } catch (error) {
+            console.error(`Failed to request status from ${controllerId}:`, error);
+          }
+        }
+      }
     };
 
     fetchDevices();
@@ -120,7 +139,8 @@ export function PowerControl() {
   useEffect(() => {
     if (events.length === 0) return;
 
-    const latestEvent = events[events.length - 1];
+    // Events are prepended to the array, so index 0 is the newest
+    const latestEvent = events[0];
     console.log('PowerControl received event:', latestEvent.type, latestEvent.controller_id);
 
     // Handle controller heartbeat
@@ -154,10 +174,15 @@ export function PowerControl() {
       }
     }
 
-    // Handle device state changes
+    // Handle device state changes (including command acknowledgements)
     if (latestEvent.type === 'device_state_changed') {
       const controllerId = latestEvent.controller_id;
       const deviceId = latestEvent.device_id;
+      const isAck = latestEvent.metadata?.is_acknowledgement;
+
+      if (isAck) {
+        console.log(`⚡ ACK received: ${controllerId}/${deviceId} -> command: ${latestEvent.payload?.command_acknowledged}`);
+      }
 
       if (controllerId?.includes('power_control')) {
         setPowerControllers(prev => {
@@ -166,7 +191,9 @@ export function PowerControl() {
 
           if (controller) {
             const deviceIndex = controller.devices.findIndex(d => d.device_id === deviceId);
-            const deviceState = latestEvent.payload?.new_state?.on ?? latestEvent.payload?.new_state?.state ?? false;
+            // Check for power (boolean), state (0/1), or on (boolean) - firmware sends both power and state
+            const newState = latestEvent.payload?.new_state;
+            const deviceState = newState?.power ?? (newState?.state === 1 || newState?.state === true) ?? newState?.on ?? false;
 
             if (deviceIndex >= 0) {
               // Only update existing device state (devices come from database via API)
@@ -180,9 +207,7 @@ export function PowerControl() {
     }
   }, [events]);
 
-  const handleToggleDevice = async (_controllerId: string, deviceId: string, currentState: boolean) => {
-    const newState = !currentState;
-
+  const handleSetDeviceState = async (_controllerId: string, deviceId: string, newState: boolean) => {
     // Send command to API (DO NOT optimistically update - wait for controller acknowledgment)
     try {
       const token = getAuthToken();
@@ -266,30 +291,31 @@ export function PowerControl() {
                 <small>Waiting for controller to report devices...</small>
               </div>
             ) : (
-              <div className="device-grid">
+              <div className="device-grid-compact">
                 {controller.devices.map(device => (
-                  <div key={device.device_id} className="device-control">
-                    <div className="device-info">
-                      <span className="device-name">{device.name}</span>
-                      <span className="device-id">{device.device_id}</span>
+                  <div key={device.device_id} className={`device-row ${device.state ? 'state-on' : 'state-off'}`}>
+                    <div className={`state-indicator ${device.state ? 'on' : 'off'}`}>
+                      {device.state ? 'ON' : 'OFF'}
                     </div>
-                    <button
-                      className={`power-button ${device.state ? 'on' : 'off'}`}
-                      onClick={() => handleToggleDevice(controller.controller_id, device.device_id, device.state)}
-                      disabled={!controller.online}
-                    >
-                      {device.state ? (
-                        <>
-                          <Zap size={16} />
-                          <span>ON</span>
-                        </>
-                      ) : (
-                        <>
-                          <ZapOff size={16} />
-                          <span>OFF</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="device-info-compact">
+                      <span className="device-name-compact">{device.name}</span>
+                    </div>
+                    <div className="button-pair">
+                      <button
+                        className={`btn-on ${device.state ? 'active' : ''}`}
+                        onClick={() => handleSetDeviceState(controller.controller_id, device.device_id, true)}
+                        disabled={!controller.online}
+                      >
+                        ON
+                      </button>
+                      <button
+                        className={`btn-off ${!device.state ? 'active' : ''}`}
+                        onClick={() => handleSetDeviceState(controller.controller_id, device.device_id, false)}
+                        disabled={!controller.online}
+                      >
+                        OFF
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -372,85 +398,121 @@ export function PowerControl() {
           color: #6b7280;
         }
 
-        .device-grid {
-          display: grid;
-          gap: 1rem;
-        }
-
-        .device-control {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem;
-          background: rgba(30, 41, 59, 0.4);
-          border: 1px solid rgba(124, 58, 237, 0.1);
-          border-radius: 0.5rem;
-          transition: all 0.2s;
-        }
-
-        .device-control:hover {
-          border-color: rgba(124, 58, 237, 0.3);
-          background: rgba(30, 41, 59, 0.6);
-        }
-
-        .device-info {
+        .device-grid-compact {
           display: flex;
           flex-direction: column;
+          gap: 0.375rem;
+        }
+
+        .device-row {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 0.75rem;
+          background: rgba(30, 41, 59, 0.4);
+          border-radius: 0.375rem;
+          border-left: 3px solid transparent;
+          transition: all 0.15s;
+        }
+
+        .device-row.state-on {
+          border-left-color: #10b981;
+          background: rgba(16, 185, 129, 0.08);
+        }
+
+        .device-row.state-off {
+          border-left-color: #6b7280;
+        }
+
+        .state-indicator {
+          font-size: 0.625rem;
+          font-weight: 700;
+          padding: 0.2rem 0.4rem;
+          border-radius: 0.25rem;
+          min-width: 32px;
+          text-align: center;
+          letter-spacing: 0.05em;
+        }
+
+        .state-indicator.on {
+          background: #10b981;
+          color: white;
+        }
+
+        .state-indicator.off {
+          background: #4b5563;
+          color: #9ca3af;
+        }
+
+        .device-info-compact {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .device-name-compact {
+          font-size: 0.8125rem;
+          font-weight: 500;
+          color: #e0e7ff;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: block;
+        }
+
+        .button-pair {
+          display: flex;
           gap: 0.25rem;
         }
 
-        .device-name {
-          font-size: 1rem;
-          font-weight: 500;
-          color: #e0e7ff;
-        }
-
-        .device-id {
-          font-size: 0.75rem;
-          color: #9ca3af;
-          font-family: 'Monaco', 'Courier New', monospace;
-        }
-
-        .power-button {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1rem;
+        .btn-on, .btn-off {
+          padding: 0.3rem 0.6rem;
           border: none;
-          border-radius: 0.5rem;
+          border-radius: 0.25rem;
           font-weight: 600;
-          font-size: 0.875rem;
+          font-size: 0.6875rem;
           cursor: pointer;
-          transition: all 0.2s;
-          min-width: 80px;
-          justify-content: center;
+          transition: all 0.15s;
+          min-width: 36px;
         }
 
-        .power-button:disabled {
-          opacity: 0.5;
+        .btn-on {
+          background: rgba(16, 185, 129, 0.2);
+          color: #6b7280;
+          border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-on:hover:not(:disabled) {
+          background: rgba(16, 185, 129, 0.4);
+          color: #10b981;
+        }
+
+        .btn-on.active {
+          background: #10b981;
+          color: white;
+          border-color: #10b981;
+        }
+
+        .btn-off {
+          background: rgba(107, 114, 128, 0.2);
+          color: #6b7280;
+          border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-off:hover:not(:disabled) {
+          background: rgba(239, 68, 68, 0.3);
+          color: #ef4444;
+          border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-off.active {
+          background: #6b7280;
+          color: white;
+          border-color: #6b7280;
+        }
+
+        .btn-on:disabled, .btn-off:disabled {
+          opacity: 0.4;
           cursor: not-allowed;
-        }
-
-        .power-button.on {
-          background: linear-gradient(135deg, #10b981, #059669);
-          color: white;
-        }
-
-        .power-button.on:hover:not(:disabled) {
-          background: linear-gradient(135deg, #059669, #047857);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .power-button.off {
-          background: linear-gradient(135deg, #6b7280, #4b5563);
-          color: white;
-        }
-
-        .power-button.off:hover:not(:disabled) {
-          background: linear-gradient(135deg, #4b5563, #374151);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
         }
         `}</style>
       </div>

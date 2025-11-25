@@ -203,6 +203,7 @@ void publish_hardware_status();
 void save_gauge_position(int gauge_number);
 void load_gauge_positions();
 String extract_command_value(const JsonDocument &payload);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // MQTT objects
 SentientCapabilityManifest manifest;
@@ -408,6 +409,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
 
         Serial.println("[GAUGES] Activated - tracking valve positions");
         publish_hardware_status();
+        publish_command_acknowledgement(naming::CONTROLLER_ID, command);
     }
 
     // ========================================
@@ -430,6 +432,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
 
         Serial.println("[GAUGES] Inactivated - moving to zero");
         publish_hardware_status();
+        publish_command_acknowledgement(naming::CONTROLLER_ID, command);
     }
 
     // ========================================
@@ -890,4 +893,33 @@ String extract_command_value(const JsonDocument &payload)
         return String(payload.as<const char *>());
     }
     return "";
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Command Acknowledgement
+// ──────────────────────────────────────────────────────────────────────────────
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!mqtt.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    mqtt.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }

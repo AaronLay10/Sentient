@@ -176,6 +176,7 @@
   flex: 1;
   overflow-y: auto;
   background: var(--bg-primary);
+  padding: 1.5rem 2rem;
 }
 
 /* Responsive */

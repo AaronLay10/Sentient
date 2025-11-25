@@ -159,13 +159,18 @@ Sentient Engine uses a consistent domain model across controllers, services, and
   - Media PCs / Windows machines
   - Any future hardware that can run a Sentient “agent” or firmware
 
-- **Device**  
+- **Device**
   A hardware endpoint attached to a controller:
   - Sensors (buttons, proximity, hall effect, pressure mats)
   - Relays, MOSFET drivers, motor controllers
   - Maglocks, solenoids, actuators
   - LEDs, light fixtures, DMX channels
   - Audio triggers, displays
+
+  Device state is persisted in the database (`current_state`, `state_updated_at`) so that:
+  - UI can display accurate state immediately on page load/refresh
+  - State survives service restarts
+  - Historical state changes can be tracked
 
 - **Puzzle**  
   Logical unit of gameplay. May span multiple devices and controllers. Ties game rules to physical state.
@@ -304,6 +309,18 @@ The category-first structure enables efficient MQTT broker filtering and system-
 - Controller status (heartbeats, connection):
   - `<tenant>/<room_id>/status/<controller_id>/<event_type>`
   - Example: `paragon/clockwork/status/power_control_upper_right/heartbeat`
+
+- Command acknowledgements (controllers confirm command execution):
+  - `<tenant>/<room_id>/acknowledgement/<controller_id>/<device_id>/<command>`
+  - Example: `paragon/clockwork/acknowledgement/power_control_upper_right/main_lighting_24v/power_on`
+  - Controllers publish to this topic immediately after executing a command
+  - Enables real-time UI feedback without waiting for next heartbeat
+
+- Full status reports (controller reports all device states):
+  - `<tenant>/<room_id>/status/<controller_id>/full`
+  - Example: `paragon/clockwork/status/power_control_upper_right/full`
+  - Payload contains current state of all devices managed by controller
+  - Used for UI refresh and state synchronization
 
 - System registration (new controllers/devices):
   - `sentient/system/register/controller`
@@ -468,14 +485,34 @@ Controllers can be:
 
 **Firmware Pattern:**
 
-- `loop_hardware()` – scan inputs, update outputs, basic conditioning  
-- `loop_mqtt()` – maintain MQTT connection, publish device state, apply received commands  
-- `loop_diagnostics()` – health reporting, watchdog, uptime, error codes  
+- `loop_hardware()` – scan inputs, update outputs, basic conditioning
+- `loop_mqtt()` – maintain MQTT connection, publish device state, apply received commands
+- `loop_diagnostics()` – health reporting, watchdog, uptime, error codes
+
+**Command Handling with Acknowledgements:**
+
+When a controller receives a command:
+1. Execute the physical action (toggle relay, move motor, etc.)
+2. Publish acknowledgement to `<tenant>/<room>/acknowledgement/<controller>/<device>/<command>`
+3. Include new device state in acknowledgement payload
+
+Example acknowledgement payload:
+```json
+{
+  "v": 1,
+  "controller_id": "power_control_upper_right",
+  "device_id": "main_lighting_24v",
+  "command_acknowledged": "power_on",
+  "state": 1,
+  "timestamp": "2025-01-22T12:34:56.789Z"
+}
+```
 
 Teensy firmware:
 
-- Does **not** contain puzzle logic  
-- Only implements deterministic I/O behavior per configuration  
+- Does **not** contain puzzle logic
+- Only implements deterministic I/O behavior per configuration
+- **Must** publish acknowledgements after executing commands for real-time UI feedback  
 
 ### 6.1.2 Pi / PC Controllers
 
@@ -543,11 +580,30 @@ Access layer:
 
 Redis is used for:
 
-- Caching frequently-used configurations (room layouts, controller/device maps)  
+- Caching frequently-used configurations (room layouts, controller/device maps)
 - Pub/sub channels for:
   - Events from MQTT Gateway → Orchestrator
   - Domain events from Orchestrator → Realtime Gateway
-  - Commands from Sentient UI → Orchestrator  
+  - Commands from Sentient UI → Orchestrator
+
+**Key Redis Channels:**
+
+- `sentient:events:domain` - Domain events broadcast to all services:
+  - `device_state_changed` - Device state updates (from controller acknowledgements)
+  - `controller_heartbeat` - Controller liveness signals
+  - `controller_online` / `controller_offline` - Connection state changes
+
+- `sentient:commands:status_request` - Request current status from a controller:
+  - API Service publishes when UI needs fresh state
+  - MQTT Gateway subscribes and forwards to controller via MQTT
+
+**State Persistence Flow:**
+
+1. Controller executes command and publishes acknowledgement to MQTT
+2. MQTT Gateway receives acknowledgement and publishes `device_state_changed` to Redis
+3. HeartbeatEventHandler in API Service receives event and persists state to PostgreSQL
+4. Realtime Gateway receives event and pushes to connected WebSocket clients
+5. UI updates in real-time; page refresh loads persisted state from database  
 
 ---
 

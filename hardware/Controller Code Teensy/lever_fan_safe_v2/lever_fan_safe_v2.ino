@@ -119,6 +119,7 @@ SentientMQTT sentient(make_mqtt_config());
 SentientCapabilityManifest manifest;
 
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 void monitor_sensors();
 void handle_ir_signal(int pin);
 void switch_ir_sensor();
@@ -290,7 +291,48 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             ir_enabled = false;
             Serial.println(F("[CMD] IR Receivers DISABLED"));
         }
+        else
+        {
+            return;
+        }
     }
+    else
+    {
+        return; // Unknown device/command
+    }
+
+    // Publish acknowledgement for successful command
+    publish_command_acknowledgement(device_id, command);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

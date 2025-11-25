@@ -33,7 +33,12 @@
       "Bash(docker-compose restart:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(for dir in */)",
+      "Bash(do if [ -f \"$dir/controller_naming.h\" ])",
+      "Bash([ ! -d \"$dir/build\" ])",
+      "Bash(then if grep -q \"CAT_ACKNOWLEDGEMENT\" \"$dir/controller_naming.h\")",
+      "Bash(then echo \"$dir: ✓ HAS CAT_ACKNOWLEDGEMENT\" else echo \"$dir: ✗ MISSING CAT_ACKNOWLEDGEMENT\" fi fi done)"
     ],
     "deny": [],
     "ask": []

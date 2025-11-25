@@ -130,6 +130,7 @@ void handle_rfid_reader(HardwareSerial &rfid, char *tag_buffer, bool *tag_presen
 void process_rfid_byte(char incoming_char, char *tag_buffer);
 void publish_rfid_state(const char *reader_name, const char *sensor_name, const char *tag_id, bool is_present);
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SECTION 2: DEVICE REGISTRY (SINGLE SOURCE OF TRUTH!)
@@ -580,5 +581,39 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
   {
     Serial.print("[CMD] Unknown device: ");
     Serial.println(device_id);
+    return; // Don't send ACK for unknown commands
   }
+
+  // Publish command acknowledgement
+  publish_command_acknowledgement(device_id, cmd_name);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SECTION 9: COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+  if (!sentient.isConnected())
+    return;
+
+  StaticJsonDocument<160> ack;
+  ack["controller_id"] = naming::CONTROLLER_ID;
+  ack["device_id"] = device_id;
+  ack["command"] = command;
+  ack["success"] = true;
+  ack["timestamp_ms"] = millis();
+
+  char buf[196];
+  serializeJson(ack, buf, sizeof(buf));
+
+  // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+  String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                    String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                    String(device_id) + "/" + String(command);
+
+  sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+  Serial.print("[ACK] -> ");
+  Serial.println(ackTopic);
 }

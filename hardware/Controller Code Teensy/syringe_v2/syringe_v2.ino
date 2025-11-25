@@ -140,6 +140,7 @@ SentientCapabilityManifest manifest;
 
 // Forward declarations
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 void monitor_encoders();
 void update_encoder(int index, int pinA, int pinB);
 void set_led_ring_color(CRGB *ring, const char *color);
@@ -332,26 +333,32 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
     if (strcmp(device_id, naming::DEV_LED_RING_A) == 0 && strcmp(command, naming::CMD_SET_COLOR) == 0)
     {
         set_led_ring_color(ring_a, payload["color"]);
+        publish_command_acknowledgement(device_id, command);
     }
     else if (strcmp(device_id, naming::DEV_LED_RING_B) == 0 && strcmp(command, naming::CMD_SET_COLOR) == 0)
     {
         set_led_ring_color(ring_b, payload["color"]);
+        publish_command_acknowledgement(device_id, command);
     }
     else if (strcmp(device_id, naming::DEV_LED_RING_C) == 0 && strcmp(command, naming::CMD_SET_COLOR) == 0)
     {
         set_led_ring_color(ring_c, payload["color"]);
+        publish_command_acknowledgement(device_id, command);
     }
     else if (strcmp(device_id, naming::DEV_LED_RING_D) == 0 && strcmp(command, naming::CMD_SET_COLOR) == 0)
     {
         set_led_ring_color(ring_d, payload["color"]);
+        publish_command_acknowledgement(device_id, command);
     }
     else if (strcmp(device_id, naming::DEV_LED_RING_E) == 0 && strcmp(command, naming::CMD_SET_COLOR) == 0)
     {
         set_led_ring_color(ring_e, payload["color"]);
+        publish_command_acknowledgement(device_id, command);
     }
     else if (strcmp(device_id, naming::DEV_LED_RING_F) == 0 && strcmp(command, naming::CMD_SET_COLOR) == 0)
     {
         set_led_ring_color(ring_f, payload["color"]);
+        publish_command_acknowledgement(device_id, command);
     }
     // Filament LED commands
     else if (strcmp(device_id, naming::DEV_FILAMENT_LED) == 0)
@@ -360,11 +367,13 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         {
             digitalWrite(PIN_FILAMENT_LED, HIGH);
             Serial.println(F("[CMD] Filament LED ON"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_LED_OFF) == 0)
         {
             digitalWrite(PIN_FILAMENT_LED, LOW);
             Serial.println(F("[CMD] Filament LED OFF"));
+            publish_command_acknowledgement(device_id, command);
         }
     }
     // Main Actuator commands
@@ -375,18 +384,21 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             digitalWrite(PIN_ACTUATORS_UP, HIGH);
             digitalWrite(PIN_ACTUATORS_DN, LOW);
             Serial.println(F("[CMD] Main Actuator UP"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_ACTUATOR_DOWN) == 0)
         {
             digitalWrite(PIN_ACTUATORS_UP, LOW);
             digitalWrite(PIN_ACTUATORS_DN, HIGH);
             Serial.println(F("[CMD] Main Actuator DOWN"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_ACTUATOR_STOP) == 0)
         {
             digitalWrite(PIN_ACTUATORS_UP, LOW);
             digitalWrite(PIN_ACTUATORS_DN, LOW);
             Serial.println(F("[CMD] Main Actuator STOP"));
+            publish_command_acknowledgement(device_id, command);
         }
     }
     // Forge Actuator commands
@@ -397,14 +409,46 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             digitalWrite(PIN_FORGE_ACTUATOR_EXTEND, HIGH);
             digitalWrite(PIN_FORGE_ACTUATOR_RETRACT, LOW);
             Serial.println(F("[CMD] Forge Actuator EXTEND"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_FORGE_RETRACT) == 0)
         {
             digitalWrite(PIN_FORGE_ACTUATOR_EXTEND, LOW);
             digitalWrite(PIN_FORGE_ACTUATOR_RETRACT, HIGH);
             Serial.println(F("[CMD] Forge Actuator RETRACT"));
+            publish_command_acknowledgement(device_id, command);
         }
     }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

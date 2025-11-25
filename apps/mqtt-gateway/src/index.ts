@@ -53,16 +53,18 @@ client.on('connect', () => {
   // Subscribe to Sentient v4 operational topics (category-first structure)
   // Pattern: <tenant>/<room_id>/<category>/<controller_id>/<device_id>/<action_or_sensor>
   const sentientTopics = [
-    'sentient/+/commands/#',   // All commands across all Sentient rooms
-    'sentient/+/sensors/#',    // All sensor data across all Sentient rooms
-    'sentient/+/status/#',     // All status messages across all Sentient rooms
+    'sentient/+/commands/#',        // All commands across all Sentient rooms
+    'sentient/+/sensors/#',         // All sensor data across all Sentient rooms
+    'sentient/+/status/#',          // All status messages across all Sentient rooms
+    'sentient/+/acknowledgement/#', // Command acknowledgements from controllers
   ];
 
   // Subscribe to Paragon operational topics (uses same category-first structure)
   const paragonTopics = [
-    'paragon/+/commands/#',    // All commands across all Paragon rooms
-    'paragon/+/sensors/#',     // All sensor data across all Paragon rooms
-    'paragon/+/status/#',      // All status messages across all Paragon rooms
+    'paragon/+/commands/#',         // All commands across all Paragon rooms
+    'paragon/+/sensors/#',          // All sensor data across all Paragon rooms
+    'paragon/+/status/#',           // All status messages across all Paragon rooms
+    'paragon/+/acknowledgement/#',  // Command acknowledgements from controllers
   ];
 
   [...registrationTopics, ...sentientTopics, ...paragonTopics].forEach(topic => {
@@ -98,10 +100,18 @@ client.on('message', async (topic, message) => {
     }
     // Handle category-first operational topics
     // Pattern: <tenant>/<room_id>/<category>/<controller_id>/<device_id>/<action_or_sensor>
-    else if (topic.includes('/sensors/')) {
+    else if (topic.includes('/acknowledgement/')) {
+      // Command acknowledgements from controllers - high priority for immediate UI feedback
+      await handleAcknowledgement(topic, payload);
+    } else if (topic.includes('/sensors/')) {
       await handleCategoryFirstTopic(topic, payload, 'sensors');
     } else if (topic.includes('/status/')) {
-      await handleCategoryFirstTopic(topic, payload, 'status');
+      // Check if this is a full status response
+      if (topic.endsWith('/full')) {
+        await handleFullStatusResponse(topic, payload);
+      } else {
+        await handleCategoryFirstTopic(topic, payload, 'status');
+      }
     } else if (topic.includes('/commands/')) {
       // Commands are handled by controllers, not gateway (except for logging)
       console.log(`📥 Command published on ${topic}:`, payload);
@@ -188,6 +198,121 @@ async function handleCategoryFirstTopic(topic: string, payload: any, category: s
   }
 }
 
+/**
+ * Handle command acknowledgements from controllers
+ * Topic format: <tenant>/<room_id>/acknowledgement/<controller_id>/<device_id>/<command>
+ *
+ * This provides immediate UI feedback when a controller confirms command execution,
+ * separate from periodic status updates which can be noisy with heartbeats.
+ */
+async function handleAcknowledgement(topic: string, payload: any): Promise<void> {
+  try {
+    const topicParts = topic.split('/');
+
+    if (topicParts.length < 6) {
+      console.warn(`⚠️ Malformed acknowledgement topic: ${topic}`);
+      return;
+    }
+
+    const tenant = topicParts[0];           // 'paragon' or 'sentient'
+    const room_id = topicParts[1];          // 'clockwork', etc.
+    // topicParts[2] = 'acknowledgement'
+    const controller_id = topicParts[3];    // 'power_control_upper_right', etc.
+    const device_id = topicParts[4];        // 'main_lighting_24v', etc.
+    const command = topicParts[5];          // 'power_on' or 'power_off'
+
+    console.log(`⚡ Command ACK: ${controller_id}/${device_id}/${command} -> state=${payload.state}`);
+
+    // Create domain event for command acknowledgement
+    const domainEvent = {
+      event_id: uuidv4(),
+      type: EventType.DEVICE_STATE_CHANGED,
+      tenant_id: tenant,
+      room_id: room_id,
+      controller_id: controller_id,
+      device_id: device_id,
+      payload: {
+        previous_state: null,
+        new_state: payload,
+        command_acknowledged: command,
+        raw_mqtt_payload: payload,
+      },
+      timestamp: new Date(payload.ts || Date.now()),
+      metadata: {
+        source: 'mqtt-gateway',
+        mqtt_topic: topic,
+        is_acknowledgement: true,
+      },
+    };
+
+    await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
+    console.log(`✅ Published ACK event: ${device_id} -> ${command} (state=${payload.state})`);
+  } catch (error) {
+    console.error('❌ Error handling acknowledgement:', error);
+  }
+}
+
+/**
+ * Handle full status response from controllers
+ * Topic format: <tenant>/<room_id>/status/<controller_id>/full
+ *
+ * This is triggered when the UI requests current state on page load.
+ * The payload contains all device states which we emit as individual device state events.
+ */
+async function handleFullStatusResponse(topic: string, payload: any): Promise<void> {
+  try {
+    const topicParts = topic.split('/');
+
+    if (topicParts.length < 5) {
+      console.warn(`⚠️ Malformed full status topic: ${topic}`);
+      return;
+    }
+
+    const tenant = topicParts[0];           // 'paragon' or 'sentient'
+    const room_id = topicParts[1];          // 'clockwork', etc.
+    // topicParts[2] = 'status'
+    const controller_id = topicParts[3];    // 'power_control_upper_right', etc.
+    // topicParts[4] = 'full'
+
+    console.log(`📋 Full status received from ${controller_id}:`, Object.keys(payload).length, 'fields');
+
+    // Extract device states from payload (exclude metadata fields)
+    const metadataFields = ['uptime', 'ts', 'uid', 'fw', 'timestamp'];
+    const deviceStates = Object.entries(payload).filter(
+      ([key]) => !metadataFields.includes(key)
+    );
+
+    // Emit individual device state events for each device
+    for (const [device_id, state] of deviceStates) {
+      const domainEvent = {
+        event_id: uuidv4(),
+        type: EventType.DEVICE_STATE_CHANGED,
+        tenant_id: tenant,
+        room_id: room_id,
+        controller_id: controller_id,
+        device_id: device_id,
+        payload: {
+          previous_state: null,
+          new_state: { power: state, state: state ? 1 : 0 },
+          raw_mqtt_payload: payload,
+        },
+        timestamp: new Date(payload.ts || Date.now()),
+        metadata: {
+          source: 'mqtt-gateway',
+          mqtt_topic: topic,
+          is_full_status: true,
+        },
+      };
+
+      await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
+    }
+
+    console.log(`✅ Published ${deviceStates.length} device state events from full status`);
+  } catch (error) {
+    console.error('❌ Error handling full status response:', error);
+  }
+}
+
 async function registerController(data: any) {
   try {
     const response = await axios.post(
@@ -255,11 +380,11 @@ process.on('SIGTERM', shutdown);
 
 // Subscribe to device command events from Redis
 const redisSubscriber = new Redis(REDIS_URL);
-redisSubscriber.subscribe('sentient:commands:device', (err) => {
+redisSubscriber.subscribe('sentient:commands:device', 'sentient:commands:status_request', (err) => {
   if (err) {
-    console.error('❌ Failed to subscribe to device commands channel:', err);
+    console.error('❌ Failed to subscribe to command channels:', err);
   } else {
-    console.log('📬 Subscribed to Redis device commands channel');
+    console.log('📬 Subscribed to Redis device commands and status request channels');
   }
 });
 
@@ -290,6 +415,31 @@ redisSubscriber.on('message', async (channel, message) => {
       });
     } catch (error) {
       console.error('❌ Error processing device command:', error);
+    }
+  } else if (channel === 'sentient:commands:status_request') {
+    try {
+      const requestEvent = JSON.parse(message);
+      console.log(`📤 Received status request:`, requestEvent);
+
+      const { controller_id, room_id } = requestEvent;
+
+      // Publish request_status command to the controller
+      // Format: paragon/{room_id}/commands/{controller_id}/controller/request_status
+      const topic = `paragon/${room_id}/commands/${controller_id}/controller/request_status`;
+      const payload = {
+        command: 'request_status',
+        ts: Date.now(),
+      };
+
+      client.publish(topic, JSON.stringify(payload), { qos: 1, retain: false }, (err) => {
+        if (err) {
+          console.error(`❌ Failed to publish status request to ${topic}:`, err);
+        } else {
+          console.log(`✅ Published status request to ${topic}`);
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error processing status request:', error);
     }
   }
 });

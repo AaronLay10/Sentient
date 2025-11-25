@@ -109,8 +109,9 @@ void build_capability_manifest();
 SentientMQTTConfig build_mqtt_config();
 bool build_heartbeat_payload(JsonDocument &doc, void *ctx);
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
-void set_relay_state(int pin, bool state, bool &state_var, const char *device_name, const char *device_id);
+void set_relay_state(int pin, bool state, bool &state_var, const char *device_name, const char *device_id, const char *command);
 void publish_relay_state(const char *device_id, bool state);
+void publish_command_acknowledgement(const char *device_id, const char *command, bool state);
 void publish_hardware_status();
 void publish_full_status();
 void report_actual_relay_states();
@@ -313,44 +314,44 @@ void handle_mqtt_command(char *topic, uint8_t *payload, unsigned int length)
         if (device == naming::DEV_LEVER_RIDDLE_CUBE_24V)
         {
             if (command == "power_on")
-                set_relay_state(lever_riddle_cube_24v_pin, true, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V);
+                set_relay_state(lever_riddle_cube_24v_pin, true, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(lever_riddle_cube_24v_pin, false, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V);
+                set_relay_state(lever_riddle_cube_24v_pin, false, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V, "power_off");
         }
         else if (device == naming::DEV_LEVER_RIDDLE_CUBE_12V)
         {
             if (command == "power_on")
-                set_relay_state(lever_riddle_cube_12v_pin, true, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V);
+                set_relay_state(lever_riddle_cube_12v_pin, true, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(lever_riddle_cube_12v_pin, false, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V);
+                set_relay_state(lever_riddle_cube_12v_pin, false, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V, "power_off");
         }
         else if (device == naming::DEV_LEVER_RIDDLE_CUBE_5V)
         {
             if (command == "power_on")
-                set_relay_state(lever_riddle_cube_5v_pin, true, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V);
+                set_relay_state(lever_riddle_cube_5v_pin, true, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(lever_riddle_cube_5v_pin, false, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V);
+                set_relay_state(lever_riddle_cube_5v_pin, false, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V, "power_off");
         }
         else if (device == naming::DEV_CLOCK_24V)
         {
             if (command == "power_on")
-                set_relay_state(clock_24v_pin, true, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V);
+                set_relay_state(clock_24v_pin, true, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(clock_24v_pin, false, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V);
+                set_relay_state(clock_24v_pin, false, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V, "power_off");
         }
         else if (device == naming::DEV_CLOCK_12V)
         {
             if (command == "power_on")
-                set_relay_state(clock_12v_pin, true, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V);
+                set_relay_state(clock_12v_pin, true, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(clock_12v_pin, false, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V);
+                set_relay_state(clock_12v_pin, false, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V, "power_off");
         }
         else if (device == naming::DEV_CLOCK_5V)
         {
             if (command == "power_on")
-                set_relay_state(clock_5v_pin, true, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V);
+                set_relay_state(clock_5v_pin, true, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(clock_5v_pin, false, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V);
+                set_relay_state(clock_5v_pin, false, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V, "power_off");
         }
         else if (device == naming::DEV_CONTROLLER)
         {
@@ -420,7 +421,42 @@ void publish_relay_state(const char *device_id, bool state)
     Serial.println(state ? F("ON") : F("OFF"));
 }
 
-void set_relay_state(int pin, bool state, bool &state_var, const char *device_name, const char *device_id)
+/**
+ * Publish command acknowledgement to MQTT
+ * Topic: paragon/clockwork/acknowledgement/{controller_id}/{device_id}/{command}
+ * Payload: {"state": 1/0, "success": true, "ts": millis}
+ *
+ * This is published IMMEDIATELY after a command is executed to confirm receipt
+ * and provide instant UI feedback separate from periodic status updates.
+ */
+void publish_command_acknowledgement(const char *device_id, const char *command, bool state)
+{
+    JsonDocument doc;
+    doc["state"] = state ? 1 : 0;
+    doc["power"] = state;
+    doc["success"] = true;
+    doc["command"] = command;
+    doc["ts"] = millis();
+
+    // Publish to acknowledgement/{controller_id}/{device_id}/{command}
+    String topic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                   String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                   String(device_id) + "/" + String(command);
+
+    char jsonBuffer[128];
+    serializeJson(doc, jsonBuffer);
+
+    mqtt.get_client().publish(topic.c_str(), jsonBuffer);
+
+    Serial.print(F("[PowerCtrl] Published ACK for "));
+    Serial.print(device_id);
+    Serial.print(F("/"));
+    Serial.print(command);
+    Serial.print(F(": "));
+    Serial.println(state ? F("ON") : F("OFF"));
+}
+
+void set_relay_state(int pin, bool state, bool &state_var, const char *device_name, const char *device_id, const char *command)
 {
     digitalWrite(pin, state ? HIGH : LOW);
     state_var = state;
@@ -430,7 +466,13 @@ void set_relay_state(int pin, bool state, bool &state_var, const char *device_na
     Serial.print(F(": "));
     Serial.println(state ? F("ON") : F("OFF"));
 
-    // Publish individual relay state to MQTT for real-time UI updates
+    // Publish command acknowledgement for immediate UI feedback
+    if (mqtt.isConnected() && command != nullptr)
+    {
+        publish_command_acknowledgement(device_id, command, state);
+    }
+
+    // Also publish individual relay state to MQTT for status updates
     if (mqtt.isConnected())
     {
         publish_relay_state(device_id, state);
@@ -439,24 +481,24 @@ void set_relay_state(int pin, bool state, bool &state_var, const char *device_na
 
 void all_relays_on()
 {
-    set_relay_state(lever_riddle_cube_24v_pin, true, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V);
-    set_relay_state(lever_riddle_cube_12v_pin, true, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V);
-    set_relay_state(lever_riddle_cube_5v_pin, true, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V);
-    set_relay_state(clock_24v_pin, true, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V);
-    set_relay_state(clock_12v_pin, true, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V);
-    set_relay_state(clock_5v_pin, true, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V);
+    set_relay_state(lever_riddle_cube_24v_pin, true, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V, nullptr);
+    set_relay_state(lever_riddle_cube_12v_pin, true, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V, nullptr);
+    set_relay_state(lever_riddle_cube_5v_pin, true, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V, nullptr);
+    set_relay_state(clock_24v_pin, true, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V, nullptr);
+    set_relay_state(clock_12v_pin, true, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V, nullptr);
+    set_relay_state(clock_5v_pin, true, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V, nullptr);
 
     Serial.println(F("[PowerCtrl] All relays powered ON"));
 }
 
 void all_relays_off()
 {
-    set_relay_state(lever_riddle_cube_24v_pin, false, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V);
-    set_relay_state(lever_riddle_cube_12v_pin, false, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V);
-    set_relay_state(lever_riddle_cube_5v_pin, false, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V);
-    set_relay_state(clock_24v_pin, false, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V);
-    set_relay_state(clock_12v_pin, false, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V);
-    set_relay_state(clock_5v_pin, false, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V);
+    set_relay_state(lever_riddle_cube_24v_pin, false, lever_riddle_cube_24v_state, "Lever Riddle Cube 24V", naming::DEV_LEVER_RIDDLE_CUBE_24V, nullptr);
+    set_relay_state(lever_riddle_cube_12v_pin, false, lever_riddle_cube_12v_state, "Lever Riddle Cube 12V", naming::DEV_LEVER_RIDDLE_CUBE_12V, nullptr);
+    set_relay_state(lever_riddle_cube_5v_pin, false, lever_riddle_cube_5v_state, "Lever Riddle Cube 5V", naming::DEV_LEVER_RIDDLE_CUBE_5V, nullptr);
+    set_relay_state(clock_24v_pin, false, clock_24v_state, "Clock 24V", naming::DEV_CLOCK_24V, nullptr);
+    set_relay_state(clock_12v_pin, false, clock_12v_state, "Clock 12V", naming::DEV_CLOCK_12V, nullptr);
+    set_relay_state(clock_5v_pin, false, clock_5v_state, "Clock 5V", naming::DEV_CLOCK_5V, nullptr);
 
     Serial.println(F("[PowerCtrl] All relays powered OFF"));
 }

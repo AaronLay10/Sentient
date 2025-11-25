@@ -112,6 +112,7 @@ SentientMQTT sentient(make_mqtt_config());
 SentientCapabilityManifest manifest;
 
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // STEPPER CONTROL (Direct control, no library)
@@ -298,6 +299,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             fan_motor.state = RUNNING_SLOW;
             fan_motor.step_interval = 2000;
             Serial.println(F("[CMD] Study Fan: Start/Slow"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_FAST) == 0)
         {
@@ -306,12 +308,14 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             fan_motor.state = RUNNING_FAST;
             fan_motor.step_interval = 667;
             Serial.println(F("[CMD] Study Fan: Fast"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_STOP) == 0)
         {
             fan_motor.state = STOPPED;
             digitalWrite(PIN_FAN_ENABLE, HIGH);
             Serial.println(F("[CMD] Study Fan: Stop"));
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
@@ -326,17 +330,20 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             gear1_motor.state = RUNNING_SLOW;
             gear1_motor.step_interval = 2000;
             Serial.println(F("[CMD] Wall Gear 1: Start/Slow"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_FAST) == 0)
         {
             gear1_motor.state = RUNNING_FAST;
             gear1_motor.step_interval = 667;
             Serial.println(F("[CMD] Wall Gear 1: Fast"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_STOP) == 0)
         {
             gear1_motor.state = STOPPED;
             Serial.println(F("[CMD] Wall Gear 1: Stop"));
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
@@ -351,17 +358,20 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             gear2_motor.state = RUNNING_SLOW;
             gear2_motor.step_interval = 2000;
             Serial.println(F("[CMD] Wall Gear 2: Start/Slow"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_FAST) == 0)
         {
             gear2_motor.state = RUNNING_FAST;
             gear2_motor.step_interval = 667;
             Serial.println(F("[CMD] Wall Gear 2: Fast"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_STOP) == 0)
         {
             gear2_motor.state = STOPPED;
             Serial.println(F("[CMD] Wall Gear 2: Stop"));
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
@@ -376,17 +386,20 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             gear3_motor.state = RUNNING_SLOW;
             gear3_motor.step_interval = 2000;
             Serial.println(F("[CMD] Wall Gear 3: Start/Slow"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_FAST) == 0)
         {
             gear3_motor.state = RUNNING_FAST;
             gear3_motor.step_interval = 667;
             Serial.println(F("[CMD] Wall Gear 3: Fast"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_STOP) == 0)
         {
             gear3_motor.state = STOPPED;
             Serial.println(F("[CMD] Wall Gear 3: Stop"));
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
@@ -396,36 +409,42 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
     {
         digitalWrite(PIN_TV_1, strcmp(command, naming::CMD_ON) == 0 ? HIGH : LOW);
         Serial.printf("[CMD] TV 1: %s\n", command);
+        publish_command_acknowledgement(device_id, command);
         return;
     }
     if (strcmp(device_id, naming::DEV_TV_2) == 0)
     {
         digitalWrite(PIN_TV_2, strcmp(command, naming::CMD_ON) == 0 ? HIGH : LOW);
         Serial.printf("[CMD] TV 2: %s\n", command);
+        publish_command_acknowledgement(device_id, command);
         return;
     }
     if (strcmp(device_id, naming::DEV_MAKSERVO) == 0)
     {
         digitalWrite(PIN_MAKSERVO, strcmp(command, naming::CMD_ON) == 0 ? HIGH : LOW);
         Serial.printf("[CMD] Makservo: %s\n", command);
+        publish_command_acknowledgement(device_id, command);
         return;
     }
     if (strcmp(device_id, naming::DEV_STUDY_FAN_LIGHT) == 0)
     {
         digitalWrite(PIN_STUDY_FAN_LIGHT, strcmp(command, naming::CMD_ON) == 0 ? HIGH : LOW);
         Serial.printf("[CMD] Study Fan Light: %s\n", command);
+        publish_command_acknowledgement(device_id, command);
         return;
     }
     if (strcmp(device_id, naming::DEV_BLACKLIGHTS) == 0)
     {
         digitalWrite(PIN_BLACKLIGHTS, strcmp(command, naming::CMD_ON) == 0 ? HIGH : LOW);
         Serial.printf("[CMD] Blacklights: %s\n", command);
+        publish_command_acknowledgement(device_id, command);
         return;
     }
     if (strcmp(device_id, naming::DEV_NIXIE_LEDS) == 0)
     {
         digitalWrite(PIN_NIXIE_LEDS, strcmp(command, naming::CMD_ON) == 0 ? HIGH : LOW);
         Serial.printf("[CMD] Nixie LEDs: %s\n", command);
+        publish_command_acknowledgement(device_id, command);
         return;
     }
 
@@ -436,18 +455,51 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         {
             digitalWrite(PIN_FOG_POWER, HIGH);
             Serial.println(F("[CMD] Fog Machine: Power ON"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_OFF) == 0)
         {
             digitalWrite(PIN_FOG_POWER, LOW);
             digitalWrite(PIN_FOG_TRIGGER, LOW);
             Serial.println(F("[CMD] Fog Machine: Power OFF"));
+            publish_command_acknowledgement(device_id, command);
         }
         else if (strcmp(command, naming::CMD_FOG_TRIGGER) == 0)
         {
             digitalWrite(PIN_FOG_TRIGGER, HIGH);
             Serial.println(F("[CMD] Fog Machine: Trigger"));
+            publish_command_acknowledgement(device_id, command);
         }
         return;
     }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }

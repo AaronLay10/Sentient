@@ -189,6 +189,7 @@ void build_capability_manifest();
 SentientMQTTConfig build_mqtt_config();
 bool build_heartbeat_payload(JsonDocument &doc, void *ctx);
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 void read_sensors();
 void publish_sensor_changes(bool force_publish);
 void publish_hardware_status();
@@ -501,7 +502,41 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
     else
     {
         Serial.println(F("[WARNING] Unknown device or command"));
+        return;
     }
+
+    // Publish acknowledgement for successful command
+    publish_command_acknowledgement(device_ctx, command);
+}
+
+// =============================================================================
+// COMMAND ACKNOWLEDGEMENT
+// =============================================================================
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!mqtt.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(CLIENT_ID) + "/" + String(ROOM_ID) + "/" +
+                      String(CAT_ACKNOWLEDGEMENT) + "/" + String(CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    mqtt.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }
 
 // =============================================================================

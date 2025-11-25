@@ -80,6 +80,7 @@ SentientMQTT sentient(make_mqtt_config());
 SentientCapabilityManifest manifest;
 
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SETUP
@@ -200,6 +201,7 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         Serial.print(F("[CMD] "));
         Serial.print(device_id);
         Serial.println(F(" ON"));
+        publish_command_acknowledgement(device_id, command);
     }
     else if (strcmp(command, naming::CMD_OUTPUT_OFF) == 0)
     {
@@ -207,5 +209,36 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
         Serial.print(F("[CMD] "));
         Serial.print(device_id);
         Serial.println(F(" OFF"));
+        publish_command_acknowledgement(device_id, command);
     }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }

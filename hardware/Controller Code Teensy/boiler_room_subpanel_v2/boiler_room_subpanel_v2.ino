@@ -474,7 +474,7 @@ void setup()
         else { /* unknown */ }
       }
 
-      // Publish command acknowledgement
+      // Publish command acknowledgement to dedicated acknowledgement topic
       StaticJsonDocument<160> ack;
       ack["controller_id"] = controller_id;
       ack["device_id"] = device;
@@ -483,8 +483,8 @@ void setup()
       ack["timestamp_ms"] = millis();
       if (ack_duration_ms >= 0) { ack["duration_ms"] = (long)ack_duration_ms; }
       char buf[196]; serializeJson(ack, buf, sizeof(buf));
-    // Publish ACK as an event to avoid contaminating persisted status/state
-    String ackTopic = String(mqtt_namespace) + "/" + room_id + "/" + naming::CAT_EVENTS + "/" + controller_id + "/" + device + "/command_ack";
+      // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+      String ackTopic = String(mqtt_namespace) + "/" + room_id + "/" + naming::CAT_ACKNOWLEDGEMENT + "/" + controller_id + "/" + device + "/" + command;
       mqtt.get_client().publish(ackTopic.c_str(), buf, false);
       Serial.print(F("[BoilerRmA] ACK -> "));
       Serial.println(ackTopic); });

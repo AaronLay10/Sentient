@@ -97,30 +97,24 @@ export class HeartbeatEventHandlerService implements OnModuleInit, OnModuleDestr
         return;
       }
 
-      // Get current device to merge with existing properties
-      const device = await this.prisma.device.findUnique({
-        where: { id: deviceId },
-        select: { properties: true }
-      });
-
-      const currentProperties = (device?.properties as Record<string, any>) || {};
-
-      // Update device state in database (store in properties JSON field)
+      // Update device state in database using the current_state column
       await this.prisma.device.update({
         where: { id: deviceId },
         data: {
-          properties: {
-            ...currentProperties,
-            state: stateValue,
-            last_state_update: new Date(event.timestamp).toISOString(),
-          },
+          current_state: stateValue,
+          state_updated_at: new Date(event.timestamp),
           last_seen: new Date(event.timestamp),
         },
       });
 
       this.logger.debug(`Updated device state: ${deviceId} -> ${stateValue ? 'ON' : 'OFF'}`);
     } catch (error) {
-      this.logger.error(`Failed to update device state for ${event.device_id}:`, error);
+      // Don't error if device not found - it may not be registered yet
+      if (error?.code === 'P2025') {
+        this.logger.debug(`Device not found in database: ${event.device_id}`);
+      } else {
+        this.logger.error(`Failed to update device state for ${event.device_id}:`, error);
+      }
     }
   }
 }

@@ -47,6 +47,7 @@ namespace naming
     constexpr const char *CAT_SENSORS = "sensors";
     constexpr const char *CAT_STATUS = "status";
     constexpr const char *CAT_EVENTS = "events";
+    constexpr const char *CAT_ACKNOWLEDGEMENT = "acknowledgement";
     constexpr const char *ITEM_HEARTBEAT = "heartbeat";
     constexpr const char *ITEM_HARDWARE = "hardware";
     constexpr const char *ITEM_COMMAND_ACK = "command_ack";

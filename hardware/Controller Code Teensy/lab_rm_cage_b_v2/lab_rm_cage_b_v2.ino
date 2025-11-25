@@ -123,6 +123,7 @@ SentientMQTT sentient(make_mqtt_config());
 SentientCapabilityManifest manifest;
 
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // DOOR CONTROL FUNCTIONS
@@ -432,6 +433,11 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             set_door_direction(3, STOPPED);
             Serial.println(F("[CMD] Door 3: Stop"));
         }
+        else
+        {
+            return;
+        }
+        publish_command_acknowledgement(device_id, command);
         return;
     }
 
@@ -453,6 +459,11 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             set_door_direction(4, STOPPED);
             Serial.println(F("[CMD] Door 4: Stop"));
         }
+        else
+        {
+            return;
+        }
+        publish_command_acknowledgement(device_id, command);
         return;
     }
 
@@ -474,6 +485,41 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             set_door_direction(5, STOPPED);
             Serial.println(F("[CMD] Door 5: Stop"));
         }
+        else
+        {
+            return;
+        }
+        publish_command_acknowledgement(device_id, command);
         return;
     }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }

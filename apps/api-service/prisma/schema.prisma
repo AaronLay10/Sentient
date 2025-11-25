@@ -101,6 +101,8 @@ model Device {
   device_type    String
   device_category String?
   properties     Json?
+  current_state  Boolean   @default(false)
+  state_updated_at DateTime?
   last_seen      DateTime?
   created_at     DateTime @default(now())
   actions        DeviceAction[]

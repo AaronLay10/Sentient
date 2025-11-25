@@ -144,6 +144,7 @@ SentientMQTT sentient(make_mqtt_config());
 SentientCapabilityManifest manifest;
 
 void handle_mqtt_command(const char *command, const JsonDocument &payload, void *ctx);
+void publish_command_acknowledgement(const char *device_id, const char *command);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CONTROL FUNCTIONS
@@ -483,6 +484,11 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             set_hoist_direction(0);
             Serial.println(F("[CMD] Hoist: Stop"));
         }
+        else
+        {
+            return;
+        }
+        publish_command_acknowledgement(device_id, command);
         return;
     }
 
@@ -504,6 +510,11 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             set_door_direction(true, 0);
             Serial.println(F("[CMD] Left Door: Stop"));
         }
+        else
+        {
+            return;
+        }
+        publish_command_acknowledgement(device_id, command);
         return;
     }
 
@@ -525,6 +536,11 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             set_door_direction(false, 0);
             Serial.println(F("[CMD] Right Door: Stop"));
         }
+        else
+        {
+            return;
+        }
+        publish_command_acknowledgement(device_id, command);
         return;
     }
 
@@ -541,6 +557,41 @@ void handle_mqtt_command(const char *command, const JsonDocument &payload, void 
             digitalWrite(PIN_ROPE_DROP, LOW);
             Serial.println(F("[CMD] Rope Drop: Reset"));
         }
+        else
+        {
+            return;
+        }
+        publish_command_acknowledgement(device_id, command);
         return;
     }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COMMAND ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+void publish_command_acknowledgement(const char *device_id, const char *command)
+{
+    if (!sentient.isConnected())
+        return;
+
+    StaticJsonDocument<160> ack;
+    ack["controller_id"] = naming::CONTROLLER_ID;
+    ack["device_id"] = device_id;
+    ack["command"] = command;
+    ack["success"] = true;
+    ack["timestamp_ms"] = millis();
+
+    char buf[196];
+    serializeJson(ack, buf, sizeof(buf));
+
+    // Topic: <tenant>/<room>/acknowledgement/<controller>/<device>/<command>
+    String ackTopic = String(naming::CLIENT_ID) + "/" + String(naming::ROOM_ID) + "/" +
+                      String(naming::CAT_ACKNOWLEDGEMENT) + "/" + String(naming::CONTROLLER_ID) + "/" +
+                      String(device_id) + "/" + String(command);
+
+    sentient.get_client().publish(ackTopic.c_str(), buf, false);
+
+    Serial.print(F("[ACK] -> "));
+    Serial.println(ackTopic);
 }
