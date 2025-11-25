@@ -10,7 +10,7 @@ services:
     container_name: sentient_postgres
     restart: unless-stopped
     env_file:
-      - .env.sentient.sentient
+      - .env.sentient
     environment:
       # Unified database name for dev and prod
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -49,7 +49,7 @@ services:
     container_name: sentient_api
     restart: unless-stopped
     env_file:
-      - .env.sentient.sentient
+      - .env.sentient
     environment:
       NODE_ENV: production
       API_PORT: 3000
