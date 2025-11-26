@@ -1,15 +1,17 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # Compile Teensy 4.1 Firmware
 # Usage: ./compile_teensy.sh <path_to_ino_file>
 #
 
-set -euo pipefail
+set -e  # Exit on error
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Script directory
@@ -48,15 +50,15 @@ fi
 # Extract controller name from path
 CONTROLLER_DIR=$(dirname "${INO_PATH}")
 CONTROLLER_NAME=$(basename "${CONTROLLER_DIR}")
-OUTPUT_DIR="${CONTROLLER_DIR}/build"
+OUTPUT_DIR="${PROJECT_ROOT}/hardware/HEX_OUTPUT"
 
 # Version bump logic
-METADATA_FILE="$(dirname "${INO_PATH}")/FirmwareMetadata.h"
+METADATA_FILE="${CONTROLLER_DIR}/FirmwareMetadata.h"
 if [ -f "${METADATA_FILE}" ]; then
-    # Read current version from FirmwareMetadata.h
+    # Read current version
     CURRENT_VERSION=$(grep 'constexpr const char \*VERSION' "${METADATA_FILE}" | sed 's/.*"\(.*\)".*/\1/')
     
-    # Parse version components (e.g., "2.3.0" -> 2 3 0)
+    # Parse version components
     IFS='.' read -ra VERSION_PARTS <<< "${CURRENT_VERSION}"
     MAJOR="${VERSION_PARTS[0]}"
     MINOR="${VERSION_PARTS[1]}"
@@ -70,23 +72,18 @@ if [ -f "${METADATA_FILE}" ]; then
     sed -i.bak "s/constexpr const char \*VERSION = \".*\";/constexpr const char *VERSION = \"${NEW_VERSION}\";/" "${METADATA_FILE}"
     rm "${METADATA_FILE}.bak"
     
-    echo -e "${YELLOW}Version bumped: ${CURRENT_VERSION} → ${NEW_VERSION}${NC}"
+    echo -e "${YELLOW}Version: ${CURRENT_VERSION} → ${NEW_VERSION}${NC}"
 else
-    echo -e "${YELLOW}Warning: FirmwareMetadata.h not found at ${METADATA_FILE}${NC}"
     NEW_VERSION="unknown"
 fi
 
-echo -e "${GREEN}========================================${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}Compiling Teensy 4.1 Firmware${NC}"
-echo -e "${GREEN}========================================${NC}"
-echo "Controller: ${CONTROLLER_NAME}"
-echo "Version: ${NEW_VERSION}"
-echo "Source: ${INO_FILE}"
-echo "Output: ${OUTPUT_DIR}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}Controller:${NC} ${CONTROLLER_NAME}"
+echo -e "${BLUE}Version:${NC} ${NEW_VERSION}"
+echo -e "${BLUE}Output:${NC} ${OUTPUT_DIR}"
 echo ""
-
-# Create output directory
-mkdir -p "${OUTPUT_DIR}"
 
 # Initialize arduino-cli config if needed
 if [ ! -f ~/Library/Arduino15/arduino-cli.yaml ]; then
@@ -110,10 +107,13 @@ if ! arduino-cli core list | grep -q "teensy:avr"; then
     arduino-cli core install teensy:avr
 fi
 
+# Create output directory
+mkdir -p "${OUTPUT_DIR}"
+
 # Compile
 echo -e "${YELLOW}Compiling...${NC}"
 arduino-cli compile \
-    --fqbn teensy:avr:teensy41:speed=600,opt=o2std,usb=serial,keys=en-us \
+    --fqbn teensy:avr:teensy41 \
     --libraries "${PROJECT_ROOT}/hardware/Custom Libraries" \
     --output-dir "${OUTPUT_DIR}" \
     "${INO_PATH}"
@@ -121,17 +121,19 @@ arduino-cli compile \
 # Check if compilation succeeded
 if [ $? -eq 0 ]; then
     echo ""
-    echo -e "${GREEN}========================================${NC}"
-    echo -e "${GREEN}✓ Compilation successful!${NC}"
-    echo -e "${GREEN}========================================${NC}"
-    echo "Output files:"
-    ls -lh "${OUTPUT_DIR}"/*.hex 2>/dev/null || echo "No .hex file found"
+    HEX_FILE="${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.hex"
+    if [ -f "${HEX_FILE}" ]; then
+        HEX_SIZE=$(du -h "${HEX_FILE}" | cut -f1)
+        echo -e "${GREEN}✓ SUCCESS${NC} - HEX: ${HEX_SIZE}"
+        echo -e "${BLUE}File:${NC} ${HEX_FILE}"
+    else
+        echo -e "${RED}✗ FAILED${NC} - No HEX file generated"
+        exit 1
+    fi
     echo ""
     echo "To upload, use Teensy Loader or:"
-    echo "  teensy_loader_cli --mcu=TEENSY41 -w ${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.hex"
+    echo "  teensy_loader_cli --mcu=TEENSY41 -w ${HEX_FILE}"
 else
-    echo -e "${RED}========================================${NC}"
-    echo -e "${RED}✗ Compilation failed${NC}"
-    echo -e "${RED}========================================${NC}"
+    echo -e "${RED}✗ FAILED${NC} - Compilation error"
     exit 1
 fi

@@ -1,0 +1,283 @@
+/Users/aaron/Sentient/hardware/Controller Code Teensy/boiler_room_subpanel_v2/boiler_room_subpanel_v2.ino:31:10: fatal error: SentientCapabilityManifest.h: No such file or directory
+   31 | #include <SentientCapabilityManifest.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/chemical_v2/chemical_v2.ino:24:10: fatal error: SentientCapabilityManifest.h: No such file or directory
+   24 | #include <SentientCapabilityManifest.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/clock_v2/clock_v2.ino:20:10: fatal error: SentientMQTT.h: No such file or directory
+   20 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/crank_v2/crank_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/floor_v2/floor_v2.ino:19:10: fatal error: SentientMQTT.h: No such file or directory
+   19 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed library[0m [92mVersion[0m [90mPath[0m
+[93mWire[0m         1.0     [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0/libraries/Wire[0m
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/fuse_v2/fuse_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/gauge_1_3_4_v2/gauge_1_3_4_v2.ino:27:10: fatal error: SentientMQTT.h: No such file or directory
+   27 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/gauge_2_5_7_v2/gauge_2_5_7_v2.ino:27:10: fatal error: SentientMQTT.h: No such file or directory
+   27 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/gauge_6_leds_v2/gauge_6_leds_v2.ino:28:10: fatal error: SentientMQTT.h: No such file or directory
+   28 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/gear_v2/gear_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/gun_drawers_v2/gun_drawers_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/keys_v2/keys_v2.ino:24:10: fatal error: SentientMQTT.h: No such file or directory
+   24 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/kraken_v2/kraken_v2.ino:12:10: fatal error: SentientMQTT.h: No such file or directory
+   12 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/lab_rm_cage_a_v2/lab_rm_cage_a_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/lab_rm_cage_b_v2/lab_rm_cage_b_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/lab_rm_doors_hoist_v2/lab_rm_doors_hoist_v2.ino:7:10: fatal error: SentientMQTT.h: No such file or directory
+    7 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/lever_boiler_v2/lever_boiler_v2.ino:18:10: fatal error: SentientMQTT.h: No such file or directory
+   18 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/lever_fan_safe_v2/lever_fan_safe_v2.ino:7:10: fatal error: SentientMQTT.h: No such file or directory
+    7 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/lever_riddle_v2/lever_riddle_v2.ino:7:10: fatal error: SentientMQTT.h: No such file or directory
+    7 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/main_lighting_v2/main_lighting_v2.ino:30:10: fatal error: SentientCapabilityManifest.h: No such file or directory
+   30 | #include <SentientCapabilityManifest.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/maks_servo_v2/maks_servo_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/music_v2/music_v2.ino:11:10: fatal error: SentientMQTT.h: No such file or directory
+   11 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/picture_frame_leds_v2/picture_frame_leds_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/pilaster_v2/pilaster_v2.ino:11:10: fatal error: SentientMQTT.h: No such file or directory
+   11 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/pilot_light_v2/pilot_light_v2.ino:29:10: fatal error: SentientCapabilityManifest.h: No such file or directory
+   29 | #include <SentientCapabilityManifest.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/power_control_lower_left/power_control_lower_left.ino:28:10: fatal error: SentientCapabilityManifest.h: No such file or directory
+   28 | #include <SentientCapabilityManifest.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/power_control_lower_right/power_control_lower_right.ino:35:10: fatal error: SentientCapabilityManifest.h: No such file or directory
+   35 | #include <SentientCapabilityManifest.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/power_control_upper_right/power_control_upper_right.ino:36:10: fatal error: SentientCapabilityManifest.h: No such file or directory
+   36 | #include <SentientCapabilityManifest.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/riddle_v2/riddle_v2.ino:7:10: fatal error: SentientMQTT.h: No such file or directory
+    7 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/study_a_v2/study_a_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/study_b_v2/study_b_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/study_d_v2/study_d_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/syringe_v2/syringe_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/vault_v2/vault_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1
+/Users/aaron/Sentient/hardware/Controller Code Teensy/vern_v2/vern_v2.ino:6:10: fatal error: SentientMQTT.h: No such file or directory
+    6 | #include <SentientMQTT.h>
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mteensy:avr[0m    1.59.0  [90m/Users/aaron/Library/Arduino15/packages/teensy/hardware/avr/1.59.0[0m
+Error during build: exit status 1

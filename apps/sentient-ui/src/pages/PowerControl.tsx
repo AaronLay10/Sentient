@@ -232,6 +232,40 @@ export function PowerControl() {
     }
   };
 
+  const handlePowerAllDevices = async (controllerId: string, newState: boolean) => {
+    const controller = powerControllers.get(controllerId);
+    if (!controller || controller.devices.length === 0) return;
+
+    console.log(`🔌 Powering ${newState ? 'ON' : 'OFF'} all devices for ${controllerId}`);
+    
+    // Send commands for all devices in parallel
+    const promises = controller.devices.map(device => 
+      handleSetDeviceState(controllerId, device.device_id, newState)
+    );
+
+    await Promise.all(promises);
+  };
+
+  const handleRefreshStatus = async (controllerId: string) => {
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`${API_URL}/controllers/${controllerId}/request-status`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        console.log(`✅ Status refresh requested for ${controllerId}`);
+      } else {
+        console.error(`❌ Failed to request status from ${controllerId}`);
+      }
+    } catch (error) {
+      console.error(`❌ Error requesting status from ${controllerId}:`, error);
+    }
+  };
+
   return (
     <>
       <div className="page-container">
@@ -279,11 +313,33 @@ export function PowerControl() {
                       </p>
                     </div>
                   </div>
-                  {controller.online && controller.lastHeartbeat && (
-                    <div className="heartbeat-time">
-                      Last seen: {Math.floor((Date.now() - controller.lastHeartbeat) / 1000)}s ago
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                    {controller.online && controller.lastHeartbeat && (
+                      <div className="heartbeat-time">
+                        Last seen: {Math.floor((Date.now() - controller.lastHeartbeat) / 1000)}s ago
+                      </div>
+                    )}
+                    {controller.devices.length > 0 && (
+                      <div className="power-all-buttons">
+                        <button
+                          className="btn-power-all-on"
+                          onClick={() => handlePowerAllDevices(controller.controller_id, true)}
+                          disabled={!controller.online}
+                          title="Turn all devices ON"
+                        >
+                          All ON
+                        </button>
+                        <button
+                          className="btn-power-all-off"
+                          onClick={() => handlePowerAllDevices(controller.controller_id, false)}
+                          disabled={!controller.online}
+                          title="Turn all devices OFF"
+                        >
+                          All OFF
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {controller.devices.length === 0 ? (
@@ -513,6 +569,54 @@ export function PowerControl() {
 
         .btn-on:disabled, .btn-off:disabled {
           opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .power-all-buttons {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .btn-power-all-on, .btn-power-all-off {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 0.375rem;
+          font-weight: 600;
+          font-size: 0.75rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .btn-power-all-on {
+          background: rgba(16, 185, 129, 0.2);
+          color: #10b981;
+          border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-power-all-on:hover:not(:disabled) {
+          background: #10b981;
+          color: white;
+          border-color: #10b981;
+          box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-power-all-off {
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
+          border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-power-all-off:hover:not(:disabled) {
+          background: #ef4444;
+          color: white;
+          border-color: #ef4444;
+          box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-power-all-on:disabled, .btn-power-all-off:disabled {
+          opacity: 0.3;
           cursor: not-allowed;
         }
         `}</style>

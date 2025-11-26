@@ -23,7 +23,7 @@ services:
     image: redis:7-alpine
     container_name: sentient_redis
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
+    command: [ "redis-server", "--appendonly", "yes" ]
     ports:
       - "6379:6379"
     volumes:
@@ -53,7 +53,7 @@ services:
     networks:
       - sentient_net
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -80,7 +80,7 @@ services:
       redis:
         condition: service_started
     ports:
-      - "3001:3000"  # container 3000 -> host 3001
+      - "3001:3000" # container 3000 -> host 3001
     networks:
       - sentient_net
     command: sh -c "pnpm prisma:db:push && pnpm start:prod"
@@ -120,7 +120,7 @@ services:
         condition: service_healthy
     network_mode: "host"
     healthcheck:
-      test: ["CMD", "node", "-e", "process.exit(0)"]
+      test: [ "CMD", "node", "-e", "process.exit(0)" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -163,7 +163,7 @@ services:
       - api-service
       - realtime-gateway
     ports:
-      - "3000:3000"
+      - "3000:80"
     networks:
       - sentient_net
 
