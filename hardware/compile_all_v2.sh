@@ -19,6 +19,14 @@ echo -e "${GREEN}Compiling All V2 Controllers${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 
+# Clean entire HEX_OUTPUT directory before mass compile
+OUTPUT_DIR="${SCRIPT_DIR}/HEX_OUTPUT"
+if [ -d "${OUTPUT_DIR}" ]; then
+  echo -e "${YELLOW}Cleaning HEX_OUTPUT directory...${NC}"
+  rm -rf "${OUTPUT_DIR}"/*
+  echo ""
+fi
+
 SUCCESS_COUNT=0
 FAILED_COUNT=0
 SKIPPED_COUNT=0

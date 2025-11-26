@@ -107,8 +107,16 @@ if ! arduino-cli core list | grep -q "teensy:avr"; then
     arduino-cli core install teensy:avr
 fi
 
-# Create output directory
+# Create output directory and clean old build artifacts for this controller
 mkdir -p "${OUTPUT_DIR}"
+
+# Clean old artifacts for this specific controller
+echo -e "${YELLOW}Cleaning old build artifacts for ${CONTROLLER_NAME}...${NC}"
+rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.hex"
+rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.eep"
+rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.elf"
+rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.lst"
+rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.sym"
 
 # Compile
 echo -e "${YELLOW}Compiling...${NC}"
