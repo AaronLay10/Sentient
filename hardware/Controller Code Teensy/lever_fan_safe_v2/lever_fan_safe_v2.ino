@@ -31,7 +31,7 @@ const int PIN_STEPPER_2 = 34;
 const int PIN_STEPPER_3 = 35;
 const int PIN_STEPPER_4 = 36;
 
-const int PHOTOCELL_THRESHOLD = 500;
+const int PHOTOCELL_THRESHOLD = 300;
 const unsigned long IR_SWITCH_INTERVAL = 200; // ms between IR sensor switching
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -53,8 +53,8 @@ AccelStepper stepper(AccelStepper::FULL4WIRE, PIN_STEPPER_1, PIN_STEPPER_2, PIN_
 
 int photocell_safe = 0;
 int photocell_fan = 0;
-int last_photocell_safe = -1;
-int last_photocell_fan = -1;
+String last_state_safe = "";
+String last_state_fan = "";
 
 bool ir_enabled = true;
 int current_ir_pin = PIN_IR_FAN;
@@ -344,26 +344,26 @@ void monitor_sensors()
     if (!sentient.isConnected())
         return;
 
-    // Safe photocell
+    // Safe photocell - only publish on state change
     photocell_safe = analogRead(PIN_PHOTOCELL_SAFE);
-    if (abs(photocell_safe - last_photocell_safe) > 50)
+    String current_state_safe = (photocell_safe > PHOTOCELL_THRESHOLD) ? "OPEN" : "CLOSED";
+    if (current_state_safe != last_state_safe)
     {
         JsonDocument doc;
-        doc["lever_position"] = (photocell_safe > PHOTOCELL_THRESHOLD) ? "OPEN" : "CLOSED";
-        doc["raw_value"] = photocell_safe;
+        doc["lever_position"] = current_state_safe;
         sentient.publishJson(naming::CAT_SENSORS, naming::DEV_PHOTOCELL_SAFE, doc);
-        last_photocell_safe = photocell_safe;
+        last_state_safe = current_state_safe;
     }
 
-    // Fan photocell
+    // Fan photocell - only publish on state change
     photocell_fan = analogRead(PIN_PHOTOCELL_FAN);
-    if (abs(photocell_fan - last_photocell_fan) > 50)
+    String current_state_fan = (photocell_fan > PHOTOCELL_THRESHOLD) ? "OPEN" : "CLOSED";
+    if (current_state_fan != last_state_fan)
     {
         JsonDocument doc;
-        doc["lever_position"] = (photocell_fan > PHOTOCELL_THRESHOLD) ? "OPEN" : "CLOSED";
-        doc["raw_value"] = photocell_fan;
+        doc["lever_position"] = current_state_fan;
         sentient.publishJson(naming::CAT_SENSORS, naming::DEV_PHOTOCELL_FAN, doc);
-        last_photocell_fan = photocell_fan;
+        last_state_fan = current_state_fan;
     }
 }
 

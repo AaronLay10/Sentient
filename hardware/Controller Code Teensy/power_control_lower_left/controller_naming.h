@@ -30,9 +30,6 @@ namespace naming
     constexpr const char *DEV_CLOCK_12V = "clock_12v";
     constexpr const char *DEV_CLOCK_5V = "clock_5v";
 
-    // Controller virtual device
-    constexpr const char *DEV_CONTROLLER = "controller";
-
     // ========================================================================
     // FRIENDLY NAMES (UI-only, never in MQTT topics)
     // ========================================================================

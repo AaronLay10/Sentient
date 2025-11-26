@@ -593,10 +593,18 @@ void loop()
   // 1. LISTEN for commands from Sentient
   mqtt.loop();
 
-  // 2. EXECUTE LED updates
-  FastLED.show();
+  // 2. EXECUTE LED updates (non-blocking)
+  static unsigned long last_led_update = 0;
+  if (millis() - last_led_update >= 20) // Update LEDs every 20ms
+  {
+    FastLED.show();
+    last_led_update = millis();
+  }
 
-  delay(10);
+  // 3. Service MQTT again to ensure heartbeats aren't blocked
+  mqtt.loop();
+
+  delay(5);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

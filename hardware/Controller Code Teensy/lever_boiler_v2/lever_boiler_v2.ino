@@ -18,6 +18,9 @@
 #include <SentientMQTT.h>
 #include <SentientDeviceRegistry.h>
 #include <SentientCapabilityManifest.h>
+
+// Suppress IRremote begin() error - we're using receiver only
+#define SUPPRESS_ERROR_MESSAGE_FOR_BEGIN
 #include <IRremote.hpp>
 
 #include "FirmwareMetadata.h"
@@ -258,7 +261,7 @@ void setup()
     set_stepper_pins(0, 0, 0, 0);
 
     // IR init
-    IrReceiver.begin(current_ir_pin, ENABLE_LED_FEEDBACK);
+    IrReceiver.begin(current_ir_pin, DISABLE_LED_FEEDBACK, power_led_pin);
     last_ir_switch_time = millis();
 
     // Register devices and build manifest
@@ -328,7 +331,7 @@ void loop()
     if (ir_enabled && !ir_signal_in_progress && millis() - last_ir_switch_time > ir_switch_interval)
     {
         current_ir_pin = (current_ir_pin == ir_sensor_1_pin) ? ir_sensor_2_pin : ir_sensor_1_pin;
-        IrReceiver.begin(current_ir_pin, ENABLE_LED_FEEDBACK);
+        IrReceiver.begin(current_ir_pin, ENABLE_LED_FEEDBACK, power_led_pin);
         last_ir_switch_time = millis();
     }
 
