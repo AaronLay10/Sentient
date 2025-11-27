@@ -38,7 +38,7 @@ export interface RoomInfo {
 export function Overview() {
   // WebSocket connection for real-time events
   const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
-  const { isConnected: wsConnected, events: wsEvents } = useWebSocket({ url: wsUrl });
+  const { events: wsEvents } = useWebSocket({ url: wsUrl });
 
   // Fetch controllers from the database
   const { data: controllersData } = useQuery({
@@ -253,7 +253,7 @@ export function Overview() {
     },
   });
 
-  const handleIssueClick = (issueId: string) => {
+  const handleIssueClick = () => {
     // TODO: Implement issue detail view
   };
 
