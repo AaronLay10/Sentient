@@ -15,6 +15,12 @@ SINGLE_SERVICE=""
 
 # Default environment selection (override via ENV_FILE / UI_VITE_* when calling script)
 ENV_FILE="${ENV_FILE:-.env.sentient.prod}"
+
+# Load UI build variables from env file if they exist, otherwise use defaults
+if [ -f "$ENV_FILE" ]; then
+  source <(grep "^UI_VITE_" "$ENV_FILE" | sed 's/^/export /')
+fi
+
 UI_VITE_API_URL="${UI_VITE_API_URL:-https://sentientengine.ai/api}"
 UI_VITE_WS_URL="${UI_VITE_WS_URL:-wss://sentientengine.ai/ws}"
 export UI_VITE_API_URL UI_VITE_WS_URL
