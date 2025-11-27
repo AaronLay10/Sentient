@@ -103,16 +103,16 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
                   e.dataTransfer.effectAllowed = 'move';
                   e.stopPropagation();
                 }}
-                onDrag={(e) => {
+                onDrag={() => {
                   console.log('🔄 Dragging:', node.label);
                 }}
-                onDragEnd={(e) => {
+                onDragEnd={() => {
                   console.log('🎯 Drag ended for node:', node.label);
                 }}
-                onMouseDown={(e) => {
+                onMouseDown={() => {
                   console.log('🖱️ Mouse down on:', node.label);
                 }}
-                onClick={(e) => {
+                onClick={() => {
                   console.log('👆 Click on:', node.label);
                   onAddNode(node.type, node.subtype, node.label, node.icon, node.color);
                 }}

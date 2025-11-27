@@ -54,43 +54,15 @@ export function Overview() {
     refetchInterval: 5000,
   });
 
-  // Performance monitoring
-  useEffect(() => {
-    const logPerformance = () => {
-      if ((performance as any).memory) {
-        const memory = (performance as any).memory;
-        console.log('[Overview Performance]', {
-          wsConnected,
-          wsEventsCount: wsEvents.length,
-          controllersCount: controllersData?.length || 0,
-          devicesCount: devicesData?.length || 0,
-          memoryUsedMB: (memory.usedJSHeapSize / 1048576).toFixed(2),
-          memoryLimitMB: (memory.jsHeapSizeLimit / 1048576).toFixed(2),
-          memoryPercent: ((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100).toFixed(1) + '%',
-        });
-      } else {
-        console.log('[Overview Status]', {
-          wsConnected,
-          wsEventsCount: wsEvents.length,
-          controllersCount: controllersData?.length || 0,
-          devicesCount: devicesData?.length || 0,
-          note: 'Memory API not available (use Chrome with --enable-precise-memory-info)',
-        });
-      }
-    };
-
-    logPerformance();
-    const interval = setInterval(logPerformance, 10000); // Log every 10 seconds
-
-    return () => clearInterval(interval);
-  }, [wsConnected, wsEvents, controllersData, devicesData]);
+  // Performance monitoring disabled in production for better performance
+  // Enable in development by uncommenting this effect
 
   // Calculate controller node positions early so effects can safely reference them
   const controllerNodes = useMemo((): ControllerNodeData[] => {
     if (!controllersData || controllersData.length === 0) return [];
 
     // Filter out Power Control controllers as they have their own dedicated page
-    const filtered = controllersData.filter(c => 
+    const filtered = controllersData.filter(c =>
       !c.friendly_name.toLowerCase().includes('power control')
     );
 
@@ -282,7 +254,7 @@ export function Overview() {
   });
 
   const handleIssueClick = (issueId: string) => {
-    console.log('Issue clicked:', issueId);
+    // TODO: Implement issue detail view
   };
 
   // Remove completed pulses
@@ -295,7 +267,7 @@ export function Overview() {
     if (!wsEvents.length || !controllerNodes.length) return;
 
     const latestEvent = wsEvents[0];
-    
+
     // Only create pulses for controller-originated events
     const controllerEventTypes = [
       'controller_heartbeat',
@@ -335,7 +307,7 @@ export function Overview() {
     if (!wsEvents.length || !deviceNodes.length || !controllerNodes.length) return;
 
     const latestEvent = wsEvents[0];
-    
+
     // Only create pulses for device-specific events
     const deviceEventTypes = [
       'device_state_changed',
@@ -348,12 +320,12 @@ export function Overview() {
 
     const deviceId = latestEvent.device_id;
     const controllerId = latestEvent.controller_id;
-    
+
     if (!deviceId || !controllerId) return;
 
     const deviceNode = deviceNodes.find(n => n.id === deviceId);
     const controllerNode = controllerNodes.find(n => n.id === controllerId);
-    
+
     if (!deviceNode || !controllerNode) return;
 
     // Create pulse from device to controller
@@ -419,8 +391,8 @@ export function Overview() {
             <ControllerNode
               key={node.id}
               data={node}
-              onClick={() => {}}
-              onHover={() => {}}
+              onClick={() => { }}
+              onHover={() => { }}
             />
           ))}
 

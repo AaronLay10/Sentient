@@ -429,9 +429,9 @@ export function LightingKiosk() {
         }
 
         .light-btn.on {
-          background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
-          border-color: #fbbf24;
-          box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+          background: linear-gradient(135deg, rgba(0, 217, 255, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%);
+          border-color: #00d9ff;
+          box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
         }
 
         .light-btn.off {
@@ -466,8 +466,8 @@ export function LightingKiosk() {
         }
 
         .light-btn.on .light-status {
-          background: #fbbf24;
-          color: #1f2937;
+          background: #00d9ff;
+          color: #0a0a12;
         }
 
         .light-btn.off .light-status {

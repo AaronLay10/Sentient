@@ -483,7 +483,7 @@ export function NetworkCanvas({ onNodesUpdate }: NetworkCanvasProps) {
   const handleClick = () => {
     if (hoveredNode) {
       // Trigger command pulse on click
-      console.log('Clicked node:', hoveredNode.name);
+      // Node clicked - implement detail view here
     }
   };
 

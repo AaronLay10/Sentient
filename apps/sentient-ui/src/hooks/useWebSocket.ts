@@ -33,7 +33,6 @@ export function useWebSocket(options: UseWebSocketOptions) {
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
         setIsConnected(true);
         onConnect?.();
 
@@ -68,10 +67,6 @@ export function useWebSocket(options: UseWebSocketOptions) {
       };
 
       ws.onclose = () => {
-        // Suppress logs during React StrictMode cleanup
-        if (!isCleaningUpRef.current) {
-          console.log('WebSocket disconnected');
-        }
         setIsConnected(false);
         onDisconnect?.();
         wsRef.current = null;
@@ -79,7 +74,6 @@ export function useWebSocket(options: UseWebSocketOptions) {
         // Don't reconnect if we're in cleanup phase
         if (!isCleaningUpRef.current) {
           reconnectTimeoutRef.current = setTimeout(() => {
-            console.log('Attempting to reconnect...');
             connect();
           }, reconnectInterval);
         }

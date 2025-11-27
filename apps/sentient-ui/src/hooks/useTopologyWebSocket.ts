@@ -21,7 +21,6 @@ export function useTopologyWebSocket() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('[Topology WS] Connected to', WS_URL);
         // Subscribe to topology channel
         ws.send(JSON.stringify({ type: 'subscribe', channel: 'topology' }));
       };
@@ -51,13 +50,11 @@ export function useTopologyWebSocket() {
       };
 
       ws.onclose = (event) => {
-        console.log('[Topology WS] Disconnected', event.code, event.reason);
         wsRef.current = null;
 
         // Attempt to reconnect after 5 seconds
         if (isMounted && !event.wasClean) {
           reconnectTimeoutRef.current = setTimeout(() => {
-            console.log('[Topology WS] Attempting to reconnect...');
             connect();
           }, 5000);
         }

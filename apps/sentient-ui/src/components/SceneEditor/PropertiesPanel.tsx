@@ -16,10 +16,10 @@ interface PropertiesPanelProps {
   selectedRoomId: string;
 }
 
-export function PropertiesPanel({ 
-  selectedNode, 
-  sceneInfo, 
-  onSceneInfoChange, 
+export function PropertiesPanel({
+  selectedNode,
+  // sceneInfo, 
+  // onSceneInfoChange, 
   onNodeConfigChange,
   onNodeDataChange,
   devices,
@@ -77,7 +77,7 @@ export function PropertiesPanel({
 
                   <div className={styles.row}>
                     <label className={styles.label}>Action</label>
-                    <select 
+                    <select
                       className={styles.select}
                       value={(selectedNode.data.config as { action?: string })?.action || ''}
                       onChange={(e) => {
@@ -127,7 +127,7 @@ export function PropertiesPanel({
 
                   <div className={styles.row}>
                     <label className={styles.label}>Action</label>
-                    <select 
+                    <select
                       className={styles.select}
                       value={(selectedNode.data.config as { action?: string })?.action || 'turn_on'}
                       onChange={(e) =>
