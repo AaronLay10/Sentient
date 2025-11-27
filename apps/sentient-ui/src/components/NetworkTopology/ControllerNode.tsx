@@ -26,17 +26,17 @@ export function ControllerNode({ data, onClick, onHover }: ControllerNodeProps) 
   const getStatusColor = () => {
     switch (data.status) {
       case 'waiting':
-        return '#6b7280'; // Grey - waiting for connection
+        return '#8888aa'; // Purple-gray - waiting for connection
       case 'online':
-        return '#10b981'; // Green - online and active
+        return '#00d9ff'; // Brand cyan - online and active
       case 'offline':
-        return '#ef4444'; // Red - powered but offline
+        return '#666677'; // Gray - powered but offline
       case 'warning':
-        return '#f59e0b'; // Orange - warning state
+        return '#ffaa32'; // Brand orange - warning state
       case 'error':
-        return '#dc2626'; // Dark red - error state
+        return '#ff3355'; // Brand red - error state
       default:
-        return '#6b7280';
+        return '#8888aa';
     }
   };
 
@@ -57,12 +57,15 @@ export function ControllerNode({ data, onClick, onHover }: ControllerNodeProps) 
       {/* Status ring */}
       <div
         className="controller-ring"
-        style={{ borderColor: getStatusColor() }}
+        style={{ 
+          borderColor: getStatusColor(),
+          backgroundColor: 'rgb(10, 14, 26)',
+        }}
       >
-        {/* Device count centered inside */}
+        {/* Controller initial centered inside */}
         <div className="controller-inner">
-          <span className="device-count-inner" style={{ color: getStatusColor() }}>
-            {data.device_count || 0}
+          <span className="controller-initial">
+            {data.friendly_name.charAt(0).toUpperCase()}
           </span>
         </div>
       </div>

@@ -76,19 +76,19 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   margin-bottom: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .node:hover {
   background: rgba(0, 217, 255, 0.05);
   border-color: var(--border-glow);
   box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
-  transform: translateX(2px);
 }
 
 .node:active {
-  transform: scale(0.98) translateX(2px);
+  cursor: grabbing;
 }
 
 .nodeIcon {
@@ -100,20 +100,24 @@
   justify-content: center;
   font-size: 14px;
   flex-shrink: 0;
+  pointer-events: none;
 }
 
 .nodeInfo {
   flex: 1;
   min-width: 0;
+  pointer-events: none;
 }
 
 .nodeName {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
+  pointer-events: none;
 }
 
 .nodeDesc {
   font-size: 11px;
   color: var(--text-muted);
+  pointer-events: none;
 }

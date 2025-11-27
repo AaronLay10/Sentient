@@ -34,6 +34,11 @@ export class DevicesService {
       controller_id: device.controllerId,
       status: 'operational' as const,
       properties: device.properties,
+      actions: device.actions.map(action => ({
+        action_id: action.action_id,
+        mqtt_topic: action.mqtt_topic,
+        friendly_name: action.action_id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      })),
       created_at: device.created_at.toISOString(),
     }));
   }

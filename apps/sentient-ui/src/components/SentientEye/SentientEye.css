@@ -12,7 +12,7 @@
 .hud-eye-container {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 350px;
   aspect-ratio: 1;
 }
 
@@ -28,8 +28,8 @@
 /* Realistic Eye Styling */
 .realistic-eye {
   position: absolute;
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: 200px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -54,8 +54,8 @@
 
 .eye-iris {
   position: absolute;
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -171,8 +171,8 @@
 
 .eye-pupil {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -190,10 +190,10 @@
 
 .pupil-highlight {
   position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 8px;
-  left: 8px;
+  width: 6px;
+  height: 6px;
+  top: 5px;
+  left: 5px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), transparent);
   filter: blur(1px);

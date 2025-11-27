@@ -72,7 +72,7 @@ export function SentientEye({ health }: SentientEyeProps) {
         </svg>
 
         {/* Rotating ring around eye - renders BEFORE eye so it appears behind */}
-        <svg viewBox="0 0 360 360" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '360px', height: '360px', pointerEvents: 'none', overflow: 'visible' }}>
+        <svg viewBox="0 0 240 240" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '240px', height: '240px', pointerEvents: 'none', overflow: 'visible' }}>
           <defs>
             {/* Outer glow filter for the rotating ring */}
             <filter id="outerGlow">
@@ -86,9 +86,9 @@ export function SentientEye({ health }: SentientEyeProps) {
 
           {/* 3D shadow/depth layer behind rings */}
           <circle
-            cx="180"
-            cy="180"
-            r="150"
+            cx="120"
+            cy="120"
+            r="100"
             fill="none"
             stroke="rgba(0, 0, 0, 0.6)"
             strokeWidth="6"
@@ -99,9 +99,9 @@ export function SentientEye({ health }: SentientEyeProps) {
           <g className={`rotating-outer-ring ${effectiveHealth === 'warning' ? 'status-warning' : effectiveHealth === 'critical' ? 'status-critical' : ''}`} style={{ filter: 'url(#outerGlow)' }}>
             {/* Primary segments - cyan (healthy), orange (warning), or red (critical) */}
             <circle
-              cx="180"
-              cy="180"
-              r="150"
+              cx="120"
+              cy="120"
+              r="100"
               fill="none"
               stroke={
                 effectiveHealth === 'critical'
@@ -111,14 +111,14 @@ export function SentientEye({ health }: SentientEyeProps) {
                   : 'rgba(0, 217, 255, 1.0)'
               }
               strokeWidth="6"
-              strokeDasharray="117.75 117.75"
+              strokeDasharray="78.5 78.5"
               strokeDashoffset="0"
             />
             {/* Secondary segments - orange (healthy), yellow (warning), or dark red (critical) */}
             <circle
-              cx="180"
-              cy="180"
-              r="150"
+              cx="120"
+              cy="120"
+              r="100"
               fill="none"
               stroke={
                 effectiveHealth === 'critical'
@@ -128,8 +128,8 @@ export function SentientEye({ health }: SentientEyeProps) {
                   : 'rgba(255, 170, 50, 1.0)'
               }
               strokeWidth="6"
-              strokeDasharray="117.75 117.75"
-              strokeDashoffset="-117.75"
+              strokeDasharray="78.5 78.5"
+              strokeDashoffset="-78.5"
             />
           </g>
         </svg>

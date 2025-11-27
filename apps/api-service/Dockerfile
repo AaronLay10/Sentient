@@ -8,13 +8,13 @@ RUN corepack enable && corepack prepare pnpm@10.22.0 --activate
 WORKDIR /app
 
 # Copy root package files
-COPY package.json pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Copy api-service package
 COPY apps/api-service/package.json ./apps/api-service/
 
-# Install dependencies
-RUN pnpm install --no-frozen-lockfile
+# Install dependencies for the workspace (api-service + root)
+RUN pnpm install --no-frozen-lockfile --recursive
 
 # Copy api-service source
 COPY apps/api-service ./apps/api-service
@@ -38,14 +38,14 @@ RUN corepack enable && corepack prepare pnpm@10.22.0 --activate
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api-service/package.json ./apps/api-service/
 
 # Copy api-service source for Prisma schema
 COPY --from=base /app/apps/api-service/prisma ./apps/api-service/prisma
 
 # Install ALL dependencies (need prisma cli for migrations)
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile --recursive
 
 WORKDIR /app/apps/api-service
 

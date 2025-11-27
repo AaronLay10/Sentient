@@ -1,6 +1,10 @@
 # Multi-stage build for production-ready Sentient UI
 FROM node:22-alpine AS base
 
+# Allow overriding API/WS endpoints at build time (defaults fall back to production)
+ARG VITE_API_URL=https://sentientengine.ai/api
+ARG VITE_WS_URL=wss://sentientengine.ai/ws
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10.22.0 --activate
 
@@ -20,9 +24,9 @@ RUN pnpm install --frozen-lockfile
 # Build shared packages first
 RUN pnpm -r --filter "@sentient/*" build
 
-# Build Sentient UI with production URLs using sentientengine.ai domain
-ENV VITE_API_URL=https://sentientengine.ai/api
-ENV VITE_WS_URL=wss://sentientengine.ai/ws
+# Build Sentient UI with the provided endpoints
+ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_WS_URL=${VITE_WS_URL}
 RUN pnpm -r --filter sentient-ui build
 
 # Production stage with nginx

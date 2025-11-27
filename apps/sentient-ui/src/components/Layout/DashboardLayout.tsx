@@ -13,7 +13,7 @@ export function DashboardLayout() {
   };
 
   return (
-    <div className="dashboard-layout circuit-bg">
+    <div className="dashboard-layout">
       <div className="neural-grid" />
       <div className="scan-line" />
 

@@ -4,7 +4,7 @@ Utility scripts for monitoring and managing the Sentient Engine in production.
 
 ## Deployment
 
-**Main deploy script is in the project root: [`deploy.sh`](../deploy.sh)**
+**Production:** [`deploy.sh`](../deploy.sh)
 
 ```bash
 # On the server
@@ -14,9 +14,19 @@ cd /opt/sentient
 ./deploy.sh --service api-service # Deploy single service
 ```
 
+**Local convenience:** [`deploy.local.sh`](../deploy.local.sh)
+
+```bash
+# From repo root
+./deploy.local.sh                       # Build + start default local stack
+./deploy.local.sh --skip-build          # Reuse existing images
+./deploy.local.sh --service sentient-ui # Only bring up the UI container
+```
+
 ## Monitoring
 
 ### [`monitor.sh`](./monitor.sh)
+
 Interactive dashboard for monitoring services and viewing logs.
 
 ```bash
@@ -24,6 +34,7 @@ Interactive dashboard for monitoring services and viewing logs.
 ```
 
 **Features**:
+
 - View service status
 - Monitor resource usage
 - View logs (with filtering)
@@ -36,6 +47,7 @@ Interactive dashboard for monitoring services and viewing logs.
 ## Recovery
 
 ### [`rollback.sh`](./rollback.sh)
+
 Interactive menu for rollback and recovery operations.
 
 ```bash
@@ -43,6 +55,7 @@ Interactive menu for rollback and recovery operations.
 ```
 
 **Features**:
+
 - Rollback to previous Docker image
 - Restore database from backup
 - Emergency stop/restart
@@ -69,5 +82,6 @@ docker compose -f docker-compose.prod.yml exec postgres psql -U sentient sentien
 
 ## See Also
 
+- [`deploy.local.sh`](../deploy.local.sh) - Local stack helper honoring `.env.sentient.local`
 - [DEPLOYMENT.md](../DEPLOYMENT.md) - Complete deployment guide
 - [Sentient_Engine_Deployment_Guide.md](../Sentient_Engine_Deployment_Guide.md) - Server setup guide

@@ -59,6 +59,12 @@ export interface Controller {
   created_at: string;
 }
 
+export interface DeviceAction {
+  action_id: string;
+  mqtt_topic: string;
+  friendly_name?: string;
+}
+
 export interface Device {
   id: string;
   friendly_name: string;
@@ -67,6 +73,7 @@ export interface Device {
   controller_id: string;
   status: 'operational' | 'warning' | 'error' | 'offline';
   properties?: Record<string, unknown>;
+  actions?: DeviceAction[];
   created_at: string;
 }
 
@@ -95,6 +102,46 @@ export interface User {
   role: string;
   photo_url?: string;
   created_at: string;
+}
+
+export interface SceneNode {
+  id: string;
+  type: string;
+  position: { x: number; y: number };
+  data: {
+    label: string;
+    nodeType: string;
+    subtype: string;
+    icon: string;
+    color: string;
+    config?: Record<string, any>;
+  };
+}
+
+export interface SceneEdge {
+  id: string;
+  source: string;
+  target: string;
+  sourceHandle?: string | null;
+  targetHandle?: string | null;
+}
+
+export interface SceneGraph {
+  nodes: SceneNode[];
+  edges: SceneEdge[];
+}
+
+export interface Scene {
+  id: string;
+  clientId: string;
+  roomId: string;
+  name: string;
+  description?: string;
+  graph: SceneGraph;
+  active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export const api = {
@@ -129,32 +176,8 @@ export const api = {
 
   // Devices
   async getDevices(): Promise<Device[]> {
-    try {
-      const response = await client.get('/internal/devices');
-      return response.data;
-    } catch (error) {
-      console.warn('Failed to fetch devices, using mock data', error);
-      return [
-        {
-          id: 'intro_tv_control',
-          friendly_name: 'Intro TV Control',
-          device_type: 'actuator',
-          device_category: 'output',
-          controller_id: 'boiler_room_subpanel',
-          status: 'operational',
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: 'boiler_room_fog_machine',
-          friendly_name: 'Fog Machine',
-          device_type: 'fog_system',
-          device_category: 'output',
-          controller_id: 'boiler_room_subpanel',
-          status: 'operational',
-          created_at: new Date().toISOString(),
-        },
-      ];
-    }
+    const response = await client.get('/admin/devices');
+    return response.data;
   },
 
   async getDevice(id: string): Promise<Device> {
@@ -164,7 +187,7 @@ export const api = {
 
   // Rooms
   async getRooms(): Promise<Room[]> {
-    const response = await client.get('/rooms');
+    const response = await client.get('/admin/rooms');
     return response.data;
   },
 
@@ -227,6 +250,54 @@ export const api = {
   // Topology
   async getTopology() {
     const response = await client.get('/admin/rooms/topology');
+    return response.data;
+  },
+
+  // System Version
+  async getSystemVersion() {
+    const response = await client.get('/health/version');
+    return response.data;
+  },
+
+  // Scenes
+  async getScenes(clientId: string, roomId: string): Promise<Scene[]> {
+    const response = await client.get(`/clients/${clientId}/rooms/${roomId}/scenes`);
+    return response.data;
+  },
+
+  async getScene(clientId: string, roomId: string, sceneId: string): Promise<Scene> {
+    const response = await client.get(`/clients/${clientId}/rooms/${roomId}/scenes/${sceneId}`);
+    return response.data;
+  },
+
+  async createScene(clientId: string, roomId: string, data: {
+    name: string;
+    description?: string;
+    graph: SceneGraph;
+    active?: boolean;
+    order?: number;
+  }): Promise<Scene> {
+    const response = await client.post(`/clients/${clientId}/rooms/${roomId}/scenes`, data);
+    return response.data;
+  },
+
+  async updateScene(clientId: string, roomId: string, sceneId: string, data: {
+    name?: string;
+    description?: string;
+    graph?: SceneGraph;
+    active?: boolean;
+    order?: number;
+  }): Promise<Scene> {
+    const response = await client.patch(`/clients/${clientId}/rooms/${roomId}/scenes/${sceneId}`, data);
+    return response.data;
+  },
+
+  async deleteScene(clientId: string, roomId: string, sceneId: string): Promise<void> {
+    await client.delete(`/clients/${clientId}/rooms/${roomId}/scenes/${sceneId}`);
+  },
+
+  async duplicateScene(clientId: string, roomId: string, sceneId: string): Promise<Scene> {
+    const response = await client.post(`/clients/${clientId}/rooms/${roomId}/scenes/${sceneId}/duplicate`);
     return response.data;
   },
 };

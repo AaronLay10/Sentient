@@ -1,8 +1,9 @@
 import { memo } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position, useReactFlow } from '@xyflow/react';
 import styles from './SceneNode.module.css';
 
 interface SceneNodeProps {
+  id: string;
   data: {
     label: string;
     nodeType: string;
@@ -14,9 +15,15 @@ interface SceneNodeProps {
   selected?: boolean;
 }
 
-export const SceneNode = memo(({ data, selected }: SceneNodeProps) => {
-  const hasInput = data.nodeType !== 'trigger';
+export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
+  const { deleteElements } = useReactFlow();
+  const hasInput = data.nodeType !== 'trigger' || data.subtype === 'timer';
   const hasMultipleOutputs = data.subtype === 'branch';
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    deleteElements({ nodes: [{ id }] });
+  };
 
   return (
     <div className={`${styles.node} ${selected ? styles.selected : ''}`}>
@@ -33,7 +40,15 @@ export const SceneNode = memo(({ data, selected }: SceneNodeProps) => {
           {data.icon}
         </div>
         <div className={styles.title}>{data.label}</div>
-        <div className={styles.menu}>⋮</div>
+        {selected && (
+          <div 
+            className={styles.deleteBtn} 
+            title="Delete node (Del/Backspace)"
+            onClick={handleDelete}
+          >
+            ×
+          </div>
+        )}
       </div>
 
       <div className={styles.body}>

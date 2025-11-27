@@ -1,0 +1,34 @@
+# Development Dockerfile for Sentient UI with hot reload
+FROM node:22-alpine
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# Copy workspace config
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+
+# Copy all package.json files
+COPY packages/*/package.json ./packages/
+COPY apps/sentient-ui/package.json ./apps/sentient-ui/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy shared packages (these don't change as often)
+COPY packages ./packages
+
+# Copy UI source (but this will be mounted as volume for hot reload)
+COPY apps/sentient-ui ./apps/sentient-ui
+
+# Build args for Vite
+ARG VITE_API_URL
+ARG VITE_WS_URL
+ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_WS_URL=${VITE_WS_URL}
+
+EXPOSE 5173
+
+# Command will be overridden by docker-compose
+CMD ["sh", "-c", "cd apps/sentient-ui && pnpm dev --host 0.0.0.0 --port 5173"]

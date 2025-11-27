@@ -153,6 +153,9 @@ services:
     build:
       context: .
       dockerfile: apps/sentient-ui/Dockerfile
+      args:
+        VITE_API_URL: ${UI_VITE_API_URL:-http://localhost:3001}
+        VITE_WS_URL: ${UI_VITE_WS_URL:-ws://localhost:3002}
     container_name: sentient_ui
     restart: unless-stopped
     env_file:

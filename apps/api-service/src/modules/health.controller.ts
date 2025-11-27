@@ -1,6 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { HealthService } from './health.service';
 
+const packageJson = require('../../package.json');
+
 @Controller('health')
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
@@ -8,6 +10,16 @@ export class HealthController {
   @Get()
   getHealth() {
     return { status: 'ok' };
+  }
+
+  @Get('version')
+  getVersion() {
+    return {
+      service: 'api-service',
+      version: packageJson.version,
+      node: process.version,
+      uptime: process.uptime(),
+    };
   }
 
   @Get('dependencies')

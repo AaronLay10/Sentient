@@ -11,4 +11,14 @@ export class AdminController {
   async getTopology() {
     return this.adminService.getSystemTopology();
   }
+
+  @Get('rooms')
+  async getAllRooms() {
+    return this.adminService.getAllRooms();
+  }
+
+  @Get('devices')
+  async getAllDevices() {
+    return this.adminService.getAllDevices();
+  }
 }

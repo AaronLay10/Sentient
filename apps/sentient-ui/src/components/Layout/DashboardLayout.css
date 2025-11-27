@@ -5,6 +5,7 @@
   height: 100vh;
   position: relative;
   overflow: hidden;
+  background: transparent;
 }
 
 /* Top Navigation Bar */
@@ -175,7 +176,7 @@
 .main-content {
   flex: 1;
   overflow-y: auto;
-  background: var(--bg-primary);
+  background: transparent;
   padding: 1.5rem 2rem;
 }
 

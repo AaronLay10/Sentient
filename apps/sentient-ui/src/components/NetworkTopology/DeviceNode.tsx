@@ -25,18 +25,8 @@ interface DeviceNodeProps {
 
 export function DeviceNode({ data, onClick, onHover }: DeviceNodeProps) {
   const getStatusColor = () => {
-    switch (data.status) {
-      case 'operational':
-        return '#10b981'; // Green - operational
-      case 'offline':
-        return '#6b7280'; // Grey - offline
-      case 'warning':
-        return '#f59e0b'; // Orange - warning state
-      case 'error':
-        return '#ef4444'; // Red - error state
-      default:
-        return '#6b7280';
-    }
+    // All devices are cyan to match brand
+    return '#00d9ff'; // Brand cyan
   };
 
   return (
@@ -70,9 +60,9 @@ export function DeviceNode({ data, onClick, onHover }: DeviceNodeProps) {
           y1={data.size / 2}
           x2={data.controllerX - data.x + data.size / 2}
           y2={data.controllerY - data.y + data.size / 2}
-          stroke={getStatusColor()}
+          stroke="#ffaa32"
           strokeWidth="1"
-          strokeOpacity="0.3"
+          strokeOpacity="1"
         />
       </svg>
 
@@ -81,7 +71,7 @@ export function DeviceNode({ data, onClick, onHover }: DeviceNodeProps) {
         className="device-circle"
         style={{
           borderColor: getStatusColor(),
-          backgroundColor: `${getStatusColor()}22` // 22 = ~13% opacity
+          backgroundColor: `${getStatusColor()}40` // 40 = ~25% opacity for brightness
         }}
       />
 

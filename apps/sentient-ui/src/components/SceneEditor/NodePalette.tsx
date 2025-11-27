@@ -19,6 +19,9 @@ const NODE_CATEGORIES = {
     { type: 'trigger', subtype: 'scene-start', label: 'Scene Start', description: 'Triggers when scene begins', icon: '▶', color: '#ff8c42' },
     { type: 'trigger', subtype: 'timer', label: 'Timer', description: 'Time-based trigger', icon: '⏲', color: '#fbbf24' },
   ],
+  Devices: [
+    { type: 'device', subtype: 'control', label: 'Device Control', description: 'Control any device', icon: '🎛', color: '#8b5cf6' },
+  ],
   Sensors: [
     { type: 'sensor', subtype: 'button', label: 'Button Press', description: 'Physical button trigger', icon: '◉', color: '#34d399' },
     { type: 'sensor', subtype: 'rfid', label: 'RFID Scan', description: 'RFID tag detection', icon: '⊡', color: '#34d399' },
@@ -86,7 +89,33 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
               <div
                 key={node.subtype}
                 className={styles.node}
-                onClick={() => onAddNode(node.type, node.subtype, node.label, node.icon, node.color)}
+                draggable="true"
+                onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
+                  console.log('🎯 Drag started for node:', node.label);
+                  const data = JSON.stringify({
+                    type: node.type,
+                    subtype: node.subtype,
+                    label: node.label,
+                    icon: node.icon,
+                    color: node.color,
+                  });
+                  e.dataTransfer.setData('application/reactflow', data);
+                  e.dataTransfer.effectAllowed = 'move';
+                  e.stopPropagation();
+                }}
+                onDrag={(e) => {
+                  console.log('🔄 Dragging:', node.label);
+                }}
+                onDragEnd={(e) => {
+                  console.log('🎯 Drag ended for node:', node.label);
+                }}
+                onMouseDown={(e) => {
+                  console.log('🖱️ Mouse down on:', node.label);
+                }}
+                onClick={(e) => {
+                  console.log('👆 Click on:', node.label);
+                  onAddNode(node.type, node.subtype, node.label, node.icon, node.color);
+                }}
               >
                 <div
                   className={styles.nodeIcon}

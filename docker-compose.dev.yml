@@ -1,0 +1,23 @@
+name: sentient
+
+services:
+  # Development override for sentient-ui with hot reload
+  sentient-ui:
+    build:
+      context: .
+      dockerfile: apps/sentient-ui/Dockerfile.dev
+      args:
+        VITE_API_URL: ${UI_VITE_API_URL:-http://localhost:3001}
+        VITE_WS_URL: ${UI_VITE_WS_URL:-ws://localhost:3002}
+    volumes:
+      - ./apps/sentient-ui/src:/app/apps/sentient-ui/src:delegated
+      - ./apps/sentient-ui/public:/app/apps/sentient-ui/public:delegated
+      - ./apps/sentient-ui/index.html:/app/apps/sentient-ui/index.html:delegated
+      - ./apps/sentient-ui/vite.config.ts:/app/apps/sentient-ui/vite.config.ts:delegated
+      - ./apps/sentient-ui/.env.local:/app/apps/sentient-ui/.env.local:delegated
+      - ./packages:/app/packages:delegated
+    command: sh -c "cd apps/sentient-ui && pnpm dev --host 0.0.0.0 --port 80"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=${UI_VITE_API_URL:-http://localhost:3001}
+      - VITE_WS_URL=${UI_VITE_WS_URL:-ws://localhost:3002}

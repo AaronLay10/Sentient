@@ -16,6 +16,7 @@ model Client {
   users      User[]
   controllers Controller[]
   devices     Device[]
+  scenes      Scene[]
 }
 
 model Venue {
@@ -40,6 +41,7 @@ model Room {
   created_at DateTime @default(now())
   controllers Controller[]
   devices     Device[]
+  scenes      Scene[]
 
   @@unique([venueId, name])
   @@index([clientId])
@@ -127,4 +129,23 @@ model DeviceAction {
 
   @@unique([deviceId, action_id])
   @@index([deviceId])
+}
+
+model Scene {
+  id          String   @id @default(cuid())
+  clientId    String
+  roomId      String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  graph       Json     // Stores nodes and edges for visual flow
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([roomId])
+  @@unique([roomId, name])
 }
