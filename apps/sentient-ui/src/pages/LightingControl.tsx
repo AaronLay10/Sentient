@@ -36,7 +36,7 @@ export function LightingControl() {
   const [controller, setController] = useState<LightingController | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingCommands, setPendingCommands] = useState<Set<string>>(new Set());
-  const wsUrl = window.location.protocol === 'https:' ? 'wss://sentientengine.ai/ws' : 'ws://sentientengine.ai/ws';
+  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
   const { isConnected: connected, events } = useWebSocket({ url: wsUrl });
 
   // Fetch devices on mount

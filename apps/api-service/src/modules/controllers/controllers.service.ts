@@ -108,6 +108,37 @@ export class ControllersService {
       create: createData
     });
 
+    // Sync devices: remove devices no longer in the manifest
+    if (dto.capability_manifest?.devices && dto.capability_manifest.devices.length > 0) {
+      const manifestDeviceIds = dto.capability_manifest.devices.map(d => d.device_id);
+      
+      // Find devices in DB that belong to this controller but aren't in the manifest
+      const devicesToRemove = await this.prisma.device.findMany({
+        where: {
+          controllerId: controller.id,
+          id: { notIn: manifestDeviceIds }
+        },
+        select: { id: true }
+      });
+
+      // Delete orphaned devices and their actions
+      if (devicesToRemove.length > 0) {
+        const deviceIdsToRemove = devicesToRemove.map(d => d.id);
+        
+        // Delete actions first (foreign key constraint)
+        await this.prisma.deviceAction.deleteMany({
+          where: { deviceId: { in: deviceIdsToRemove } }
+        });
+        
+        // Delete devices
+        await this.prisma.device.deleteMany({
+          where: { id: { in: deviceIdsToRemove } }
+        });
+
+        console.log(`🗑️  Removed ${devicesToRemove.length} orphaned device(s) from controller ${controller.id}:`, deviceIdsToRemove);
+      }
+    }
+
     return { controller_id: controller.id, status: 'registered' };
   }
 

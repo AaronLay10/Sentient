@@ -36,7 +36,7 @@ interface ApiDevice {
 export function PowerControl() {
   const [powerControllers, setPowerControllers] = useState<Map<string, PowerController>>(new Map());
   const [loading, setLoading] = useState(true);
-  const wsUrl = window.location.protocol === 'https:' ? 'wss://sentientengine.ai/ws' : 'ws://sentientengine.ai/ws';
+  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
   const { isConnected: connected, events } = useWebSocket({ url: wsUrl });
 
   // Fetch devices and controller status from API on mount
@@ -197,8 +197,11 @@ export function PowerControl() {
             const deviceState = newState?.power ?? (newState?.state === 1 || newState?.state === true) ?? newState?.on ?? false;
 
             if (deviceIndex >= 0) {
+              console.log(`📝 Updating ${deviceId}: state=${deviceState}, payload=`, newState);
               // Only update existing device state (devices come from database via API)
               controller.devices[deviceIndex].state = deviceState;
+            } else {
+              console.warn(`⚠️ Device ${deviceId} not found in controller ${controllerId}`);
             }
             // Note: We don't add new devices here - devices must be registered in database first
           }
@@ -336,6 +339,23 @@ export function PowerControl() {
                           title="Turn all devices OFF"
                         >
                           All OFF
+                        </button>
+                        <button
+                          className="btn-refresh-status"
+                          onClick={() => handleRefreshStatus(controller.controller_id)}
+                          disabled={!controller.online}
+                          title="Request controller status snapshot"
+                          style={{
+                            padding: '0.35rem 0.75rem',
+                            borderRadius: '0.45rem',
+                            border: '1px solid rgba(59,130,246,0.6)',
+                            backgroundColor: 'rgba(59,130,246,0.15)',
+                            color: '#93c5fd',
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Refresh
                         </button>
                       </div>
                     )}

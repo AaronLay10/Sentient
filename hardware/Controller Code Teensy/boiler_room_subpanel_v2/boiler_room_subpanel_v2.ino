@@ -98,12 +98,10 @@ const char *fog_machine_commands[] = {
     naming::CMD_ULTRASONIC_ON,
     naming::CMD_ULTRASONIC_OFF};
 
-// Barrel — maglock + IR activation
+// Barrel — maglock only
 const char *barrel_commands[] = {
     naming::CMD_BARREL_LOCK,
-    naming::CMD_BARREL_UNLOCK,
-    naming::CMD_ACTIVATE_IR,
-    naming::CMD_DEACTIVATE_IR};
+    naming::CMD_BARREL_UNLOCK};
 
 // Study Door — group control
 const char *study_door_commands[] = {
@@ -117,38 +115,39 @@ const char *gauge_chest_commands[] = {
     naming::CMD_GAUGE_SOLVED_3,
     naming::CMD_GAUGE_CLEAR};
 
-// Sensor items
-const char *barrel_sensors[] = {"ir_code"};
+// IR Sensor — gun detection control
+const char *ir_sensor_commands[] = {
+    naming::CMD_IR_ACTIVATE,
+    naming::CMD_IR_DEACTIVATE};
 
-// Controller virtual device — power-off sequence
-const char *controller_commands[] = {
-    naming::CMD_CONTROLLER_POWER_OFF_SEQUENCE};
+// Sensor items
+const char *ir_sensor_sensors[] = {"ir_code"};
 
 // Create device definitions with friendly names
 SentientDeviceDef dev_intro_tv(
-    naming::DEV_INTRO_TV, naming::FRIENDLY_INTRO_TV, "actuator",
+    naming::DEV_INTRO_TV, naming::FRIENDLY_INTRO_TV, naming::TYPE_INTRO_TV,
     intro_tv_commands, 4);
 
 SentientDeviceDef dev_fog_machine(
-    naming::DEV_BOILER_FOG_MACHINE, naming::FRIENDLY_BOILER_FOG_MACHINE, "fog_system",
+    naming::DEV_BOILER_FOG_MACHINE, naming::FRIENDLY_BOILER_FOG_MACHINE, naming::TYPE_BOILER_FOG_MACHINE,
     fog_machine_commands, 5);
 
 SentientDeviceDef dev_barrel(
-    naming::DEV_BOILER_ROOM_BARREL, naming::FRIENDLY_BOILER_ROOM_BARREL, "maglock",
-    barrel_commands, 4,
-    barrel_sensors, 1);
+    naming::DEV_BOILER_ROOM_BARREL, naming::FRIENDLY_BOILER_ROOM_BARREL, naming::TYPE_BOILER_ROOM_BARREL,
+    barrel_commands, 2);
+
+SentientDeviceDef dev_ir_sensor(
+    naming::DEV_IR_SENSOR, naming::FRIENDLY_IR_SENSOR, naming::TYPE_IR_SENSOR,
+    ir_sensor_commands, 2,
+    ir_sensor_sensors, 1);
 
 SentientDeviceDef dev_study_door(
-    naming::DEV_STUDY_DOOR, naming::FRIENDLY_STUDY_DOOR, "maglock_group",
+    naming::DEV_STUDY_DOOR, naming::FRIENDLY_STUDY_DOOR, naming::TYPE_STUDY_DOOR,
     study_door_commands, 2);
 
 SentientDeviceDef dev_gauge_chest(
-    naming::DEV_GAUGE_PROGRESS_CHEST, naming::FRIENDLY_GAUGE_PROGRESS_CHEST, "led_strip",
+    naming::DEV_GAUGE_PROGRESS_CHEST, naming::FRIENDLY_GAUGE_PROGRESS_CHEST, naming::TYPE_GAUGE_PROGRESS_CHEST,
     gauge_chest_commands, 4);
-
-SentientDeviceDef dev_controller(
-    naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller",
-    controller_commands, 1);
 
 // Create the device registry (manifest builder will use these IDs and names)
 SentientDeviceRegistry deviceRegistry;
@@ -273,9 +272,9 @@ void setup()
   deviceRegistry.addDevice(&dev_intro_tv);
   deviceRegistry.addDevice(&dev_fog_machine);
   deviceRegistry.addDevice(&dev_barrel);
+  deviceRegistry.addDevice(&dev_ir_sensor);
   deviceRegistry.addDevice(&dev_study_door);
   deviceRegistry.addDevice(&dev_gauge_chest);
-  deviceRegistry.addDevice(&dev_controller);
   deviceRegistry.printSummary();
 
   // Build capability manifest
@@ -383,8 +382,8 @@ void setup()
         else if (command == naming::CMD_TV_LIFT_DOWN) { tv_lift_state = -1; digitalWrite(tv_lift_down_pin, HIGH); digitalWrite(tv_lift_up_pin, LOW); publish_hardware_status(); }
         else { /* unknown */ }
       }
-      // Controller-level (power-off sequence)
-      else if (device == naming::DEV_CONTROLLER) {
+      // Controller-level commands (direct to controller, not a device)
+      else if (device == "controller") {
         if (command == naming::CMD_CONTROLLER_POWER_OFF_SEQUENCE) {
           // Perform power-off sequence: set outputs to safe/off state
           // TV
@@ -465,12 +464,16 @@ void setup()
         else if (command == naming::CMD_GAUGE_SOLVED_3) { gauge_progress_level = 3; fill_solid(leds, 45, CRGB::Green); fill_solid(leds + 45, num_leds - 45, CRGB::Black); }
         FastLED.show(); publish_hardware_status();
       }
-      // Barrel (maglock + IR control)
+      // Barrel (maglock only)
       else if (device == naming::DEV_BOILER_ROOM_BARREL) {
         if (command == naming::CMD_BARREL_UNLOCK) { barrel_maglock_locked = false; digitalWrite(barrel_maglock_pin, LOW); publish_hardware_status(); }
         else if (command == naming::CMD_BARREL_LOCK) { barrel_maglock_locked = true; digitalWrite(barrel_maglock_pin, HIGH); publish_hardware_status(); }
-        else if (command == naming::CMD_ACTIVATE_IR) { ir_sensor_active = true; publish_hardware_status(); }
-        else if (command == naming::CMD_DEACTIVATE_IR) { ir_sensor_active = false; publish_hardware_status(); }
+        else { /* unknown */ }
+      }
+      // IR Sensor (gun detection control)
+      else if (device == naming::DEV_IR_SENSOR) {
+        if (command == naming::CMD_IR_ACTIVATE) { ir_sensor_active = true; publish_hardware_status(); }
+        else if (command == naming::CMD_IR_DEACTIVATE) { ir_sensor_active = false; publish_hardware_status(); }
         else { /* unknown */ }
       }
 

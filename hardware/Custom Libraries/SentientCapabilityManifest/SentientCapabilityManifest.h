@@ -120,7 +120,7 @@ public:
 
     // STEP 1: Publish controller metadata (small, ~800 bytes)
     {
-      StaticJsonDocument<1024> controller_doc;
+      StaticJsonDocument<2048> controller_doc;
       controller_doc["controller_id"] = controller_id;
       controller_doc["room_id"] = room_id_uuid;
       controller_doc["friendly_name"] = friendly_name;
@@ -141,6 +141,21 @@ public:
       controller_doc["mqtt_namespace"] = mqtt_namespace;
       controller_doc["mqtt_room_id"] = mqtt_room_id;
       controller_doc["mqtt_controller_id"] = mqtt_controller_id;
+
+      // Add capability manifest for device sync
+      JsonObject manifest = controller_doc.createNestedObject("capability_manifest");
+      manifest["controller_id"] = controller_id;
+      manifest["firmware_version"] = firmware_version;
+      JsonArray manifest_devices = manifest.createNestedArray("devices");
+      for (JsonVariant device_variant : devices)
+      {
+        JsonObject device = device_variant.as<JsonObject>();
+        JsonObject manifest_device = manifest_devices.add<JsonObject>();
+        manifest_device["device_id"] = device["device_id"];
+        manifest_device["device_type"] = device["device_type"];
+        manifest_device["friendly_name"] = device["friendly_name"];
+        manifest_device["device_category"] = device["device_category"];
+      }
 
       String payload;
       serializeJson(controller_doc, payload);

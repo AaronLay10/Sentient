@@ -209,4 +209,42 @@ export class AdminService {
       edges,
     };
   }
+
+  async getAllRooms() {
+    return this.prisma.room.findMany({
+      select: {
+        id: true,
+        name: true,
+        clientId: true,
+        venueId: true,
+        created_at: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async getAllDevices() {
+    const devices = await this.prisma.device.findMany({
+      include: {
+        actions: true,
+      },
+      orderBy: { friendly_name: 'asc' },
+    });
+
+    return devices.map(device => ({
+      id: device.id,
+      friendly_name: device.friendly_name,
+      device_type: device.device_type,
+      device_category: device.device_category,
+      controller_id: device.controllerId,
+      status: 'operational' as const,
+      properties: device.properties,
+      actions: device.actions.map(action => ({
+        action_id: action.action_id,
+        mqtt_topic: action.mqtt_topic,
+        friendly_name: action.action_id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      })),
+      created_at: device.created_at.toISOString(),
+    }));
+  }
 }
