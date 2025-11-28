@@ -608,57 +608,62 @@ function SceneEditorInner() {
                       await new Promise(resolve => setTimeout(resolve, duration));
                       
                     } else if (node.data.nodeType === 'media' && node.data.subtype === 'video') {
-                      // Video playback node
-                      const videoConfig = node.data.config as any;
-                      const videoUrl = videoConfig?.videoUrl;
-                      const volume = videoConfig?.volume ?? 100;
-                      const waitForCompletion = videoConfig?.waitForCompletion ?? true;
+                      // Video playback node - send command to video device
+                      const nodeConfig = node.data.config as any;
                       
-                      if (!videoUrl) {
-                        throw new Error('Video URL not configured');
+                      if (!nodeConfig?.deviceId || !nodeConfig?.action) {
+                        throw new Error('Video device and action must be configured');
                       }
                       
-                      console.log(`🎬 Playing video: ${videoUrl} (volume: ${volume}%)`);
-                      
-                      // Create video element for playback
-                      const video = document.createElement('video');
-                      video.src = videoUrl;
-                      video.volume = volume / 100;
-                      video.style.position = 'fixed';
-                      video.style.top = '50%';
-                      video.style.left = '50%';
-                      video.style.transform = 'translate(-50%, -50%)';
-                      video.style.zIndex = '10000';
-                      video.style.maxWidth = '90vw';
-                      video.style.maxHeight = '90vh';
-                      video.style.backgroundColor = 'black';
-                      document.body.appendChild(video);
-                      
-                      if (waitForCompletion) {
-                        // Wait for video to finish
-                        await new Promise<void>((resolve, reject) => {
-                          video.onended = () => {
-                            document.body.removeChild(video);
-                            resolve();
-                          };
-                          video.onerror = () => {
-                            document.body.removeChild(video);
-                            reject(new Error('Video playback failed'));
-                          };
-                          video.play().catch(err => {
-                            document.body.removeChild(video);
-                            reject(err);
-                          });
-                        });
-                        console.log('✅ Video playback completed');
-                      } else {
-                        // Play and continue immediately
-                        video.play().catch(err => {
-                          console.error('Video playback error:', err);
-                          document.body.removeChild(video);
-                        });
-                        console.log('▶️  Video started, continuing scene...');
+                      // Parse payload if it's a string
+                      let payload = {};
+                      if (nodeConfig.payload) {
+                        try {
+                          payload = typeof nodeConfig.payload === 'string' 
+                            ? JSON.parse(nodeConfig.payload) 
+                            : nodeConfig.payload;
+                        } catch (e) {
+                          throw new Error('Invalid JSON payload');
+                        }
                       }
+                      
+                      const device = devices.find(d => d.id === nodeConfig.deviceId);
+                      const action = device?.actions.find(a => a.action_name === nodeConfig.action);
+                      
+                      console.log(`🎬 Video command: ${device?.friendly_name} - ${action?.friendly_name}`);
+                      
+                      // Set up acknowledgement promise
+                      const commandSentAt = Date.now();
+                      const ackPromise = new Promise<boolean>((resolve) => {
+                        acknowledgementResolvers.current.set(node.id, resolve);
+                        
+                        // 5-second timeout
+                        setTimeout(() => {
+                          if (acknowledgementResolvers.current.has(node.id)) {
+                            acknowledgementResolvers.current.delete(node.id);
+                            resolve(false);
+                          }
+                        }, 5000);
+                      });
+                      
+                      // Send command to video device
+                      await api.sendDeviceCommand(
+                        nodeConfig.deviceId,
+                        nodeConfig.action,
+                        payload
+                      );
+                      
+                      console.log('✅ Video command sent, waiting for acknowledgement...');
+                      
+                      // Wait for acknowledgement
+                      const ackReceived = await ackPromise;
+                      
+                      if (!ackReceived) {
+                        throw new Error(`Command timeout: No acknowledgement received from ${device?.friendly_name} within 5 seconds`);
+                      }
+                      
+                      const latencyMs = Date.now() - commandSentAt;
+                      console.log(`⚡ Video command acknowledged (${latencyMs}ms latency)`);
                       
                     } else {
                       // Other node types - immediate execution
