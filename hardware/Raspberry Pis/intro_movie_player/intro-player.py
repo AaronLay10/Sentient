@@ -228,18 +228,10 @@ class ClockworkIntroPlayer:
             else:
                 logger.warning("Failed to publish registration")
             
-            # Subscribe to control topics
-            topics = [
-                f"paragon/{self.room_id}/commands/{self.controller_id}/intro_tv/play_loop",
-                f"paragon/{self.room_id}/commands/{self.controller_id}/intro_tv/play_intro",
-                f"paragon/{self.room_id}/commands/{self.controller_id}/intro_tv/stop",
-                f"paragon/{self.room_id}/game/start",
-                f"paragon/{self.room_id}/game/reset"
-            ]
-            
-            for topic in topics:
-                client.subscribe(topic, qos=1)
-                logger.info(f"  Subscribed to: {topic}")
+            # Subscribe to device-level command topic (Sentient v4 standard)
+            device_topic = f"paragon/{self.room_id}/commands/{self.controller_id}/intro_tv/#"
+            client.subscribe(device_topic, qos=1)
+            logger.info(f"  Subscribed to: {device_topic}")
                 
             logger.info("✓ Ready for MQTT commands")
             
@@ -251,32 +243,55 @@ class ClockworkIntroPlayer:
         if rc != 0:
             logger.warning(f"Lost MQTT connection (rc={rc}), will try to reconnect...")
             self.mqtt_connected = False
+    
+    def publish_acknowledgement(self, device_id, command, success=True):
+        """Publish acknowledgement matching Teensy controller pattern"""
+        if self.mqtt_connected and self.mqtt_client:
+            topic = f"paragon/{self.room_id}/acknowledgement/{self.controller_id}/{device_id}/{command}"
+            payload = {
+                "controller_id": self.controller_id,
+                "device_id": device_id,
+                "command": command,
+                "success": success,
+                "timestamp_ms": int(time.time() * 1000)
+            }
+            self.mqtt_client.publish(topic, json.dumps(payload), qos=1)
+            logger.info(f"✓ ACK: {device_id}/{command} (success={success})")
             
     def on_message(self, client, userdata, msg):
-        """Handle MQTT commands"""
+        """Handle MQTT commands - Sentient v4 standard"""
         try:
             topic = msg.topic
-            payload = msg.payload.decode('utf-8')
+            payload = msg.payload.decode('utf-8') if msg.payload else ''
             
-            logger.info(f"MQTT Command: {topic} = {payload}")
-            
-            # New Sentient-style topics
-            if topic.endswith("/play_loop"):
-                self.play_loop()
-            elif topic.endswith("/play_intro"):
-                self.play_intro()
-            elif topic.endswith("/stop"):
-                self.stop_video()
-                self.play_loop()
-            
-            # Legacy game control topics
-            elif topic.endswith("/game/start"):
-                # Start the intro video
-                self.play_intro()
+            # Parse command from topic: paragon/room/commands/controller/device/command
+            parts = topic.split('/')
+            if len(parts) >= 6 and parts[2] == 'commands':
+                device_id = parts[4]
+                command = parts[5]
                 
-            elif topic.endswith("/game/reset"):
-                # Return to loop
-                self.play_loop()
+                logger.info(f"MQTT Command: {device_id}/{command}")
+                
+                success = True
+                try:
+                    if command == "play_loop":
+                        self.play_loop()
+                    elif command == "play_intro":
+                        self.play_intro()
+                    elif command == "stop":
+                        self.stop_video()
+                        self.play_loop()
+                    else:
+                        logger.warning(f"Unknown command: {command}")
+                        success = False
+                except Exception as e:
+                    logger.error(f"Command execution failed: {e}")
+                    success = False
+                
+                # Publish acknowledgement
+                self.publish_acknowledgement(device_id, command, success)
+            else:
+                logger.warning(f"Unhandled topic format: {topic}")
                 
         except Exception as e:
             logger.error(f"Error handling message: {e}")
@@ -459,19 +474,21 @@ class ClockworkIntroPlayer:
                 pass
     
     def start_heartbeat_timer(self):
-        """Start periodic heartbeat publishing"""
+        """Start periodic heartbeat publishing - Sentient v4 standard"""
         def publish_heartbeat():
             if self.mqtt_connected and self.mqtt_client:
                 uptime = int(time.time() - self.start_time)
                 
-                # Publish heartbeat using registration helper
+                # Heartbeat matching Teensy controller format
                 topic = f"paragon/{self.room_id}/status/{self.controller_id}/heartbeat"
                 message = {
                     "controller_id": self.controller_id,
                     "firmware_version": self.firmware_version,
-                    "uptime_seconds": uptime,
+                    "uptime_ms": uptime * 1000,
+                    "timestamp_ms": int(time.time() * 1000),
+                    # Additional Pi-specific fields
                     "current_video": self.current_video,
-                    "timestamp": int(time.time() * 1000)
+                    "player_running": self.current_process is not None
                 }
                 
                 self.mqtt_client.publish(topic, json.dumps(message), qos=1)
