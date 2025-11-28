@@ -99,41 +99,39 @@ function SceneEditorInner() {
         
         if (!deviceId) return;
         
-        // Refetch devices to get fresh state from database
-        refetchDevices();
-        
-        // Find node with matching deviceId
+        // Find node with matching deviceId - only process if device is in this scene
         const matchingNode = nodes.find(n => 
           n.data.nodeType === 'device' && 
           (n.data.config as any)?.deviceId === deviceId
         );
         
-        if (matchingNode) {
-          // Update acknowledged nodes set for visual feedback
-          setAcknowledgedNodes(prev => new Set(prev).add(matchingNode.id));
-          
-          // If this is an acknowledgement event, resolve any pending promise immediately
-          if (isAcknowledgement) {
-            const resolver = acknowledgementResolvers.current.get(matchingNode.id);
-            if (resolver) {
-              console.log(`✅ Acknowledgement received for node: ${matchingNode.id} (device: ${deviceId})`);
-              resolver(true);
-              acknowledgementResolvers.current.delete(matchingNode.id);
-            }
+        // Ignore events for devices not in this scene
+        if (!matchingNode) return;
+        
+        // Refetch devices to get fresh state from database
+        refetchDevices();
+        
+        // Update acknowledged nodes set for visual feedback
+        setAcknowledgedNodes(prev => new Set(prev).add(matchingNode.id));
+        
+        // If this is an acknowledgement event, resolve any pending promise immediately
+        if (isAcknowledgement) {
+          const resolver = acknowledgementResolvers.current.get(matchingNode.id);
+          if (resolver) {
+            console.log(`✅ Acknowledgement received for node: ${matchingNode.id} (device: ${deviceId})`);
+            resolver(true);
+            acknowledgementResolvers.current.delete(matchingNode.id);
           }
-          
-          // Clear visual acknowledgement indicator after 2 seconds
-          setTimeout(() => {
-            setAcknowledgedNodes(prev => {
-              const newSet = new Set(prev);
-              newSet.delete(matchingNode.id);
-              return newSet;
-            });
-          }, 2000);
-        } else if (acknowledgementResolvers.current.size > 0) {
-          // Only warn if we're actually waiting for acknowledgements
-          console.warn(`⚠️ No matching node found for device: ${deviceId}`);
         }
+        
+        // Clear visual acknowledgement indicator after 2 seconds
+        setTimeout(() => {
+          setAcknowledgedNodes(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(matchingNode.id);
+            return newSet;
+          });
+        }, 2000);
       }
     } catch (error) {
       console.error('Error processing WebSocket event:', error);
