@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ReactFlow,
@@ -57,9 +57,12 @@ function SceneEditorInner() {
     description: '',
   });
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [autoSaveEnabled] = useState(true); // Auto-save enabled by default
   const [runningNodeId, setRunningNodeId] = useState<string | null>(null);
   const [acknowledgedNodes, setAcknowledgedNodes] = useState<Set<string>>(new Set());
+  
+  // Map to store pending acknowledgement promises - event-driven, no polling!
+  const acknowledgementResolvers = useRef<Map<string, (value: boolean) => void>>(new Map());
 
   // WebSocket connection for real-time acknowledgements
   const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
@@ -82,7 +85,7 @@ function SceneEditorInner() {
     staleTime: 0,
   });
 
-  // Listen for device state changes and refetch device states
+  // Listen for device state changes - proactive WebSocket event handling (no polling!)
   useEffect(() => {
     try {
       if (!events || events.length === 0) return;
@@ -92,6 +95,7 @@ function SceneEditorInner() {
       // Check if this is a device state change event
       if (latestEvent?.type === 'device_state_changed') {
         const deviceId = latestEvent.device_id;
+        const isAcknowledgement = latestEvent.metadata?.is_acknowledgement === true;
         
         if (!deviceId) return;
         
@@ -101,13 +105,24 @@ function SceneEditorInner() {
         // Find node with matching deviceId
         const matchingNode = nodes.find(n => 
           n.data.nodeType === 'device' && 
-          n.data.config?.deviceId === deviceId
+          (n.data.config as any)?.deviceId === deviceId
         );
         
         if (matchingNode) {
+          // Update acknowledged nodes set for visual feedback
           setAcknowledgedNodes(prev => new Set(prev).add(matchingNode.id));
           
-          // Clear acknowledgement after 2 seconds
+          // If this is an acknowledgement event, resolve any pending promise immediately
+          if (isAcknowledgement) {
+            const resolver = acknowledgementResolvers.current.get(matchingNode.id);
+            if (resolver) {
+              console.log(`✅ Acknowledgement received for node: ${matchingNode.id} (device: ${deviceId})`);
+              resolver(true);
+              acknowledgementResolvers.current.delete(matchingNode.id);
+            }
+          }
+          
+          // Clear visual acknowledgement indicator after 2 seconds
           setTimeout(() => {
             setAcknowledgedNodes(prev => {
               const newSet = new Set(prev);
@@ -115,12 +130,22 @@ function SceneEditorInner() {
               return newSet;
             });
           }, 2000);
+        } else if (acknowledgementResolvers.current.size > 0) {
+          // Only warn if we're actually waiting for acknowledgements
+          console.warn(`⚠️ No matching node found for device: ${deviceId}`);
         }
       }
     } catch (error) {
       console.error('Error processing WebSocket event:', error);
     }
   }, [events, nodes, refetchDevices]);
+  
+  // Cleanup pending acknowledgement resolvers on unmount
+  useEffect(() => {
+    return () => {
+      acknowledgementResolvers.current.clear();
+    };
+  }, []);
 
   // Fetch scenes for selected room
   const { data: scenes = [] } = useQuery<Scene[]>({
@@ -516,35 +541,40 @@ function SceneEditorInner() {
                     setRunningNodeId(node.id);
                     
                     // Execute based on node type
-                    if (node.data.nodeType === 'device' && node.data.config?.deviceId && node.data.config?.action) {
-                      // Device command - wait for acknowledgement
+                    const nodeConfig = node.data.config as any;
+                    if (node.data.nodeType === 'device' && nodeConfig?.deviceId && nodeConfig?.action) {
+                      // Device command - wait for acknowledgement via WebSocket event (no polling!)
                       const commandSentAt = Date.now();
                       
                       try {
+                        // Set up promise that will be resolved by WebSocket event handler
+                        const ackPromise = new Promise<boolean>((resolve) => {
+                          acknowledgementResolvers.current.set(node.id, resolve);
+                          
+                          // 5-second timeout
+                          setTimeout(() => {
+                            if (acknowledgementResolvers.current.has(node.id)) {
+                              acknowledgementResolvers.current.delete(node.id);
+                              resolve(false);
+                            }
+                          }, 5000);
+                        });
+                        
+                        // Send command
                         await api.sendDeviceCommand(
-                          node.data.config.deviceId,
-                          node.data.config.action,
-                          node.data.config.payload || {}
+                          nodeConfig.deviceId,
+                          nodeConfig.action,
+                          nodeConfig.payload || {}
                         );
                         
                         console.log('✅ Device command sent, waiting for acknowledgement...');
                         
-                        // Wait for acknowledgement with 5s timeout
-                        const ackReceived = await new Promise<boolean>((resolve) => {
-                          const timeout = setTimeout(() => resolve(false), 5000);
-                          
-                          const checkAck = setInterval(() => {
-                            if (acknowledgedNodes.has(node.id)) {
-                              clearTimeout(timeout);
-                              clearInterval(checkAck);
-                              resolve(true);
-                            }
-                          }, 100);
-                        });
+                        // Wait for WebSocket event to resolve promise (proactive, not reactive!)
+                        const ackReceived = await ackPromise;
                         
                         if (!ackReceived) {
-                          const device = devices.find(d => d.id === node.data.config?.deviceId);
-                          throw new Error(`Command timeout: No acknowledgement received from controller within 5 seconds\n\nDevice: ${device?.friendly_name || node.data.config?.deviceId}\nAction: ${node.data.config?.action}`);
+                          const device = devices.find(d => d.id === nodeConfig?.deviceId);
+                          throw new Error(`Command timeout: No acknowledgement received from controller within 5 seconds\n\nDevice: ${device?.friendly_name || nodeConfig?.deviceId}\nAction: ${nodeConfig?.action}`);
                         }
                         
                         const latencyMs = Date.now() - commandSentAt;
@@ -555,8 +585,8 @@ function SceneEditorInner() {
                         const errorDetails = {
                           nodeId: node.id,
                           nodeName: node.data.label,
-                          deviceId: node.data.config?.deviceId,
-                          action: node.data.config?.action,
+                          deviceId: nodeConfig?.deviceId,
+                          action: nodeConfig?.action,
                           error: error.message
                         };
                         console.error('❌ Execution failed:', errorDetails);
@@ -575,7 +605,7 @@ function SceneEditorInner() {
                       
                     } else if (node.data.nodeType === 'trigger' && node.data.subtype === 'timer') {
                       // Timer node - explicit delay
-                      const duration = node.data.config?.duration || 1000;
+                      const duration = (node.data.config as any)?.duration || 1000;
                       console.log(`⏱️  Timer: waiting ${duration}ms...`);
                       await new Promise(resolve => setTimeout(resolve, duration));
                       
@@ -647,12 +677,10 @@ function SceneEditorInner() {
             nodesConnectable={true}
             nodesFocusable={true}
             elementsSelectable={true}
-            nodeDragHandle=".drag-handle"
             snapToGrid={true}
             snapGrid={[24, 24]}
             nodeOrigin={[0.5, 0.5]}
             connectionLineStyle={{ stroke: '#6366f1', strokeWidth: 2 }}
-            connectionLineType="default"
             fitView
             className={styles.reactFlow}
           >

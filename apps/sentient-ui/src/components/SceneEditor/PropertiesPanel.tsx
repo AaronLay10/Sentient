@@ -23,7 +23,7 @@ export function PropertiesPanel({
   // sceneInfo, 
   // onSceneInfoChange, 
   onNodeConfigChange,
-  onNodeDataChange,
+  // onNodeDataChange,
   devices,
   rooms,
   selectedRoomId,

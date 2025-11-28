@@ -22,6 +22,8 @@ interface SceneNodeProps {
     color: string;
     config?: any;
     devices?: Device[];
+    isRunning?: boolean;
+    isAcknowledged?: boolean;
     onConfigChange?: (nodeId: string, config: any) => void;
     onDataChange?: (nodeId: string, data: any) => void;
   };
