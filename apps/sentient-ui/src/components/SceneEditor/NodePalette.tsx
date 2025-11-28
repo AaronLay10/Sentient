@@ -38,7 +38,8 @@ const NODE_CATEGORIES = {
     { type: 'effect', subtype: 'fog', label: 'Fog Machine', description: 'Atmospheric effect', icon: '☁', color: '#f472b6' },
     { type: 'effect', subtype: 'maglock', label: 'Mag Lock', description: 'Door/compartment lock', icon: '🔓', color: '#f472b6' },
   ],
-  Audio: [
+  'Audio/Visual': [
+    { type: 'media', subtype: 'video', label: 'Video Playback', description: 'Play video file', icon: '🎬', color: '#22d3ee' },
     { type: 'audio', subtype: 'sfx', label: 'Sound Effect', description: 'Play audio clip', icon: '🔊', color: '#22d3ee' },
     { type: 'audio', subtype: 'music', label: 'Background Music', description: 'Ambient/loop audio', icon: '♫', color: '#22d3ee' },
     { type: 'audio', subtype: 'voice', label: 'Voice Line', description: 'Narration/dialogue', icon: '🎤', color: '#22d3ee' },

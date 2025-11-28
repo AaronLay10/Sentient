@@ -607,6 +607,59 @@ function SceneEditorInner() {
                       console.log(`⏱️  Timer: waiting ${duration}ms...`);
                       await new Promise(resolve => setTimeout(resolve, duration));
                       
+                    } else if (node.data.nodeType === 'media' && node.data.subtype === 'video') {
+                      // Video playback node
+                      const videoConfig = node.data.config as any;
+                      const videoUrl = videoConfig?.videoUrl;
+                      const volume = videoConfig?.volume ?? 100;
+                      const waitForCompletion = videoConfig?.waitForCompletion ?? true;
+                      
+                      if (!videoUrl) {
+                        throw new Error('Video URL not configured');
+                      }
+                      
+                      console.log(`🎬 Playing video: ${videoUrl} (volume: ${volume}%)`);
+                      
+                      // Create video element for playback
+                      const video = document.createElement('video');
+                      video.src = videoUrl;
+                      video.volume = volume / 100;
+                      video.style.position = 'fixed';
+                      video.style.top = '50%';
+                      video.style.left = '50%';
+                      video.style.transform = 'translate(-50%, -50%)';
+                      video.style.zIndex = '10000';
+                      video.style.maxWidth = '90vw';
+                      video.style.maxHeight = '90vh';
+                      video.style.backgroundColor = 'black';
+                      document.body.appendChild(video);
+                      
+                      if (waitForCompletion) {
+                        // Wait for video to finish
+                        await new Promise<void>((resolve, reject) => {
+                          video.onended = () => {
+                            document.body.removeChild(video);
+                            resolve();
+                          };
+                          video.onerror = () => {
+                            document.body.removeChild(video);
+                            reject(new Error('Video playback failed'));
+                          };
+                          video.play().catch(err => {
+                            document.body.removeChild(video);
+                            reject(err);
+                          });
+                        });
+                        console.log('✅ Video playback completed');
+                      } else {
+                        // Play and continue immediately
+                        video.play().catch(err => {
+                          console.error('Video playback error:', err);
+                          document.body.removeChild(video);
+                        });
+                        console.log('▶️  Video started, continuing scene...');
+                      }
+                      
                     } else {
                       // Other node types - immediate execution
                       console.log('⏭️  Non-device node, proceeding immediately');

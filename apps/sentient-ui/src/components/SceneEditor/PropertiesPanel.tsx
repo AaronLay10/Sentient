@@ -284,6 +284,52 @@ export function PropertiesPanel({
                 </div>
               )}
 
+              {selectedNode.data.nodeType === 'media' && selectedNode.data.subtype === 'video' && (
+                <>
+                  <div className={styles.row}>
+                    <label className={styles.label}>Video File URL</label>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      value={(selectedNode.data.config as { videoUrl?: string })?.videoUrl || ''}
+                      onChange={(e) => {
+                        const config = selectedNode.data.config as any || {};
+                        onNodeConfigChange(selectedNode.id, { ...config, videoUrl: e.target.value });
+                      }}
+                      placeholder="https://example.com/video.mp4"
+                    />
+                  </div>
+                  <div className={styles.row}>
+                    <label className={styles.label}>Volume (%)</label>
+                    <input
+                      type="number"
+                      className={styles.input}
+                      min="0"
+                      max="100"
+                      value={(selectedNode.data.config as { volume?: number })?.volume ?? 100}
+                      onChange={(e) => {
+                        const config = selectedNode.data.config as any || {};
+                        onNodeConfigChange(selectedNode.id, { ...config, volume: parseInt(e.target.value) });
+                      }}
+                    />
+                  </div>
+                  <div className={styles.row}>
+                    <label className={styles.label}>Wait for Completion</label>
+                    <label className={styles.checkbox}>
+                      <input
+                        type="checkbox"
+                        checked={(selectedNode.data.config as { waitForCompletion?: boolean })?.waitForCompletion ?? true}
+                        onChange={(e) => {
+                          const config = selectedNode.data.config as any || {};
+                          onNodeConfigChange(selectedNode.id, { ...config, waitForCompletion: e.target.checked });
+                        }}
+                      />
+                      <span>Block until video finishes</span>
+                    </label>
+                  </div>
+                </>
+              )}
+
               {selectedNode.data.nodeType === 'audio' && (
                 <>
                   <div className={styles.row}>
