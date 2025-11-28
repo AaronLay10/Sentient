@@ -404,6 +404,70 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
           </div>
         )}
         
+        {/* Video Playback Node */}
+        {data.nodeType === 'media' && data.subtype === 'video' && (
+          <>
+            <div className={styles.field}>
+              <div className={styles.label}>Video Device</div>
+              <select
+                className={`${styles.dropdown} nopan nodrag`}
+                value={data.config?.deviceId || ''}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  const device = data.devices?.find(d => d.id === e.target.value);
+                  data.onConfigChange?.(id, { 
+                    deviceId: e.target.value,
+                    deviceName: device?.friendly_name || '',
+                    action: '',
+                    payload: {}
+                  });
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <option value="">Select device...</option>
+                {data.devices?.filter(d => d.device_type === 'video_display').map((device) => (
+                  <option key={device.id} value={device.id}>
+                    {device.friendly_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.field}>
+              <div className={styles.label}>Action</div>
+              <select
+                className={`${styles.dropdown} nopan nodrag`}
+                value={data.config?.action || ''}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  data.onConfigChange?.(id, { 
+                    ...data.config,
+                    action: e.target.value,
+                    payload: {}
+                  });
+                }}
+                onClick={(e) => e.stopPropagation()}
+                disabled={!data.config?.deviceId}
+              >
+                <option value="">Select action...</option>
+                {(() => {
+                  const deviceId = data.config?.deviceId;
+                  const device = data.devices?.find(d => d.id === deviceId);
+                  
+                  if (!device?.actions || device.actions.length === 0) {
+                    return <option value="" disabled>No actions available</option>;
+                  }
+                  
+                  return device.actions.map((action) => (
+                    <option key={action.action_id} value={action.action_id}>
+                      {action.friendly_name || action.action_id.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    </option>
+                  ));
+                })()}
+              </select>
+            </div>
+          </>
+        )}
+        
         {/* Audio Node */}
         {data.nodeType === 'audio' && data.config?.audioFile && (
           <div className={styles.field}>
@@ -413,7 +477,7 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
         )}
         
         {/* Empty state for unconfigured nodes */}
-        {!data.config?.deviceName && !data.config?.device && !data.config?.duration && !data.config?.audioFile && data.nodeType !== 'trigger' && (
+        {!data.config?.deviceName && !data.config?.device && !data.config?.duration && !data.config?.audioFile && !data.config?.deviceId && data.nodeType !== 'trigger' && (
           <div className={styles.field}>
             <div className={styles.label}>Status</div>
             <div className={styles.value}>Not configured</div>

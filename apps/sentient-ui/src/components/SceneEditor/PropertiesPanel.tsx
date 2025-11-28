@@ -284,64 +284,7 @@ export function PropertiesPanel({
                 </div>
               )}
 
-              {selectedNode.data.nodeType === 'media' && selectedNode.data.subtype === 'video' && (
-                <>
-                  <div className={styles.row}>
-                    <label className={styles.label}>Video Device</label>
-                    <select
-                      className={styles.select}
-                      value={(selectedNode.data.config as { deviceId?: string })?.deviceId || ''}
-                      onChange={(e) => {
-                        const config = selectedNode.data.config as any || {};
-                        onNodeConfigChange(selectedNode.id, { ...config, deviceId: e.target.value });
-                      }}
-                    >
-                      <option value="">Select device...</option>
-                      {devices
-                        .filter(d => d.device_category === 'media_playback')
-                        .map(device => (
-                          <option key={device.id} value={device.id}>
-                            {device.friendly_name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <div className={styles.row}>
-                    <label className={styles.label}>Action</label>
-                    <select
-                      className={styles.select}
-                      value={(selectedNode.data.config as { action?: string })?.action || ''}
-                      onChange={(e) => {
-                        const config = selectedNode.data.config as any || {};
-                        onNodeConfigChange(selectedNode.id, { ...config, action: e.target.value });
-                      }}
-                    >
-                      <option value="">Select action...</option>
-                      {(selectedNode.data.config as { deviceId?: string })?.deviceId &&
-                        devices
-                          .find(d => d.id === (selectedNode.data.config as { deviceId?: string })?.deviceId)
-                          ?.actions.map(action => (
-                            <option key={action.action_name} value={action.action_name}>
-                              {action.friendly_name}
-                            </option>
-                          ))}
-                    </select>
-                  </div>
-                  <div className={styles.row}>
-                    <label className={styles.label}>Payload (JSON)</label>
-                    <textarea
-                      className={styles.textarea}
-                      rows={3}
-                      value={(selectedNode.data.config as { payload?: string })?.payload || '{}'}
-                      onChange={(e) => {
-                        const config = selectedNode.data.config as any || {};
-                        onNodeConfigChange(selectedNode.id, { ...config, payload: e.target.value });
-                      }}
-                      placeholder='{"key": "value"}'
-                    />
-                  </div>
-                </>
-              )}
+
 
               {selectedNode.data.nodeType === 'audio' && (
                 <>

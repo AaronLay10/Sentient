@@ -615,22 +615,10 @@ function SceneEditorInner() {
                         throw new Error('Video device and action must be configured');
                       }
                       
-                      // Parse payload if it's a string
-                      let payload = {};
-                      if (nodeConfig.payload) {
-                        try {
-                          payload = typeof nodeConfig.payload === 'string' 
-                            ? JSON.parse(nodeConfig.payload) 
-                            : nodeConfig.payload;
-                        } catch (e) {
-                          throw new Error('Invalid JSON payload');
-                        }
-                      }
-                      
                       const device = devices.find(d => d.id === nodeConfig.deviceId);
-                      const action = device?.actions.find(a => a.action_name === nodeConfig.action);
+                      const action = device?.actions.find(a => a.action_id === nodeConfig.action);
                       
-                      console.log(`🎬 Video command: ${device?.friendly_name} - ${action?.friendly_name}`);
+                      console.log(`🎬 Video command: ${device?.friendly_name} - ${action?.friendly_name || nodeConfig.action}`);
                       
                       // Set up acknowledgement promise
                       const commandSentAt = Date.now();
@@ -650,7 +638,7 @@ function SceneEditorInner() {
                       await api.sendDeviceCommand(
                         nodeConfig.deviceId,
                         nodeConfig.action,
-                        payload
+                        nodeConfig.payload || {}
                       );
                       
                       console.log('✅ Video command sent, waiting for acknowledgement...');
