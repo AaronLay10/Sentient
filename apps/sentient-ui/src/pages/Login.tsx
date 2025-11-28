@@ -71,8 +71,10 @@ export function Login() {
           <div className={styles.eyeWrapper}>
             <SentientEye />
           </div>
-          <h1 className={styles.title}>Sentient Engine</h1>
-          <p className={styles.subtitle}>Theatrical Control & Orchestration Platform</p>
+          <div className={styles.brandingWrapper}>
+            <h1 className={styles.title}>SENTIENT</h1>
+            <p className={styles.subtitle}>Escape Room Neural Engine</p>
+          </div>
         </div>
 
         {/* Login Form */}

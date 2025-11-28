@@ -12,10 +12,7 @@
 .backgroundGradient {
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 50%, rgba(255, 140, 66, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 40%),
-    radial-gradient(ellipse at 20% 80%, rgba(34, 211, 238, 0.05) 0%, transparent 40%);
+  background: url('/login-background.jpg') center center / cover no-repeat;
   pointer-events: none;
   z-index: 0;
 }
@@ -23,48 +20,58 @@
 .loginCard {
   position: relative;
   width: 100%;
-  max-width: 440px;
-  background: rgba(18, 18, 24, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  max-width: 460px;
+  background: rgba(18, 18, 24, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   padding: 48px 40px;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 140, 66, 0.1);
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 140, 66, 0.15);
   z-index: 1;
 }
 
 .logoContainer {
-  text-align: center;
-  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 48px;
 }
 
 .eyeWrapper {
-  display: inline-block;
-  margin-bottom: 24px;
+  width: 160px;
+  height: 160px;
   filter: drop-shadow(0 8px 32px rgba(255, 140, 66, 0.3));
 }
 
+.brandingWrapper {
+  text-align: center;
+}
+
 .title {
-  font-size: 28px;
+  font-size: 52px;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 8px 0;
-  letter-spacing: 0.5px;
+  margin: 0 0 16px 0;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 20px rgba(255, 140, 66, 0.4);
 }
 
 .subtitle {
-  font-size: 14px;
-  color: #a1a1aa;
+  font-size: 17px;
+  color: #d4d4d8;
   margin: 0;
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .errorAlert {
@@ -85,6 +92,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -260,11 +268,22 @@
     padding: 40px 28px;
   }
 
-  .title {
-    font-size: 24px;
+  .logoContainer {
+    gap: 24px;
+    margin-bottom: 36px;
   }
 
   .eyeWrapper {
-    margin-bottom: 20px;
+    width: 140px;
+    height: 140px;
+  }
+
+  .title {
+    font-size: 42px;
+    letter-spacing: 4px;
+  }
+
+  .subtitle {
+    font-size: 15px;
   }
 }
