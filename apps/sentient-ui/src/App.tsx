@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardLayout } from './components/Layout/DashboardLayout';
 import { Login } from './pages/Login';
+import { SystemMonitor } from './pages/SystemMonitor';
 import { Overview } from './pages/Overview';
 import { Topology } from './pages/Topology';
 import { SceneEditor } from './pages/SceneEditor';
@@ -43,7 +44,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to="/overview" replace />} />
+            <Route index element={<Navigate to="/monitor" replace />} />
+            <Route path="monitor" element={<SystemMonitor />} />
             <Route path="overview" element={<Overview />} />
             <Route path="topology" element={<Topology />} />
             <Route path="scenes" element={<SceneEditor />} />

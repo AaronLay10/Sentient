@@ -39,8 +39,8 @@ export function useWebSocket(options: UseWebSocketOptions) {
         // Subscribe to room if provided
         if (roomId) {
           ws.send(JSON.stringify({
-            type: 'subscribe',
-            room_id: roomId,
+            action: 'subscribe',
+            channels: [`room:${roomId}`],
           }));
         }
       };
@@ -51,7 +51,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
 
           if (message.type === 'event_notification' && message.data) {
             setLastEvent(message.data);
-            setEvents((prev) => [message.data!, ...prev].slice(0, 100));
+            setEvents((prev) => [message.data!, ...prev].slice(0, 20));
             onEvent?.(message.data);
           }
         } catch (error) {

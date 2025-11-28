@@ -1,4 +1,4 @@
-import type { Node as FlowNode } from '@xyflow/react';
+import type { Node as FlowNode, Edge } from '@xyflow/react';
 import type { Device, Room } from '../../lib/api';
 import styles from './PropertiesPanel.module.css';
 
@@ -14,6 +14,8 @@ interface PropertiesPanelProps {
   devices: Device[];
   rooms: Room[];
   selectedRoomId: string;
+  nodes: FlowNode[];
+  edges: Edge[];
 }
 
 export function PropertiesPanel({
@@ -24,9 +26,44 @@ export function PropertiesPanel({
   onNodeDataChange,
   devices,
   rooms,
-  selectedRoomId
+  selectedRoomId,
+  nodes,
+  edges
 }: PropertiesPanelProps) {
   const selectedRoom = rooms.find(r => r.id === selectedRoomId);
+
+  // Build execution flow by traversing from Scene Start node
+  const buildFlowSummary = () => {
+    const startNode = nodes.find(n => n.data.subtype === 'scene-start');
+    if (!startNode) return [];
+
+    const flow: Array<{ id: string; label: string; icon: string; color: string }> = [];
+    const visited = new Set<string>();
+    
+    const traverse = (nodeId: string) => {
+      if (visited.has(nodeId)) return;
+      visited.add(nodeId);
+      
+      const node = nodes.find(n => n.id === nodeId);
+      if (!node) return;
+      
+      flow.push({
+        id: node.id,
+        label: String(node.data.label),
+        icon: String(node.data.icon),
+        color: String(node.data.color)
+      });
+      
+      // Find outgoing edges
+      const outgoingEdges = edges.filter(e => e.source === nodeId);
+      outgoingEdges.forEach(edge => traverse(edge.target));
+    };
+    
+    traverse(startNode.id);
+    return flow;
+  };
+
+  const flowSummary = buildFlowSummary();
 
   return (
     <aside className={styles.panel}>
@@ -36,8 +73,32 @@ export function PropertiesPanel({
       </div>
 
       <div className={styles.body}>
+        {/* Scene Flow Summary */}
+        <div className={styles.group}>
+          <div className={styles.groupTitle}>Scene Flow</div>
+          {flowSummary.length > 0 ? (
+            <div className={styles.flowList}>
+              {flowSummary.map((step, index) => (
+                <div key={step.id} className={styles.flowItem}>
+                  <div className={styles.flowNumber}>{index + 1}</div>
+                  <div 
+                    className={styles.flowIcon}
+                    style={{ background: `${step.color}33`, color: step.color }}
+                  >
+                    {step.icon}
+                  </div>
+                  <div className={styles.flowLabel}>{step.label}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.emptyState}>No nodes connected</div>
+          )}
+        </div>
+
         {/* Selected Node */}
         <div className={styles.group}>
+          <div className={styles.groupTitle}>Node Properties</div>
 
           {selectedNode ? (
             <>
@@ -60,10 +121,14 @@ export function PropertiesPanel({
                       value={(selectedNode.data.config as { deviceId?: string })?.deviceId || ''}
                       onChange={(e) => {
                         const device = devices.find(d => d.id === e.target.value);
-                        const action = (selectedNode.data.config as { action?: string })?.action || 'turn_on';
-                        const newLabel = device ? `${device.friendly_name} - ${action.replace('_', ' ')}` : 'Device Control';
-                        onNodeConfigChange(selectedNode.id, { deviceId: e.target.value });
-                        onNodeDataChange(selectedNode.id, { label: newLabel });
+                        const action = (selectedNode.data.config as { action?: string })?.action;
+                        const actionName = action ? action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '';
+                        
+                        onNodeConfigChange(selectedNode.id, { 
+                          deviceId: e.target.value,
+                          deviceName: device?.friendly_name || '',
+                          actionName: actionName
+                        });
                       }}
                     >
                       <option value="">Select device...</option>
@@ -81,12 +146,12 @@ export function PropertiesPanel({
                       className={styles.select}
                       value={(selectedNode.data.config as { action?: string })?.action || ''}
                       onChange={(e) => {
-                        const deviceId = (selectedNode.data.config as { deviceId?: string })?.deviceId;
-                        const device = devices.find(d => d.id === deviceId);
-                        const actionName = e.target.value.replace(/_/g, ' ');
-                        const newLabel = device ? `${device.friendly_name} - ${actionName}` : 'Device Control';
-                        onNodeConfigChange(selectedNode.id, { action: e.target.value });
-                        onNodeDataChange(selectedNode.id, { label: newLabel });
+                        const actionName = e.target.value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        
+                        onNodeConfigChange(selectedNode.id, { 
+                          action: e.target.value,
+                          actionName: actionName
+                        });
                       }}
                       disabled={!(selectedNode.data.config as { deviceId?: string })?.deviceId}
                     >
@@ -94,13 +159,57 @@ export function PropertiesPanel({
                       {(() => {
                         const deviceId = (selectedNode.data.config as { deviceId?: string })?.deviceId;
                         const device = devices.find(d => d.id === deviceId);
-                        return device?.actions?.map((action) => (
+                        
+                        if (!device?.actions || device.actions.length === 0) {
+                          return <option value="" disabled>No actions available for this device</option>;
+                        }
+                        
+                        return device.actions.map((action) => (
                           <option key={action.action_id} value={action.action_id}>
                             {action.friendly_name || action.action_id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                           </option>
-                        )) || [];
+                        ));
                       })()}
                     </select>
+                  </div>
+                </>
+              )}
+
+              {selectedNode.data.nodeType === 'sensor' && selectedNode.data.subtype === 'button' && (
+                <>
+                  <div className={styles.row}>
+                    <label className={styles.label}>Touchscreen</label>
+                    <select
+                      className={styles.select}
+                      value={(selectedNode.data.config as { controllerId?: string })?.controllerId || ''}
+                      onChange={(e) =>
+                        onNodeConfigChange(selectedNode.id, { 
+                          controllerId: e.target.value,
+                          buttonName: '' // Reset button when controller changes
+                        })
+                      }
+                    >
+                      <option value="">Select touchscreen...</option>
+                      {devices.filter(d => d.device_type === 'touchscreen').map((device) => (
+                        <option key={device.id} value={device.id}>
+                          {device.friendly_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className={styles.row}>
+                    <label className={styles.label}>Button Name</label>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      value={(selectedNode.data.config as { buttonName?: string })?.buttonName || ''}
+                      onChange={(e) =>
+                        onNodeConfigChange(selectedNode.id, { buttonName: e.target.value })
+                      }
+                      placeholder="Enter button name..."
+                      disabled={!(selectedNode.data.config as { controllerId?: string })?.controllerId}
+                    />
                   </div>
                 </>
               )}

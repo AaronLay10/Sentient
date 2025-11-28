@@ -239,6 +239,8 @@ export class AdminService {
       controller_id: device.controllerId,
       status: 'operational' as const,
       properties: device.properties,
+      current_state: device.current_state,
+      state_updated_at: device.state_updated_at?.toISOString(),
       actions: device.actions.map(action => ({
         action_id: action.action_id,
         mqtt_topic: action.mqtt_topic,

@@ -27,4 +27,9 @@ export class DevicesController {
   async getById(@Param('deviceId') deviceId: string) {
     return this.devicesService.getById(deviceId);
   }
+
+  @Get(':deviceId/actions')
+  async getDeviceActions(@Param('deviceId') deviceId: string) {
+    return this.devicesService.getDeviceActions(deviceId);
+  }
 }

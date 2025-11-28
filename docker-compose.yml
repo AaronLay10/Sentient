@@ -138,7 +138,7 @@ services:
       NODE_ENV: production
       REDIS_URL: redis://redis:6379
       WS_PORT: 3002
-      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_LEVEL: debug
     depends_on:
       - redis
     ports:

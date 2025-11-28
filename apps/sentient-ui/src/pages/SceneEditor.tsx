@@ -17,6 +17,7 @@ import { NodePalette } from '../components/SceneEditor/NodePalette';
 import { PropertiesPanel } from '../components/SceneEditor/PropertiesPanel';
 import { SceneNode } from '../components/SceneEditor/SceneNode';
 import { api, type Room, type Device, type Scene } from '../lib/api';
+import { useWebSocket } from '../hooks/useWebSocket';
 import styles from './SceneEditor.module.css';
 
 const nodeTypes = {
@@ -44,7 +45,7 @@ const initialEdges: Array<{ id: string; type: 'default'; animated: boolean; styl
 
 function SceneEditorInner() {
   const queryClient = useQueryClient();
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, fitView } = useReactFlow();
   const [nodes, setNodes] = useState<FlowNode[]>(initialNodes);
   const [edges, setEdges] = useState<Array<{ id: string; type: 'default'; animated: boolean; style: { stroke: string; strokeWidth: number }; source: string; target: string; sourceHandle: string | null; targetHandle: string | null }>>(initialEdges);
   const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
@@ -55,6 +56,17 @@ function SceneEditorInner() {
     name: 'New Scene',
     description: '',
   });
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [runningNodeId, setRunningNodeId] = useState<string | null>(null);
+  const [acknowledgedNodes, setAcknowledgedNodes] = useState<Set<string>>(new Set());
+
+  // WebSocket connection for real-time acknowledgements
+  const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
+  const { events } = useWebSocket({
+    url: WS_URL,
+    roomId: selectedRoomId || undefined,
+  });
 
   // Fetch rooms
   const { data: rooms = [] } = useQuery<Room[]>({
@@ -62,11 +74,53 @@ function SceneEditorInner() {
     queryFn: api.getRooms,
   });
 
-  // Fetch devices
-  const { data: devices = [] } = useQuery<Device[]>({
+  // Fetch devices - always fetch fresh state from database (never cache)
+  const { data: devices = [], refetch: refetchDevices } = useQuery<Device[]>({
     queryKey: ['devices'],
     queryFn: api.getDevices,
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
+
+  // Listen for device state changes and refetch device states
+  useEffect(() => {
+    try {
+      if (!events || events.length === 0) return;
+
+      const latestEvent = events[0];
+      
+      // Check if this is a device state change event
+      if (latestEvent?.type === 'device_state_changed') {
+        const deviceId = latestEvent.device_id;
+        
+        if (!deviceId) return;
+        
+        // Refetch devices to get fresh state from database
+        refetchDevices();
+        
+        // Find node with matching deviceId
+        const matchingNode = nodes.find(n => 
+          n.data.nodeType === 'device' && 
+          n.data.config?.deviceId === deviceId
+        );
+        
+        if (matchingNode) {
+          setAcknowledgedNodes(prev => new Set(prev).add(matchingNode.id));
+          
+          // Clear acknowledgement after 2 seconds
+          setTimeout(() => {
+            setAcknowledgedNodes(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(matchingNode.id);
+              return newSet;
+            });
+          }, 2000);
+        }
+      }
+    } catch (error) {
+      console.error('Error processing WebSocket event:', error);
+    }
+  }, [events, nodes, refetchDevices]);
 
   // Fetch scenes for selected room
   const { data: scenes = [] } = useQuery<Scene[]>({
@@ -99,6 +153,29 @@ function SceneEditorInner() {
       loadScene(scenes[0]);
     }
   }, [scenes, selectedSceneId, loadScene]);
+
+  // Fit view when nodes change
+  useEffect(() => {
+    if (nodes.length > 0) {
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 300 });
+      }, 100);
+    }
+  }, [nodes.length, fitView]);
+
+  // Warn user before closing/navigating during scene execution
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const activeExecution = sessionStorage.getItem('sentient_scene_execution_state');
+      if (activeExecution) {
+        e.preventDefault();
+        e.returnValue = 'Scene execution in progress. Are you sure you want to leave?';
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   // Save scene mutation
   const saveMutation = useMutation({
@@ -138,13 +215,25 @@ function SceneEditorInner() {
     onSuccess: (savedScene) => {
       queryClient.invalidateQueries({ queryKey: ['scenes', selectedClientId, selectedRoomId] });
       setSelectedSceneId(savedScene.id);
-      alert('Scene saved successfully!');
+      setLastSaved(new Date());
     },
     onError: (error) => {
       console.error('Failed to save scene:', error);
       alert('Failed to save scene. Please try again.');
     },
   });
+
+  // Auto-save on nodes/edges change (debounced)
+  useEffect(() => {
+    if (!autoSaveEnabled || !selectedRoomId || !selectedSceneId) return;
+    
+    const debounceTimer = setTimeout(() => {
+      console.log('Auto-saving scene...');
+      saveMutation.mutate();
+    }, 3000); // Save 3 seconds after last change
+
+    return () => clearTimeout(debounceTimer);
+  }, [nodes, edges, sceneInfo, autoSaveEnabled, selectedRoomId, selectedSceneId]);
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -160,7 +249,7 @@ function SceneEditorInner() {
         ...connection,
         id: `e${connection.source}-${connection.target}`,
         type: 'default' as const,
-        animated: true,
+        animated: false,
         style: { stroke: '#6366f1', strokeWidth: 2 },
       };
       setEdges((eds) => addEdge(edge, eds));
@@ -264,6 +353,19 @@ function SceneEditorInner() {
     );
   }, []);
 
+  // Enhance nodes with devices and callbacks
+  const enhancedNodes = nodes.map(node => ({
+    ...node,
+    data: {
+      ...node.data,
+      devices,
+      onConfigChange: updateNodeConfig,
+      onDataChange: updateNodeData,
+      isRunning: node.id === runningNodeId,
+      isAcknowledged: acknowledgedNodes.has(node.id),
+    }
+  }));
+
   const handleSave = () => {
     if (!selectedRoomId) {
       alert('Please select a room first');
@@ -325,6 +427,16 @@ function SceneEditorInner() {
               </select>
             )}
             <span className={styles.subtitle}>{sceneInfo.name}</span>
+            {lastSaved && (
+              <span style={{ fontSize: '12px', color: '#52525b' }}>
+                Last saved: {lastSaved.toLocaleTimeString()}
+              </span>
+            )}
+            {saveMutation.isPending && (
+              <span style={{ fontSize: '12px', color: '#6366f1' }}>
+                Saving...
+              </span>
+            )}
           </div>
         </div>
         <div className={styles.topActions}>
@@ -334,6 +446,171 @@ function SceneEditorInner() {
             </svg>
             New Scene
           </button>
+          {selectedSceneId && (
+            <button 
+              className={styles.btnSecondary}
+              onClick={async () => {
+                if (!selectedSceneId) return;
+                
+                // Check for concurrent execution
+                const activeExecution = sessionStorage.getItem('sentient_scene_execution_state');
+                if (activeExecution) {
+                  if (!confirm('Scene execution in progress. Cancel it to start a new execution?')) {
+                    return;
+                  }
+                  sessionStorage.removeItem('sentient_scene_execution_state');
+                }
+                
+                try {
+                  // Find scene start node
+                  const startNode = nodes.find(n => n.data.subtype === 'scene-start');
+                  if (!startNode) {
+                    alert('Scene must have a "Scene Start" node');
+                    return;
+                  }
+                  
+                  // Build execution order by traversing graph
+                  const executionOrder: FlowNode[] = [];
+                  const visited = new Set<string>();
+                  
+                  const traverse = (nodeId: string) => {
+                    if (visited.has(nodeId)) return;
+                    visited.add(nodeId);
+                    const node = nodes.find(n => n.id === nodeId);
+                    if (node) executionOrder.push(node);
+                    const outgoingEdges = edges.filter(e => e.source === nodeId);
+                    outgoingEdges.forEach(edge => traverse(edge.target));
+                  };
+                  
+                  traverse(startNode.id);
+                  
+                  console.log('🎬 Starting scene execution:', {
+                    scene: sceneInfo.name,
+                    nodeCount: executionOrder.length,
+                    startedAt: new Date().toISOString()
+                  });
+                  
+                  // Save execution state
+                  const executionState = {
+                    sceneId: selectedSceneId,
+                    sceneName: sceneInfo.name,
+                    startedAt: new Date().toISOString(),
+                    completedNodes: [] as string[],
+                    currentNodeId: '',
+                    totalNodes: executionOrder.length
+                  };
+                  sessionStorage.setItem('sentient_scene_execution_state', JSON.stringify(executionState));
+                  
+                  // Execute nodes sequentially
+                  for (let i = 0; i < executionOrder.length; i++) {
+                    const node = executionOrder[i];
+                    executionState.currentNodeId = node.id;
+                    sessionStorage.setItem('sentient_scene_execution_state', JSON.stringify(executionState));
+                    
+                    console.log(`📍 Executing node ${i + 1}/${executionOrder.length}:`, {
+                      id: node.id,
+                      type: node.data.nodeType,
+                      subtype: node.data.subtype
+                    });
+                    
+                    setRunningNodeId(node.id);
+                    
+                    // Execute based on node type
+                    if (node.data.nodeType === 'device' && node.data.config?.deviceId && node.data.config?.action) {
+                      // Device command - wait for acknowledgement
+                      const commandSentAt = Date.now();
+                      
+                      try {
+                        await api.sendDeviceCommand(
+                          node.data.config.deviceId,
+                          node.data.config.action,
+                          node.data.config.payload || {}
+                        );
+                        
+                        console.log('✅ Device command sent, waiting for acknowledgement...');
+                        
+                        // Wait for acknowledgement with 5s timeout
+                        const ackReceived = await new Promise<boolean>((resolve) => {
+                          const timeout = setTimeout(() => resolve(false), 5000);
+                          
+                          const checkAck = setInterval(() => {
+                            if (acknowledgedNodes.has(node.id)) {
+                              clearTimeout(timeout);
+                              clearInterval(checkAck);
+                              resolve(true);
+                            }
+                          }, 100);
+                        });
+                        
+                        if (!ackReceived) {
+                          const device = devices.find(d => d.id === node.data.config?.deviceId);
+                          throw new Error(`Command timeout: No acknowledgement received from controller within 5 seconds\n\nDevice: ${device?.friendly_name || node.data.config?.deviceId}\nAction: ${node.data.config?.action}`);
+                        }
+                        
+                        const latencyMs = Date.now() - commandSentAt;
+                        console.log(`⚡ Acknowledgement received (${latencyMs}ms latency)`);
+                        
+                      } catch (error: any) {
+                        setRunningNodeId(null);
+                        const errorDetails = {
+                          nodeId: node.id,
+                          nodeName: node.data.label,
+                          deviceId: node.data.config?.deviceId,
+                          action: node.data.config?.action,
+                          error: error.message
+                        };
+                        console.error('❌ Execution failed:', errorDetails);
+                        
+                        // Show error modal with resume/cancel options
+                        const resume = confirm(`Scene execution failed!\n\n${error.message}\n\nClick OK to resume from "${node.data.label}"\nClick Cancel to stop execution`);
+                        
+                        if (resume) {
+                          i--; // Retry current node
+                          continue;
+                        } else {
+                          sessionStorage.removeItem('sentient_scene_execution_state');
+                          return;
+                        }
+                      }
+                      
+                    } else if (node.data.nodeType === 'trigger' && node.data.subtype === 'timer') {
+                      // Timer node - explicit delay
+                      const duration = node.data.config?.duration || 1000;
+                      console.log(`⏱️  Timer: waiting ${duration}ms...`);
+                      await new Promise(resolve => setTimeout(resolve, duration));
+                      
+                    } else {
+                      // Other node types - immediate execution
+                      console.log('⏭️  Non-device node, proceeding immediately');
+                    }
+                    
+                    // Mark node as completed
+                    executionState.completedNodes.push(node.id);
+                    sessionStorage.setItem('sentient_scene_execution_state', JSON.stringify(executionState));
+                    setRunningNodeId(null);
+                  }
+                  
+                  console.log('🎉 Scene execution completed successfully!');
+                  sessionStorage.removeItem('sentient_scene_execution_state');
+                  
+                } catch (error) {
+                  console.error('❌ Scene execution error:', error);
+                  setRunningNodeId(null);
+                  sessionStorage.removeItem('sentient_scene_execution_state');
+                }
+              }}
+              style={{ 
+                background: 'rgba(34, 197, 94, 0.1)',
+                borderColor: 'rgba(34, 197, 94, 0.3)',
+                color: '#22c55e'
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              Run Scene
+            </button>
+          )}
           <button 
             className={styles.btnPrimary} 
             onClick={handleSave}
@@ -356,7 +633,7 @@ function SceneEditorInner() {
         {/* Canvas Area */}
         <div className={styles.canvasContainer}>
           <ReactFlow
-            nodes={nodes}
+            nodes={enhancedNodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -370,10 +647,16 @@ function SceneEditorInner() {
             nodesConnectable={true}
             nodesFocusable={true}
             elementsSelectable={true}
+            nodeDragHandle=".drag-handle"
+            snapToGrid={true}
+            snapGrid={[24, 24]}
+            nodeOrigin={[0.5, 0.5]}
+            connectionLineStyle={{ stroke: '#6366f1', strokeWidth: 2 }}
+            connectionLineType="default"
             fitView
             className={styles.reactFlow}
           >
-            <Background color="#52525b" gap={24} />
+            <Background color="#52525b" gap={24} size={1} />
             <Controls className={styles.controls} />
             <MiniMap className={styles.minimap} nodeColor="#6366f1" maskColor="rgba(0, 0, 0, 0.6)" />
           </ReactFlow>
@@ -389,6 +672,8 @@ function SceneEditorInner() {
           devices={devices}
           rooms={rooms}
           selectedRoomId={selectedRoomId}
+          nodes={nodes}
+          edges={edges}
         />
       </div>
     </div>

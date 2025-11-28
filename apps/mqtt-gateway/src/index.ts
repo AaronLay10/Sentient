@@ -13,6 +13,9 @@ const API_URL = process.env.API_URL || 'http://api-service:3000';
 const REDIS_URL = process.env.REDIS_URL || 'redis://redis:6379';
 const INTERNAL_TOKEN = process.env.INTERNAL_REG_TOKEN;
 
+// In-memory cache for device actions (device_id -> actions[])
+const deviceActionsCache = new Map<string, any[]>();
+
 if (!INTERNAL_TOKEN) {
   console.error('❌ INTERNAL_REG_TOKEN not set in environment');
   process.exit(1);
@@ -221,7 +224,53 @@ async function handleAcknowledgement(topic: string, payload: any): Promise<void>
     const device_id = topicParts[4];        // 'main_lighting_24v', etc.
     const command = topicParts[5];          // 'power_on' or 'power_off'
 
-    console.log(`⚡ Command ACK: ${controller_id}/${device_id}/${command} -> state=${payload.state}`);
+    // Fetch device actions from cache or API to get friendly name
+    let stateValue = payload.state;
+    if (stateValue === undefined) {
+      try {
+        // Check cache first
+        let actions = deviceActionsCache.get(device_id);
+        
+        // If not in cache, fetch from API
+        if (!actions) {
+          const response = await axios.get(`${API_URL}/internal/devices/${device_id}/actions`, {
+            headers: { 'x-internal-token': INTERNAL_TOKEN }
+          });
+          const fetchedActions = response.data.actions || [];
+          actions = fetchedActions;
+          deviceActionsCache.set(device_id, fetchedActions);
+        }
+        
+        // Find the action matching this command
+        const action = actions?.find((a: any) => a.action_id === command);
+        
+        if (action && action.friendly_name) {
+          stateValue = action.friendly_name;
+        } else {
+          // Fallback: format command as Title Case
+          stateValue = command
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        }
+      } catch (error: any) {
+        console.warn(`⚠️ Could not fetch action friendly name for ${device_id}/${command}:`, error?.message);
+        // Fallback: format command as Title Case
+        stateValue = command
+          .split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      }
+    }
+
+    console.log(`⚡ Command ACK: ${controller_id}/${device_id}/${command} -> state="${stateValue}"`);
+
+    // Create normalized state payload
+    const normalizedState = {
+      ...payload,
+      state: stateValue,
+      command: command,
+    };
 
     // Create domain event for command acknowledgement
     const domainEvent = {
@@ -233,7 +282,7 @@ async function handleAcknowledgement(topic: string, payload: any): Promise<void>
       device_id: device_id,
       payload: {
         previous_state: null,
-        new_state: payload,
+        new_state: normalizedState,
         command_acknowledged: command,
         raw_mqtt_payload: payload,
       },
@@ -246,7 +295,7 @@ async function handleAcknowledgement(topic: string, payload: any): Promise<void>
     };
 
     await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
-    console.log(`✅ Published ACK event: ${device_id} -> ${command} (state=${payload.state})`);
+    console.log(`✅ Published ACK event: ${device_id} -> ${command} (state="${stateValue}")`);
   } catch (error) {
     console.error('❌ Error handling acknowledgement:', error);
   }

@@ -85,14 +85,31 @@ export class HeartbeatEventHandlerService implements OnModuleInit, OnModuleDestr
         return;
       }
 
-      // Extract the state value (could be boolean 'power' or numeric 'state')
-      const stateValue = newState.power !== undefined ? newState.power :
-                        (newState.state !== undefined ? Boolean(newState.state) : null);
+      // Log the full payload structure for debugging
+      this.logger.debug(`Processing device state change for ${deviceId}`, {
+        event_id: event.event_id,
+        device_id: deviceId,
+        new_state: newState,
+        new_state_keys: Object.keys(newState),
+        new_state_type: typeof newState
+      });
 
-      if (stateValue === null) {
+      // Extract the state value - can be boolean, string (for motor states), or number
+      let stateValue: any = null;
+      
+      if (newState.power !== undefined) {
+        stateValue = newState.power;
+      } else if (newState.state !== undefined) {
+        // Keep the original type - don't convert to boolean
+        stateValue = newState.state;
+      }
+
+      if (stateValue === null && stateValue !== false) {
         this.logger.warn(`Could not extract state value from payload`, {
           event_id: event.event_id,
-          payload: newState
+          device_id: deviceId,
+          payload: newState,
+          payload_json: JSON.stringify(newState, null, 2)
         });
         return;
       }
@@ -107,7 +124,7 @@ export class HeartbeatEventHandlerService implements OnModuleInit, OnModuleDestr
         },
       });
 
-      this.logger.debug(`Updated device state: ${deviceId} -> ${stateValue ? 'ON' : 'OFF'}`);
+      this.logger.debug(`Updated device state: ${deviceId} -> ${JSON.stringify(stateValue)}`);
     } catch (error) {
       // Don't error if device not found - it may not be registered yet
       if (error?.code === 'P2025') {

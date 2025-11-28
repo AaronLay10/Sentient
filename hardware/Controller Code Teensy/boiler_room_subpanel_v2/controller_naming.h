@@ -21,38 +21,67 @@ namespace naming
     constexpr const char *CONTROLLER_FRIENDLY_NAME = "Boiler Room Subpanel";
 
     // ════════════════════════════════════════════════════════════════════════
-    // DEVICE: Intro TV
+    // DEVICE: Intro TV Power (split from intro_tv)
     // ════════════════════════════════════════════════════════════════════════
-    constexpr const char *DEV_INTRO_TV = "intro_tv";
-    constexpr const char *FRIENDLY_INTRO_TV = "Intro TV";
-    constexpr const char *TYPE_INTRO_TV = "TV";
+    constexpr const char *DEV_INTRO_TV_POWER = "intro_tv_power";
+    constexpr const char *FRIENDLY_INTRO_TV_POWER = "Intro TV Power";
+    constexpr const char *TYPE_INTRO_TV_POWER = "relay";
     // Commands
     constexpr const char *CMD_TV_POWER_ON = "power_on";
     constexpr const char *CMD_TV_POWER_OFF = "power_off";
-    constexpr const char *CMD_TV_LIFT_UP = "lift_up";
-    constexpr const char *CMD_TV_LIFT_DOWN = "lower_down";
     // Command friendly names
-    constexpr const char *FRIENDLY_CMD_TV_POWER_ON = "Intro TV Power On";
-    constexpr const char *FRIENDLY_CMD_TV_POWER_OFF = "Intro TV Power Off";
-    constexpr const char *FRIENDLY_CMD_TV_LIFT_UP = "Intro TV Lift Up";
-    constexpr const char *FRIENDLY_CMD_TV_LIFT_DOWN = "Intro TV Lift Down";
+    constexpr const char *FRIENDLY_CMD_TV_POWER_ON = "Power On";
+    constexpr const char *FRIENDLY_CMD_TV_POWER_OFF = "Power Off";
 
     // ════════════════════════════════════════════════════════════════════════
-    // DEVICE: Fog Machine (Boiler Room)
+    // DEVICE: Intro TV Lift (split from intro_tv)
     // ════════════════════════════════════════════════════════════════════════
-    constexpr const char *DEV_BOILER_FOG_MACHINE = "boiler_room_fog_machine";
-    constexpr const char *FRIENDLY_BOILER_FOG_MACHINE = "Fog Machine (Boiler Room)";
-    constexpr const char *TYPE_BOILER_FOG_MACHINE = "fog_machine";
+    constexpr const char *DEV_INTRO_TV_LIFT = "intro_tv_lift";
+    constexpr const char *FRIENDLY_INTRO_TV_LIFT = "Intro TV Lift";
+    constexpr const char *TYPE_INTRO_TV_LIFT = "motor";
     // Commands
-    constexpr const char *CMD_FOG_POWER_ON = "fog_power_on";
-    constexpr const char *CMD_FOG_POWER_OFF = "fog_power_off";
-    constexpr const char *CMD_FOG_TRIGGER = "trigger_fog";
-    constexpr const char *CMD_ULTRASONIC_ON = "ultrasonic_on";
-    constexpr const char *CMD_ULTRASONIC_OFF = "ultrasonic_off";
+    constexpr const char *CMD_TV_LIFT_UP = "lift_up";
+    constexpr const char *CMD_TV_LIFT_DOWN = "lift_down";
+    constexpr const char *CMD_TV_LIFT_STOP = "lift_stop";
+    // Command friendly names
+    constexpr const char *FRIENDLY_CMD_TV_LIFT_UP = "Lift Up";
+    constexpr const char *FRIENDLY_CMD_TV_LIFT_DOWN = "Lift Down";
+    constexpr const char *FRIENDLY_CMD_TV_LIFT_STOP = "Stop Lift";
+
+    // ════════════════════════════════════════════════════════════════════════
+    // DEVICE: Fog Machine Power (split from boiler_room_fog_machine)
+    // ════════════════════════════════════════════════════════════════════════
+    constexpr const char *DEV_FOG_POWER = "fog_power";
+    constexpr const char *FRIENDLY_FOG_POWER = "Fog Machine Power";
+    constexpr const char *TYPE_FOG_POWER = "relay";
+    // Commands
+    constexpr const char *CMD_FOG_POWER_ON = "power_on";
+    constexpr const char *CMD_FOG_POWER_OFF = "power_off";
     // Command friendly names
     constexpr const char *FRIENDLY_CMD_FOG_POWER_ON = "Power On";
     constexpr const char *FRIENDLY_CMD_FOG_POWER_OFF = "Power Off";
+
+    // ════════════════════════════════════════════════════════════════════════
+    // DEVICE: Fog Machine Trigger (split from boiler_room_fog_machine)
+    // ════════════════════════════════════════════════════════════════════════
+    constexpr const char *DEV_FOG_TRIGGER = "fog_trigger";
+    constexpr const char *FRIENDLY_FOG_TRIGGER = "Fog Machine Trigger";
+    constexpr const char *TYPE_FOG_TRIGGER = "momentary_relay";
+    // Commands
+    constexpr const char *CMD_FOG_TRIGGER = "trigger";
+    // Command friendly names
     constexpr const char *FRIENDLY_CMD_FOG_TRIGGER = "Trigger Fog";
+
+    // ════════════════════════════════════════════════════════════════════════
+    // DEVICE: Fog Machine Ultrasonic (split from boiler_room_fog_machine)
+    // ════════════════════════════════════════════════════════════════════════
+    constexpr const char *DEV_FOG_ULTRASONIC = "fog_ultrasonic";
+    constexpr const char *FRIENDLY_FOG_ULTRASONIC = "Fog Machine Ultrasonic Water";
+    constexpr const char *TYPE_FOG_ULTRASONIC = "relay";
+    // Commands
+    constexpr const char *CMD_ULTRASONIC_ON = "ultrasonic_on";
+    constexpr const char *CMD_ULTRASONIC_OFF = "ultrasonic_off";
+    // Command friendly names
     constexpr const char *FRIENDLY_CMD_ULTRASONIC_ON = "Ultrasonic On";
     constexpr const char *FRIENDLY_CMD_ULTRASONIC_OFF = "Ultrasonic Off";
 

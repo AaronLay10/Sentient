@@ -83,18 +83,28 @@ CRGB leds[num_leds];
 // DEVICE REGISTRY (SINGLE SOURCE OF TRUTH!) — Updated to canonical device IDs
 // ============================================================================
 
-// Intro TV — power and lift
-const char *intro_tv_commands[] = {
+// Intro TV Power
+const char *intro_tv_power_commands[] = {
     naming::CMD_TV_POWER_ON,
-    naming::CMD_TV_POWER_OFF,
-    naming::CMD_TV_LIFT_UP,
-    naming::CMD_TV_LIFT_DOWN};
+    naming::CMD_TV_POWER_OFF};
 
-// Fog Machine — power, trigger, ultrasonic
-const char *fog_machine_commands[] = {
+// Intro TV Lift
+const char *intro_tv_lift_commands[] = {
+    naming::CMD_TV_LIFT_UP,
+    naming::CMD_TV_LIFT_DOWN,
+    naming::CMD_TV_LIFT_STOP};
+
+// Fog Machine Power
+const char *fog_power_commands[] = {
     naming::CMD_FOG_POWER_ON,
-    naming::CMD_FOG_POWER_OFF,
-    naming::CMD_FOG_TRIGGER,
+    naming::CMD_FOG_POWER_OFF};
+
+// Fog Machine Trigger
+const char *fog_trigger_commands[] = {
+    naming::CMD_FOG_TRIGGER};
+
+// Fog Machine Ultrasonic
+const char *fog_ultrasonic_commands[] = {
     naming::CMD_ULTRASONIC_ON,
     naming::CMD_ULTRASONIC_OFF};
 
@@ -124,13 +134,25 @@ const char *ir_sensor_commands[] = {
 const char *ir_sensor_sensors[] = {"ir_code"};
 
 // Create device definitions with friendly names
-SentientDeviceDef dev_intro_tv(
-    naming::DEV_INTRO_TV, naming::FRIENDLY_INTRO_TV, naming::TYPE_INTRO_TV,
-    intro_tv_commands, 4);
+SentientDeviceDef dev_intro_tv_power(
+    naming::DEV_INTRO_TV_POWER, naming::FRIENDLY_INTRO_TV_POWER, naming::TYPE_INTRO_TV_POWER,
+    intro_tv_power_commands, 2);
 
-SentientDeviceDef dev_fog_machine(
-    naming::DEV_BOILER_FOG_MACHINE, naming::FRIENDLY_BOILER_FOG_MACHINE, naming::TYPE_BOILER_FOG_MACHINE,
-    fog_machine_commands, 5);
+SentientDeviceDef dev_intro_tv_lift(
+    naming::DEV_INTRO_TV_LIFT, naming::FRIENDLY_INTRO_TV_LIFT, naming::TYPE_INTRO_TV_LIFT,
+    intro_tv_lift_commands, 3);
+
+SentientDeviceDef dev_fog_power(
+    naming::DEV_FOG_POWER, naming::FRIENDLY_FOG_POWER, naming::TYPE_FOG_POWER,
+    fog_power_commands, 2);
+
+SentientDeviceDef dev_fog_trigger(
+    naming::DEV_FOG_TRIGGER, naming::FRIENDLY_FOG_TRIGGER, naming::TYPE_FOG_TRIGGER,
+    fog_trigger_commands, 1);
+
+SentientDeviceDef dev_fog_ultrasonic(
+    naming::DEV_FOG_ULTRASONIC, naming::FRIENDLY_FOG_ULTRASONIC, naming::TYPE_FOG_ULTRASONIC,
+    fog_ultrasonic_commands, 2);
 
 SentientDeviceDef dev_barrel(
     naming::DEV_BOILER_ROOM_BARREL, naming::FRIENDLY_BOILER_ROOM_BARREL, naming::TYPE_BOILER_ROOM_BARREL,
@@ -269,8 +291,11 @@ void setup()
 
   // Register all devices (SINGLE SOURCE OF TRUTH!) — canonical IDs + friendly names
   Serial.println(F("[BoilerRmA] Registering devices (canonical)..."));
-  deviceRegistry.addDevice(&dev_intro_tv);
-  deviceRegistry.addDevice(&dev_fog_machine);
+  deviceRegistry.addDevice(&dev_intro_tv_power);
+  deviceRegistry.addDevice(&dev_intro_tv_lift);
+  deviceRegistry.addDevice(&dev_fog_power);
+  deviceRegistry.addDevice(&dev_fog_trigger);
+  deviceRegistry.addDevice(&dev_fog_ultrasonic);
   deviceRegistry.addDevice(&dev_barrel);
   deviceRegistry.addDevice(&dev_ir_sensor);
   deviceRegistry.addDevice(&dev_study_door);
@@ -374,13 +399,39 @@ void setup()
       long ack_duration_ms = -1; // will be included in ACK if >= 0
 
       // Dispatch
-      // Intro TV
-      if (device == naming::DEV_INTRO_TV) {
-        if (command == naming::CMD_TV_POWER_ON)  { tv_power_on = true;  digitalWrite(tv_power_pin, HIGH); publish_hardware_status(); }
-        else if (command == naming::CMD_TV_POWER_OFF) { tv_power_on = false; digitalWrite(tv_power_pin, LOW); publish_hardware_status(); }
-        else if (command == naming::CMD_TV_LIFT_UP)   { tv_lift_state = 1;  digitalWrite(tv_lift_up_pin, HIGH); digitalWrite(tv_lift_down_pin, LOW); publish_hardware_status(); }
-        else if (command == naming::CMD_TV_LIFT_DOWN) { tv_lift_state = -1; digitalWrite(tv_lift_down_pin, HIGH); digitalWrite(tv_lift_up_pin, LOW); publish_hardware_status(); }
-        else { /* unknown */ }
+      // Intro TV Power
+      if (device == naming::DEV_INTRO_TV_POWER) {
+        if (command == naming::CMD_TV_POWER_ON) {
+          tv_power_on = true;
+          digitalWrite(tv_power_pin, HIGH);
+          publish_hardware_status();
+        }
+        else if (command == naming::CMD_TV_POWER_OFF) {
+          tv_power_on = false;
+          digitalWrite(tv_power_pin, LOW);
+          publish_hardware_status();
+        }
+      }
+      // Intro TV Lift
+      else if (device == naming::DEV_INTRO_TV_LIFT) {
+        if (command == naming::CMD_TV_LIFT_UP) {
+          tv_lift_state = 1;
+          digitalWrite(tv_lift_up_pin, HIGH);
+          digitalWrite(tv_lift_down_pin, LOW);
+          publish_hardware_status();
+        }
+        else if (command == naming::CMD_TV_LIFT_DOWN) {
+          tv_lift_state = -1;
+          digitalWrite(tv_lift_down_pin, HIGH);
+          digitalWrite(tv_lift_up_pin, LOW);
+          publish_hardware_status();
+        }
+        else if (command == naming::CMD_TV_LIFT_STOP) {
+          tv_lift_state = 0;
+          digitalWrite(tv_lift_up_pin, LOW);
+          digitalWrite(tv_lift_down_pin, LOW);
+          publish_hardware_status();
+        }
       }
       // Controller-level commands (direct to controller, not a device)
       else if (device == "controller") {
@@ -416,12 +467,23 @@ void setup()
           mqtt.get_client().publish(rTopic.c_str(), rbuf, false);
         }
       }
-      // Fog Machine
-      else if (device == naming::DEV_BOILER_FOG_MACHINE) {
-        if (command == naming::CMD_FOG_POWER_ON)  { fog_power_on = true;  digitalWrite(fog_power_pin, HIGH); publish_hardware_status(); }
-        else if (command == naming::CMD_FOG_POWER_OFF) { fog_power_on = false; digitalWrite(fog_power_pin, LOW); publish_hardware_status(); }
-        else if (command == naming::CMD_FOG_TRIGGER)   {
-          // Option A: allow optional duration_ms (default 500ms), clamped to [100, 3000]
+      // Fog Machine Power
+      else if (device == naming::DEV_FOG_POWER) {
+        if (command == naming::CMD_FOG_POWER_ON) {
+          fog_power_on = true;
+          digitalWrite(fog_power_pin, HIGH);
+          publish_hardware_status();
+        }
+        else if (command == naming::CMD_FOG_POWER_OFF) {
+          fog_power_on = false;
+          digitalWrite(fog_power_pin, LOW);
+          publish_hardware_status();
+        }
+      }
+      // Fog Machine Trigger
+      else if (device == naming::DEV_FOG_TRIGGER) {
+        if (command == naming::CMD_FOG_TRIGGER) {
+          // Allow optional duration_ms (default 500ms), clamped to [100, 3000]
           long durationMs = 500;
           if (hasJson) {
             if (!doc["duration_ms"].isNull()) {
@@ -441,14 +503,26 @@ void setup()
           if (durationMs > 3000) durationMs = 3000;
           ack_duration_ms = durationMs;
           Serial.print(F("[BoilerRmA] Fog trigger pulse: ")); Serial.print(durationMs); Serial.println(F(" ms"));
-          fog_trigger_on = true; digitalWrite(fog_trigger_pin, HIGH);
+          fog_trigger_on = true;
+          digitalWrite(fog_trigger_pin, HIGH);
           delay((unsigned long)durationMs);
-          fog_trigger_on = false; digitalWrite(fog_trigger_pin, LOW);
+          fog_trigger_on = false;
+          digitalWrite(fog_trigger_pin, LOW);
           publish_hardware_status();
         }
-        else if (command == naming::CMD_ULTRASONIC_ON)  { ultrasonic_water_on = true;  digitalWrite(ultrasonic_water_pin, HIGH); publish_hardware_status(); }
-        else if (command == naming::CMD_ULTRASONIC_OFF) { ultrasonic_water_on = false; digitalWrite(ultrasonic_water_pin, LOW); publish_hardware_status(); }
-        else { /* unknown */ }
+      }
+      // Fog Machine Ultrasonic
+      else if (device == naming::DEV_FOG_ULTRASONIC) {
+        if (command == naming::CMD_ULTRASONIC_ON) {
+          ultrasonic_water_on = true;
+          digitalWrite(ultrasonic_water_pin, HIGH);
+          publish_hardware_status();
+        }
+        else if (command == naming::CMD_ULTRASONIC_OFF) {
+          ultrasonic_water_on = false;
+          digitalWrite(ultrasonic_water_pin, LOW);
+          publish_hardware_status();
+        }
       }
       // Study Door (group)
       else if (device == naming::DEV_STUDY_DOOR) {

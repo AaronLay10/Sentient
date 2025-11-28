@@ -135,6 +135,28 @@ export class DevicesService {
     return device;
   }
 
+  async getDeviceActions(deviceId: string) {
+    const device = await this.prisma.device.findUnique({
+      where: { id: deviceId },
+      include: {
+        actions: true
+      }
+    });
+
+    if (!device) {
+      throw new NotFoundException(`Device ${deviceId} not found`);
+    }
+
+    return {
+      device_id: deviceId,
+      actions: device.actions.map(action => ({
+        action_id: action.action_id,
+        friendly_name: action.friendly_name || action.action_id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        mqtt_topic: action.mqtt_topic
+      }))
+    };
+  }
+
   async controlDevice(deviceId: string, state: boolean) {
     console.log(`🎮 Control command received: ${deviceId} -> ${state ? 'ON' : 'OFF'}`);
 

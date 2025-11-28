@@ -103,7 +103,7 @@ model Device {
   device_type    String
   device_category String?
   properties     Json?
-  current_state  Boolean   @default(false)
+  current_state  Json?
   state_updated_at DateTime?
   last_seen      DateTime?
   created_at     DateTime @default(now())

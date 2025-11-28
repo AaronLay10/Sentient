@@ -300,4 +300,23 @@ export const api = {
     const response = await client.post(`/clients/${clientId}/rooms/${roomId}/scenes/${sceneId}/duplicate`);
     return response.data;
   },
+
+  // Scene Execution
+  async executeScene(clientId: string, roomId: string, sceneId: string): Promise<void> {
+    await client.post(`/clients/${clientId}/rooms/${roomId}/scenes/${sceneId}/execute`);
+  },
+
+  async executeDeviceAction(deviceId: string, action: string): Promise<void> {
+    await client.post(`/admin/devices/${deviceId}/execute`, { action });
+  },
+
+  // Device Command Execution
+  async sendDeviceCommand(deviceId: string, command: string, payload?: Record<string, any>): Promise<{ success: boolean; device_id: string; command: string; payload?: any }> {
+    const response = await client.post(`/devices/${deviceId}/command`, {
+      device_id: deviceId,
+      command,
+      payload: payload || {},
+    });
+    return response.data;
+  },
 };

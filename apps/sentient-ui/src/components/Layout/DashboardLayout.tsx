@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { Eye, Cpu, Boxes, Building2, Users, Layout, Power, Clapperboard, LogOut, User, Network, Sun } from 'lucide-react';
+import { Eye, Cpu, Boxes, Building2, Users, Layout, Power, Clapperboard, LogOut, User, Network, Sun, Activity } from 'lucide-react';
 import { getCurrentUser, logout } from '../ProtectedRoute';
 import './DashboardLayout.css';
 
@@ -25,6 +25,11 @@ export function DashboardLayout() {
         </div>
 
         <nav className="navbar-nav">
+          <NavLink to="/monitor" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            <Activity size={18} />
+            <span>Monitor</span>
+          </NavLink>
+
           <NavLink to="/overview" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <Eye size={18} />
             <span>Overview</span>
