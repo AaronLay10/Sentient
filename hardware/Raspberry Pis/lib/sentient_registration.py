@@ -376,7 +376,6 @@ class SentientRegistration:
                         })
 
                 device_message = {
-                    "room_id": self.room_id,
                     "controller_id": self.controller_id,
                     "device_index": device_index,  # Required for tracking
                     "device_id": device["device_id"],

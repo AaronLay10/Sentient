@@ -42,10 +42,12 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
 
   const handleTest = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (data.nodeType === 'device' && data.config?.deviceId && data.config?.action) {
+    if ((data.nodeType === 'device' || (data.nodeType === 'media' && data.subtype === 'video')) && 
+        data.config?.deviceId && data.config?.action) {
       try {
         const commandSentAt = Date.now();
-        console.log('🎮 Sending device command:', {
+        const nodeTypeLabel = data.nodeType === 'media' ? '🎬 Video' : '🎮 Device';
+        console.log(`${nodeTypeLabel} command:`, {
           deviceId: data.config.deviceId,
           action: data.config.action,
           payload: data.config.payload || {},
@@ -62,10 +64,10 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
           data.config.payload || {}
         );
         
-        console.log('✅ Device command sent successfully:', result);
+        console.log('✅ Command sent successfully:', result);
         console.log('⏱️  Waiting for acknowledgement from controller...');
       } catch (error) {
-        console.error('❌ Error sending device command:', error);
+        console.error('❌ Error sending command:', error);
       }
     }
   };
@@ -115,7 +117,8 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
         <div className={styles.title}>{data.label}</div>
         {selected && (
           <div style={{ display: 'flex', gap: '4px', marginLeft: 'auto' }}>
-            {data.nodeType === 'device' && data.config?.deviceId && data.config?.action && (
+            {((data.nodeType === 'device' && data.config?.deviceId && data.config?.action) ||
+              (data.nodeType === 'media' && data.subtype === 'video' && data.config?.deviceId && data.config?.action)) && (
               <div 
                 className={styles.testBtn} 
                 title="Test this node"

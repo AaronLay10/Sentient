@@ -50,9 +50,23 @@ export function useWebSocket(options: UseWebSocketOptions) {
           const message: WebSocketMessage = JSON.parse(event.data);
 
           if (message.type === 'event_notification' && message.data) {
+            const isAck = message.data.metadata?.is_acknowledgement === true;
+            
+            if (isAck) {
+              console.log('📨 WebSocket ACK received:', {
+                device_id: message.data.device_id,
+                event_type: message.data.type,
+                is_ack: true
+              });
+            }
+            
+            // Call onEvent FIRST for time-critical events (ACKs)
+            // This bypasses React state batching for immediate processing
+            onEvent?.(message.data);
+            
+            // Then update state for UI display (can be deferred)
             setLastEvent(message.data);
             setEvents((prev) => [message.data!, ...prev].slice(0, 20));
-            onEvent?.(message.data);
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);

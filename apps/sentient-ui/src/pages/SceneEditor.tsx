@@ -62,13 +62,66 @@ function SceneEditorInner() {
   const [acknowledgedNodes, setAcknowledgedNodes] = useState<Set<string>>(new Set());
   
   // Map to store pending acknowledgement promises - event-driven, no polling!
+  // Maps nodeId to resolver function
   const acknowledgementResolvers = useRef<Map<string, (value: boolean) => void>>(new Map());
+  // Maps deviceId to nodeId for faster lookups
+  const deviceToNodeMap = useRef<Map<string, string>>(new Map());
+  // Maps completionKey to nodeId for video completion lookups
+  const completionToNodeMap = useRef<Map<string, string>>(new Map());
 
   // WebSocket connection for real-time acknowledgements
   const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
+  
+  // Handler for immediate acknowledgement processing (bypasses React state batching)
+  const handleWebSocketEvent = useCallback((event: any) => {
+    if (event?.type === 'device_state_changed') {
+      const deviceId = event.device_id;
+      const isAcknowledgement = event.metadata?.is_acknowledgement === true;
+      
+      if (!deviceId || !isAcknowledgement) return;
+      
+      console.log('🚀 Immediate ACK handler:', { 
+        device_id: deviceId, 
+        event_id: event.event_id,
+        pending_resolvers: Array.from(acknowledgementResolvers.current.keys()),
+        device_map: Array.from(deviceToNodeMap.current.entries())
+      });
+      
+      // Look up nodeId by deviceId
+      const nodeId = deviceToNodeMap.current.get(deviceId);
+      
+      if (nodeId) {
+        const resolver = acknowledgementResolvers.current.get(nodeId);
+        if (resolver) {
+          console.log(`⚡ Immediate resolver called for node: ${nodeId} (device: ${deviceId})`);
+          resolver(true);
+          acknowledgementResolvers.current.delete(nodeId);
+          deviceToNodeMap.current.delete(deviceId);
+          
+          // Show visual feedback for the CORRECT node (not the first matching device)
+          setAcknowledgedNodes(prev => new Set(prev).add(nodeId));
+          
+          // Clear visual feedback after 2 seconds (unless it's a video node waiting for completion)
+          setTimeout(() => {
+            setAcknowledgedNodes(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(nodeId);
+              return newSet;
+            });
+          }, 2000);
+        } else {
+          console.warn(`⚠️ Node found but no resolver: ${nodeId} (device: ${deviceId})`);
+        }
+      } else {
+        console.warn(`⚠️ No node mapping found for device: ${deviceId}`);
+      }
+    }
+  }, []); // No dependencies - uses refs only
+  
   const { events } = useWebSocket({
     url: WS_URL,
     roomId: selectedRoomId || undefined,
+    onEvent: handleWebSocketEvent,
   });
 
   // Fetch rooms
@@ -95,13 +148,13 @@ function SceneEditorInner() {
       // Check if this is a device state change event
       if (latestEvent?.type === 'device_state_changed') {
         const deviceId = latestEvent.device_id;
-        const isAcknowledgement = latestEvent.metadata?.is_acknowledgement === true;
+        const videoCompleted = latestEvent.payload?.new_state?.video_completed || latestEvent.payload?.video_completed;
         
         if (!deviceId) return;
         
-        // Find node with matching deviceId - only process if device is in this scene
+        // Find node with matching deviceId
         const matchingNode = nodes.find(n => 
-          n.data.nodeType === 'device' && 
+          (n.data.nodeType === 'device' || n.data.nodeType === 'media') && 
           (n.data.config as any)?.deviceId === deviceId
         );
         
@@ -111,27 +164,39 @@ function SceneEditorInner() {
         // Refetch devices to get fresh state from database
         refetchDevices();
         
-        // Update acknowledged nodes set for visual feedback
-        setAcknowledgedNodes(prev => new Set(prev).add(matchingNode.id));
+        // NOTE: Acknowledgement handling is done by the immediate callback handler (handleWebSocketEvent)
+        // to avoid race conditions and ensure correct node highlighting when multiple nodes use the same device.
+        // The callback handler uses deviceToNodeMap for O(1) lookup of the exact waiting node.
         
-        // If this is an acknowledgement event, resolve any pending promise immediately
-        if (isAcknowledgement) {
-          const resolver = acknowledgementResolvers.current.get(matchingNode.id);
-          if (resolver) {
-            console.log(`✅ Acknowledgement received for node: ${matchingNode.id} (device: ${deviceId})`);
-            resolver(true);
-            acknowledgementResolvers.current.delete(matchingNode.id);
+        // If this is a video completion event, resolve the completion promise and clear visual indicator
+        if (videoCompleted) {
+          // Find the exact node waiting for this completion using completionToNodeMap
+          const waitingNodeId = Array.from(completionToNodeMap.current.entries())
+            .find(([key, _]) => {
+              // Extract the completion key pattern for this device
+              const completionResolver = acknowledgementResolvers.current.get(key);
+              return completionResolver !== undefined;
+            })?.[1];
+          
+          if (waitingNodeId) {
+            const completionKey = `${waitingNodeId}_completion`;
+            const completionResolver = acknowledgementResolvers.current.get(completionKey);
+            
+            if (completionResolver) {
+              console.log(`✅ Video completion received for node: ${waitingNodeId} (device: ${deviceId}, video: ${videoCompleted})`);
+              completionResolver(true);
+              acknowledgementResolvers.current.delete(completionKey);
+              completionToNodeMap.current.delete(completionKey);
+              
+              // Clear the green pulsing border now that video is done
+              setAcknowledgedNodes(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(waitingNodeId);
+                return newSet;
+              });
+            }
           }
         }
-        
-        // Clear visual acknowledgement indicator after 2 seconds
-        setTimeout(() => {
-          setAcknowledgedNodes(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(matchingNode.id);
-            return newSet;
-          });
-        }, 2000);
       }
     } catch (error) {
       console.error('Error processing WebSocket event:', error);
@@ -548,11 +613,15 @@ function SceneEditorInner() {
                         // Set up promise that will be resolved by WebSocket event handler
                         const ackPromise = new Promise<boolean>((resolve) => {
                           acknowledgementResolvers.current.set(node.id, resolve);
+                          deviceToNodeMap.current.set(nodeConfig.deviceId, node.id);
+                          
+                          console.log(`🔗 Registered resolver for node ${node.id} -> device ${nodeConfig.deviceId}`);
                           
                           // 5-second timeout
                           setTimeout(() => {
                             if (acknowledgementResolvers.current.has(node.id)) {
                               acknowledgementResolvers.current.delete(node.id);
+                              deviceToNodeMap.current.delete(nodeConfig.deviceId);
                               resolve(false);
                             }
                           }, 5000);
@@ -616,23 +685,45 @@ function SceneEditorInner() {
                       }
                       
                       const device = devices.find(d => d.id === nodeConfig.deviceId);
-                      const action = device?.actions.find(a => a.action_id === nodeConfig.action);
+                      const action = device?.actions?.find(a => a.action_id === nodeConfig.action);
                       
                       console.log(`🎬 Video command: ${device?.friendly_name} - ${action?.friendly_name || nodeConfig.action}`);
                       
-                      // Set up acknowledgement promise
+                      // Set up acknowledgement promise (command received)
                       const commandSentAt = Date.now();
                       const ackPromise = new Promise<boolean>((resolve) => {
                         acknowledgementResolvers.current.set(node.id, resolve);
+                        deviceToNodeMap.current.set(nodeConfig.deviceId, node.id);
+                        
+                        console.log(`🔗 Registered video resolver for node ${node.id} -> device ${nodeConfig.deviceId}`);
                         
                         // 5-second timeout
                         setTimeout(() => {
                           if (acknowledgementResolvers.current.has(node.id)) {
                             acknowledgementResolvers.current.delete(node.id);
+                            deviceToNodeMap.current.delete(nodeConfig.deviceId);
                             resolve(false);
                           }
                         }, 5000);
                       });
+                      console.log(`🔗 Registered ACK resolver for node ${node.id} (device: ${nodeConfig.deviceId})`);
+                      
+                      // Set up completion promise (video finished)
+                      const completionKey = `${node.id}_completion`;
+                      const completionPromise = new Promise<boolean>((resolve) => {
+                        acknowledgementResolvers.current.set(completionKey, resolve);
+                        completionToNodeMap.current.set(completionKey, node.id);
+                        
+                        // 5-minute timeout (long videos)
+                        setTimeout(() => {
+                          if (acknowledgementResolvers.current.has(completionKey)) {
+                            acknowledgementResolvers.current.delete(completionKey);
+                            completionToNodeMap.current.delete(completionKey);
+                            resolve(false);
+                          }
+                        }, 300000);
+                      });
+                      console.log(`🔗 Registered completion resolver for node ${node.id} (device: ${nodeConfig.deviceId})`);
                       
                       // Send command to video device
                       await api.sendDeviceCommand(
@@ -649,6 +740,17 @@ function SceneEditorInner() {
                       if (!ackReceived) {
                         throw new Error(`Command timeout: No acknowledgement received from ${device?.friendly_name} within 5 seconds`);
                       }
+                      
+                      console.log('✅ Command acknowledged, waiting for video to complete...');
+                      
+                      // Wait for completion event
+                      const completionReceived = await completionPromise;
+                      
+                      if (!completionReceived) {
+                        throw new Error(`Video playback timeout: No completion event received from ${device?.friendly_name}`);
+                      }
+                      
+                      console.log('✅ Video playback completed');
                       
                       const latencyMs = Date.now() - commandSentAt;
                       console.log(`⚡ Video command acknowledged (${latencyMs}ms latency)`);

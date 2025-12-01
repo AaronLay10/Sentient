@@ -92,6 +92,11 @@ client.on('reconnect', () => {
 client.on('message', async (topic, message) => {
   try {
     const payload = JSON.parse(message.toString());
+    
+    // Debug: Log all acknowledgement messages
+    if (topic.includes('/acknowledgement/')) {
+      console.log(`🔔 ACK message received on topic: ${topic}`);
+    }
 
     // Handle registration topics
     if (topic === 'sentient/system/register/controller') {
@@ -139,6 +144,13 @@ async function handleCategoryFirstTopic(topic: string, payload: any, category: s
     const controller_id = topicParts[3];    // 'power_control_upper_right', etc.
     const device_id = topicParts[4];        // 'main_lighting_24v', etc. (optional for status)
     const messageType = topicParts[5];      // 'state', 'heartbeat', 'connection', etc. (optional)
+
+    // Debug logging for intro_video_player
+    if (controller_id === 'intro_video_player') {
+      console.log(`🔍 DEBUG intro_video_player topic: ${topic}`);
+      console.log(`   Parts: controller=${controller_id}, device=${device_id}, type=${messageType}`);
+      console.log(`   Payload:`, JSON.stringify(payload));
+    }
 
     let eventType: EventType | null = null;
     let eventPayload: any = payload;
@@ -286,7 +298,7 @@ async function handleAcknowledgement(topic: string, payload: any): Promise<void>
         command_acknowledged: command,
         raw_mqtt_payload: payload,
       },
-      timestamp: new Date(payload.ts || Date.now()),
+      timestamp: new Date(payload.timestamp_ms || payload.ts || Date.now()),
       metadata: {
         source: 'mqtt-gateway',
         mqtt_topic: topic,
@@ -294,8 +306,18 @@ async function handleAcknowledgement(topic: string, payload: any): Promise<void>
       },
     };
 
-    await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, JSON.stringify(domainEvent));
+    const serializedEvent = JSON.stringify(domainEvent);
+    await redisPublisher.publish(REDIS_CHANNELS.DOMAIN_EVENTS, serializedEvent);
+    
     console.log(`✅ Published ACK event: ${device_id} -> ${command} (state="${stateValue}")`);
+    console.log(`📦 ACK Event Details:`, {
+      event_id: domainEvent.event_id,
+      type: domainEvent.type,
+      device_id: domainEvent.device_id,
+      room_id: domainEvent.room_id,
+      is_ack: domainEvent.metadata.is_acknowledgement,
+      channel: REDIS_CHANNELS.DOMAIN_EVENTS
+    });
   } catch (error) {
     console.error('❌ Error handling acknowledgement:', error);
   }

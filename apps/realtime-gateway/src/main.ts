@@ -26,7 +26,22 @@ async function bootstrap() {
 
   // Subscribe to all domain events and broadcast to WebSocket clients
   await eventSubscriber.subscribeToDomainEvents(async (event) => {
-    logger.debug('Received domain event', { type: event.type, event_id: event.event_id });
+    const isAck = event.metadata?.is_acknowledgement === true;
+    
+    logger.debug('Received domain event', { 
+      type: event.type, 
+      event_id: event.event_id,
+      device_id: event.device_id,
+      is_acknowledgement: isAck
+    });
+    
+    if (isAck) {
+      logger.info('🔔 Broadcasting ACK event', {
+        device_id: event.device_id,
+        room_id: event.room_id,
+        event_id: event.event_id
+      });
+    }
 
     // Broadcast to all clients in the room
     if (event.room_id) {

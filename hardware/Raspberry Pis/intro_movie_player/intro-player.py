@@ -255,8 +255,10 @@ class ClockworkIntroPlayer:
                 "success": success,
                 "timestamp_ms": int(time.time() * 1000)
             }
-            self.mqtt_client.publish(topic, json.dumps(payload), qos=1)
-            logger.info(f"✓ ACK: {device_id}/{command} (success={success})")
+            logger.info(f"📤 Publishing ACK to: {topic}")
+            logger.info(f"   Payload: {json.dumps(payload)}")
+            result = self.mqtt_client.publish(topic, json.dumps(payload), qos=1)
+            logger.info(f"✓ ACK: {device_id}/{command} (success={success}, rc={result.rc})")
             
     def on_message(self, client, userdata, msg):
         """Handle MQTT commands - Sentient v4 standard"""
@@ -296,6 +298,23 @@ class ClockworkIntroPlayer:
         except Exception as e:
             logger.error(f"Error handling message: {e}")
             
+    def publish_video_completed(self, video_name):
+        """Publish video completion event to state topic"""
+        if not self.mqtt_connected or not self.mqtt_client:
+            return
+        
+        # Publish to device state topic
+        topic = f"paragon/{self.room_id}/status/{self.controller_id}/intro_tv/state"
+        message = {
+            "device_id": "intro_tv",
+            "controller_id": self.controller_id,
+            "video_completed": video_name,
+            "timestamp_ms": int(time.time() * 1000)
+        }
+        
+        self.mqtt_client.publish(topic, json.dumps(message), qos=1)
+        logger.info(f"✓ Published completion: {video_name}")
+    
     def play_loop(self):
         """Play the clockwork loop video"""
         self.play_video("loop")
@@ -305,31 +324,34 @@ class ClockworkIntroPlayer:
         self.play_video("intro")
         
     def start_mpv_player(self):
-        """Start mpv with IPC control for seamless transitions"""
+        """Start mpv with BOTH videos pre-loaded in playlist for instant switching"""
         # Remove old socket if exists
         if os.path.exists(self.ipc_socket):
             os.remove(self.ipc_socket)
             
-        # Start with loop video
+        # Pre-load both videos in playlist
+        # Index 0: loop video (starts playing)
+        # Index 1: intro video (pre-loaded, ready to switch)
         loop_path = self.videos["loop"]["file"]
+        intro_path = self.videos["intro"]["file"]
         
         cmd = [
             'mpv',
-            str(loop_path),
+            str(loop_path),   # Playlist index 0
+            str(intro_path),  # Playlist index 1 (pre-loaded!)
             '--fs',  # Fullscreen
             '--vo=drm',  # Direct Rendering
             '--hwdec=auto',  # Hardware decoding
             '--really-quiet',  # Minimize output
             '--no-terminal',  # No terminal control
             '--cache=yes',  # Enable cache
-            '--demuxer-max-bytes=20M',  # Preload data
+            '--demuxer-max-bytes=50M',  # Larger preload for intro
             '--audio-device=auto',
             '--audio-fallback-to-null=yes',
             '--no-audio-display',
-            '--loop-playlist',  # Loop whatever is in the playlist
+            '--loop-file=inf',  # Loop current file (not playlist)
             '--input-ipc-server=' + self.ipc_socket,  # Enable IPC control
             '--keep-open=yes',  # Don't exit when file ends
-            '--idle=yes',  # Stay open even with no file
         ]
         
         # Set environment
@@ -425,30 +447,51 @@ class ClockworkIntroPlayer:
         
         # Clear playlist and load new video
         logger.info(f"▶ Switching to: {video_path.name}")
+        logger.info(f"  Full path: {video_path}")
+        logger.info(f"  File exists: {video_path.exists()}")
+        logger.info(f"  MPV process alive: {self.current_process and self.current_process.poll() is None}")
         
-        # Clear current playlist
-        self.send_mpv_command({"command": ["playlist-clear"]})
+        # Switch to the pre-loaded video using playlist index
+        # Index 0 = loop, Index 1 = intro
+        playlist_index = 0 if video_name == "loop" else 1
         
-        # Load new file (seamless transition)
-        self.send_mpv_command({
-            "command": ["loadfile", str(video_path), "replace"]
-        })
+        logger.info(f"  Switching to playlist index {playlist_index}")
         
-        # Set loop mode
+        # Disable loop before switching (will re-enable for loop video)
+        result = self.send_mpv_command({"command": ["set_property", "loop-file", "no"]})
+        logger.info(f"  Loop disabled: {result}")
+        
+        # Switch to the target video in playlist
+        result = self.send_mpv_command({"command": ["playlist-play-index", playlist_index]})
+        logger.info(f"  Playlist switch: {result}")
+        
+        # Wait a moment for switch
+        time.sleep(0.3)
+        
+        # Verify the switch happened
+        filename_check = self.send_mpv_command({"command": ["get_property", "filename"]})
+        logger.info(f"  Now playing: {filename_check}")
+        
+        # Set loop mode based on video type
         if video_info["loop"]:
-            self.send_mpv_command({"command": ["set_property", "loop-file", "inf"]})
+            result = self.send_mpv_command({"command": ["set_property", "loop-file", "inf"]})
+            logger.info(f"  Loop mode enabled: {result}")
             logger.info(f"✓ Playing: {video_path.name} (looping)")
         else:
-            self.send_mpv_command({"command": ["set_property", "loop-file", "no"]})
             logger.info(f"✓ Playing: {video_path.name} ({video_info['duration']}s)")
         
         self.current_video = video_name
         
         # Schedule return to loop after intro
         if video_name == "intro":
+            def on_intro_complete():
+                # Publish completion event before returning to loop
+                self.publish_video_completed("intro")
+                self.play_loop()
+            
             self.return_to_loop_timer = threading.Timer(
                 video_info["duration"] + 1,
-                self.play_loop
+                on_intro_complete
             )
             self.return_to_loop_timer.start()
             logger.info(f"⏱ Will return to loop in {video_info['duration']} seconds")

@@ -9,6 +9,7 @@ Sentient Engine is a comprehensive, event-driven control system that orchestrate
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - **Node.js** ≥22
 - **pnpm** ≥10
 - **Docker** & Docker Compose
@@ -46,24 +47,29 @@ pnpm install
 ## 📚 Documentation
 
 ### Core Architecture
+
 - **[SYSTEM_ARCHITECTURE_v4.md](docs/SYSTEM_ARCHITECTURE_v4.md)** - Complete system architecture, design decisions, component boundaries
 - **[SENTIENT_DATA_FLOW.md](docs/SENTIENT_DATA_FLOW.md)** - Event flows, MQTT topics, Redis channels, WebSocket broadcasts
 - **[BRANDING.md](docs/BRANDING.md)** - Brand guidelines, Sentient Eye design, color palette, UI components
 
 ### Deployment & Operations
+
 - **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Production deployment workflows and procedures
 - **[Sentient_Engine_Deployment_Guide.md](docs/Sentient_Engine_Deployment_Guide.md)** - Complete server setup guide (Ubuntu, Docker, networking)
 - **[Mac_Studio_Sentient_Setup_Guide.md](docs/Mac_Studio_Sentient_Setup_Guide.md)** - Local development environment setup
 
 ### UI & Frontend
+
 - **[UI_PAGES.md](docs/UI_PAGES.md)** - Complete UI page specifications, routes, components
 - **[UI_Tasks_and_Procedures.md](docs/UI_Tasks_and_Procedures.md)** - Operational procedures and user workflows
 - **[Sentient_Admin_Topology_Dashboard_Spec.md](docs/Sentient_Admin_Topology_Dashboard_Spec.md)** - Network topology dashboard specifications
 
 ### Performance & Optimization
+
 - **[Performance_Enhancements.md](docs/Performance_Enhancements.md)** - Performance analysis, optimization strategies, metrics
 
 ### Developer Guides
+
 - **[CLAUDE.md](docs/CLAUDE.md)** - Quick reference for AI coding agents
 - **[docs/UI_BUILD_VARIABLES.md](docs/UI_BUILD_VARIABLES.md)** - Vite environment configuration
 
@@ -113,17 +119,17 @@ Sentient/
 
 ## 🎮 Services Overview
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| **api-service** | 3001 | REST API for configuration & authentication |
-| **orchestrator-service** | - | Game session orchestration & logic |
-| **mqtt-gateway** | 3003 | MQTT ↔ Redis event normalization |
-| **realtime-gateway** | 3002 | WebSocket server for real-time UI updates |
-| **sentient-ui** | 3000 | Admin console & game master interface |
-| **postgres** | 5432 | PostgreSQL database |
-| **redis** | 6379 | Pub/sub & session state |
-| **mqtt** | 1883 | Mosquitto MQTT broker |
-| **nginx** | 80/443 | Reverse proxy & SSL termination |
+| Service                  | Port   | Purpose                                     |
+| ------------------------ | ------ | ------------------------------------------- |
+| **api-service**          | 3001   | REST API for configuration & authentication |
+| **orchestrator-service** | -      | Game session orchestration & logic          |
+| **mqtt-gateway**         | 3003   | MQTT ↔ Redis event normalization           |
+| **realtime-gateway**     | 3002   | WebSocket server for real-time UI updates   |
+| **sentient-ui**          | 3000   | Admin console & game master interface       |
+| **postgres**             | 5432   | PostgreSQL database                         |
+| **redis**                | 6379   | Pub/sub & session state                     |
+| **mqtt**                 | 1883   | Mosquitto MQTT broker                       |
+| **nginx**                | 80/443 | Reverse proxy & SSL termination             |
 
 ---
 
@@ -152,6 +158,7 @@ pnpm --filter api-service prisma:migrate:dev
 ## 🔌 Hardware Integration
 
 Sentient Engine supports multiple controller types:
+
 - **Teensy 4.1** - Primary controllers for high-speed I/O
 - **Raspberry Pi 4** - Media playback, touchscreen interfaces
 - **ESP32** - WiFi-enabled sensors & actuators
@@ -178,6 +185,7 @@ sentient/<room>/<category>/<controller>/<device>/<action>
 ```
 
 **Examples:**
+
 - `sentient/mesa/status/door_control_1/maglock_1/state` - Device state updates
 - `sentient/mesa/commands/door_control_1/maglock_1/unlock` - Device commands
 - `sentient/system/register/controller` - Controller registration
@@ -192,6 +200,7 @@ See [SENTIENT_DATA_FLOW.md](docs/SENTIENT_DATA_FLOW.md) for complete topic struc
 **Sentient Eye** - The animated neural eye logo serves as both branding and a real-time system health indicator.
 
 **Color Palette:**
+
 - Primary Cyan: `#00d9ff`
 - Primary Orange: `#ffa832`
 - Dark Background: `#1a2332`
