@@ -10,10 +10,10 @@
 
 ## Architecture Snapshot
 
-- **Sentient Engine** (see `SYSTEM_ARCHITECTURE_v4.md`) is a theatrical control platform for escape rooms, coordinating Teensy 4.1, Raspberry Pi, ESP32 controllers plus connected devices (relays, sensors, maglocks, motors, lighting).
+- **Sentient Engine** (see `docs/SYSTEM_ARCHITECTURE_v4.md`) is a theatrical control platform for escape rooms, coordinating Teensy 4.1, Raspberry Pi, ESP32 controllers plus connected devices (relays, sensors, maglocks, motors, lighting).
 - Controllers publish to topics (`sentient/<room>/<category>/…`); MQTT Gateway normalizes to `EventType` payloads → `sentient:events:domain`; Orchestrator and Realtime consume, UI mirrors via WS, commands return on `sentient:commands:device` → MQTT device command topics.
 - PostgreSQL holds clients/venues/rooms/controllers/devices via Prisma; Redis backs pub/sub and transient session state; MQTT broker lives at `sentientengine.ai:1883` (external, host-network binding locally).
-- Design principles: **hardware-dumb/software-smart** (all game logic centralized), event-driven, shared types across monorepo, **safety-first** (maglocks fail-safe, e-stop flows documented in `SENTIENT_DATA_FLOW.md`).
+- Design principles: **hardware-dumb/software-smart** (all game logic centralized), event-driven, shared types across monorepo, **safety-first** (maglocks fail-safe, e-stop flows documented in `docs/SENTIENT_DATA_FLOW.md`).
 
 ## Repo & Runtime Basics
 
@@ -72,6 +72,6 @@
 
 ## Key References
 
-- `SYSTEM_ARCHITECTURE_v4.md` holds canonical component boundaries and mermaid diagrams.
-- `SENTIENT_DATA_FLOW.md`, `Sentient_Engine_Deployment_Guide.md`, and `Mac_Studio_Sentient_Setup_Guide.md` cover networking, deployment, and local setup specifics.
-- `Sentient_Admin_Topology_Dashboard_Spec.md`, `UI_PAGES.md`, and `UI_Tasks_and_Procedures.md` define current UI behavior.
+- `docs/SYSTEM_ARCHITECTURE_v4.md` holds canonical component boundaries and mermaid diagrams.
+- `docs/SENTIENT_DATA_FLOW.md`, `docs/Sentient_Engine_Deployment_Guide.md`, and `docs/Mac_Studio_Sentient_Setup_Guide.md` cover networking, deployment, and local setup specifics.
+- `docs/Sentient_Admin_Topology_Dashboard_Spec.md`, `docs/UI_PAGES.md`, and `docs/UI_Tasks_and_Procedures.md` define current UI behavior.

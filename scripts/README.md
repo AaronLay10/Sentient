@@ -83,5 +83,5 @@ docker compose -f docker-compose.prod.yml exec postgres psql -U sentient sentien
 ## See Also
 
 - [`deploy.local.sh`](../deploy.local.sh) - Local stack helper honoring `.env.sentient.local`
-- [DEPLOYMENT.md](../DEPLOYMENT.md) - Complete deployment guide
-- [Sentient_Engine_Deployment_Guide.md](../Sentient_Engine_Deployment_Guide.md) - Server setup guide
+- [DEPLOYMENT.md](../docs/DEPLOYMENT.md) - Complete deployment guide
+- [Sentient_Engine_Deployment_Guide.md](../docs/Sentient_Engine_Deployment_Guide.md) - Server setup guide

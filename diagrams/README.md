@@ -57,7 +57,7 @@ After importing:
 
 These diagrams are extracted from:
 
-- `/Users/aaron/Sentient/SENTIENT_DATA_FLOW.md`
-- `/Users/aaron/Sentient/SYSTEM_ARCHITECTURE_v4.md`
+- `/Users/aaron/Sentient/docs/SENTIENT_DATA_FLOW.md`
+- `/Users/aaron/Sentient/docs/SYSTEM_ARCHITECTURE_v4.md`
 
 For detailed explanations of each flow, refer to the main documentation.
