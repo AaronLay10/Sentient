@@ -16,7 +16,7 @@ import '@xyflow/react/dist/style.css';
 import { NodePalette } from '../components/SceneEditor/NodePalette';
 import { PropertiesPanel } from '../components/SceneEditor/PropertiesPanel';
 import { SceneNode } from '../components/SceneEditor/SceneNode';
-import { api, type Room, type Device, type Scene } from '../lib/api';
+import { api, type Room, type Device, type Scene, type Puzzle } from '../lib/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import styles from './SceneEditor.module.css';
 
@@ -214,6 +214,13 @@ function SceneEditorInner() {
   const { data: scenes = [] } = useQuery<Scene[]>({
     queryKey: ['scenes', selectedClientId, selectedRoomId],
     queryFn: () => api.getScenes(selectedClientId, selectedRoomId),
+    enabled: !!selectedClientId && !!selectedRoomId,
+  });
+
+  // Fetch puzzles for selected room
+  const { data: puzzles = [] } = useQuery<Puzzle[]>({
+    queryKey: ['puzzles', selectedClientId, selectedRoomId],
+    queryFn: () => api.getPuzzles(selectedClientId, selectedRoomId),
     enabled: !!selectedClientId && !!selectedRoomId,
   });
 
@@ -447,6 +454,8 @@ function SceneEditorInner() {
     data: {
       ...node.data,
       devices,
+      puzzles: puzzles.map(p => ({ id: p.id, name: p.name, description: p.description })),
+      roomId: selectedRoomId,
       onConfigChange: updateNodeConfig,
       onDataChange: updateNodeData,
       isRunning: node.id === runningNodeId,

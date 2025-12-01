@@ -4,9 +4,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardLayout } from './components/Layout/DashboardLayout';
 import { Login } from './pages/Login';
 import { SystemMonitor } from './pages/SystemMonitor';
-import { Overview } from './pages/Overview';
-import { Topology } from './pages/Topology';
 import { SceneEditor } from './pages/SceneEditor';
+import { PuzzleEditor } from './pages/PuzzleEditor';
 import { Controllers } from './pages/Controllers';
 import { Devices } from './pages/Devices';
 import { Rooms } from './pages/Rooms';
@@ -46,9 +45,8 @@ function App() {
           >
             <Route index element={<Navigate to="/monitor" replace />} />
             <Route path="monitor" element={<SystemMonitor />} />
-            <Route path="overview" element={<Overview />} />
-            <Route path="topology" element={<Topology />} />
             <Route path="scenes" element={<SceneEditor />} />
+            <Route path="puzzles" element={<PuzzleEditor />} />
             <Route path="power-control" element={<PowerControl />} />
             <Route path="lighting" element={<LightingControl />} />
             <Route path="controllers" element={<Controllers />} />

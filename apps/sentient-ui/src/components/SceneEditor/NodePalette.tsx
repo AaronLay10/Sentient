@@ -28,9 +28,7 @@ const NODE_CATEGORIES = {
     { type: 'sensor', subtype: 'weight', label: 'Weight Sensor', description: 'Load cell threshold', icon: '⚖', color: '#34d399' },
   ],
   Puzzles: [
-    { type: 'puzzle', subtype: 'sequence', label: 'Sequence Check', description: 'Verify input sequence', icon: '⧉', color: '#6366f1' },
-    { type: 'puzzle', subtype: 'combination', label: 'Combination Lock', description: 'Code verification', icon: '🔐', color: '#6366f1' },
-    { type: 'puzzle', subtype: 'pattern', label: 'Pattern Match', description: 'Compare pattern input', icon: '◫', color: '#6366f1' },
+    { type: 'puzzle', subtype: 'puzzle-trigger', label: 'Puzzle', description: 'Trigger a puzzle from the room', icon: '🧩', color: '#6366f1' },
   ],
   Effects: [
     { type: 'effect', subtype: 'light', label: 'Lighting', description: 'Control lights/LEDs', icon: '💡', color: '#f472b6' },

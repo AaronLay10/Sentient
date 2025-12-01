@@ -38,7 +38,12 @@
       "Bash(do if [ -f \"$dir/controller_naming.h\" ])",
       "Bash([ ! -d \"$dir/build\" ])",
       "Bash(then if grep -q \"CAT_ACKNOWLEDGEMENT\" \"$dir/controller_naming.h\")",
-      "Bash(then echo \"$dir: ✓ HAS CAT_ACKNOWLEDGEMENT\" else echo \"$dir: ✗ MISSING CAT_ACKNOWLEDGEMENT\" fi fi done)"
+      "Bash(then echo \"$dir: ✓ HAS CAT_ACKNOWLEDGEMENT\" else echo \"$dir: ✗ MISSING CAT_ACKNOWLEDGEMENT\" fi fi done)",
+      "Bash(pnpm install:*)",
+      "Bash(/opt/homebrew/bin/pnpm install:*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\")",
+      "Bash(pnpm -r build:*)",
+      "Bash(pnpm exec prisma generate:*)"
     ],
     "deny": [],
     "ask": []
