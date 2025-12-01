@@ -54,8 +54,8 @@ export function Login() {
         storage.setItem('sentient_user', JSON.stringify(data.user));
       }
 
-      // Navigate to overview page
-      navigate('/overview');
+      // Navigate to monitor page
+      navigate('/monitor');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     } finally {
