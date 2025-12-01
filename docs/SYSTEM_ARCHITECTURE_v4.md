@@ -1,8 +1,9 @@
-# Sentient Engine  
+# Sentient Engine
+
 **System Architecture – Idealized Unified Design**
 
 **Version:** 4.0.0  
-**Status:** Target / Reference Architecture (Authoritative Design)  
+**Status:** Target / Reference Architecture (Authoritative Design)
 
 ---
 
@@ -12,13 +13,13 @@ Sentient Engine is a **theatrical control and orchestration platform** for escap
 
 The platform coordinates:
 
-- **Controllers**  
-  - Teensy 4.1 nodes  
-  - Raspberry Pi (3/4/5)  
-  - ESP32 / similar microcontrollers  
-  - Music players / media PCs  
+- **Controllers**
+  - Teensy 4.1 nodes
+  - Raspberry Pi (3/4/5)
+  - ESP32 / similar microcontrollers
+  - Music players / media PCs
   - Windows/Linux PCs running Sentient agents
-- **Devices** – hardware endpoints connected to controllers:  
+- **Devices** – hardware endpoints connected to controllers:
   - relays, sensors, maglocks, lighting, audio, motors, stepper motors, actuators, etc.
 - **Room displays and AV** – Pi/browser-based displays, speakers, projectors
 - **Game logic and scene progression**
@@ -28,11 +29,11 @@ The platform coordinates:
 
 This document describes the **ideal unified architecture** for Sentient Engine:
 
-- Logical components and their responsibilities  
-- Technologies and frameworks  
-- Data and messaging design  
-- Network and security model  
-- Repository and file structure  
+- Logical components and their responsibilities
+- Technologies and frameworks
+- Data and messaging design
+- Network and security model
+- Repository and file structure
 
 It is intentionally **prescriptive**: this is the design we optimize toward, even if the current implementation differs.
 
@@ -43,35 +44,35 @@ It is intentionally **prescriptive**: this is the design we optimize toward, eve
 **Platform Name:** Sentient Engine  
 **Runtime OS:** Ubuntu (24.x) on x86_64  
 **Primary Deployment:** On-prem single-server per site (e.g., Paragon-Mesa), cloud-capable in future  
-**Core Language:** TypeScript (Node.js) for all backend and orchestration logic  
+**Core Language:** TypeScript (Node.js) for all backend and orchestration logic
 
 ### Design Principles
 
-1. **Hardware-dumb, Software-smart**  
-   - Controllers (Teensy, Pi, ESP32, etc.) are deterministic field I/O modules.  
+1. **Hardware-dumb, Software-smart**
+   - Controllers (Teensy, Pi, ESP32, etc.) are deterministic field I/O modules.
    - All story, puzzle, and scene logic lives centrally in Sentient services.
 
-2. **Single Source of Truth**  
+2. **Single Source of Truth**
    - PostgreSQL is the canonical database for clients, rooms, controllers, devices, scenes, sessions, and events.
 
-3. **Event-Driven Real-Time**  
-   - MQTT for controller/device communication.  
-   - WebSockets for UI real-time updates.  
+3. **Event-Driven Real-Time**
+   - MQTT for controller/device communication.
+   - WebSockets for UI real-time updates.
    - Domain events flow through the system as first-class citizens.
 
-4. **Strong Boundaries**  
+4. **Strong Boundaries**
    - Clear separation between:
-     - Controller/device IO (MQTT Gateway)  
-     - Game logic (Orchestrator)  
-     - API & configuration (API Service)  
-     - Realtime delivery (Realtime Gateway)  
-     - UI (GM, admin, room displays)  
+     - Controller/device IO (MQTT Gateway)
+     - Game logic (Orchestrator)
+     - API & configuration (API Service)
+     - Realtime delivery (Realtime Gateway)
+     - UI (GM, admin, room displays)
 
-5. **Monorepo, Shared Types**  
+5. **Monorepo, Shared Types**
    - A single repository with shared TypeScript types and domain models used across all services, UIs, and simulators.
 
-6. **Safety First**  
-   - Maglocks fail-safe by design.  
+6. **Safety First**
+   - Maglocks fail-safe by design.
    - Dedicated safety flows and states separate from “fun game logic”.
 
 ---
@@ -193,21 +194,21 @@ Sentient Engine uses a consistent domain model across controllers, services, and
 ### 4.2 Relationships
 
 - A **Client** has many **Venues**.
-- A **Venue** has many **Rooms**.  
-- A **Room** has many **Controllers**.  
-- A **Controller** has many **Devices**.  
-- A **Puzzle** references one or more **Devices** (and therefore Controllers) as inputs/outputs.  
-- A **Scene** references many **Puzzles**, and optionally Devices directly for environmental effects.  
+- A **Venue** has many **Rooms**.
+- A **Room** has many **Controllers**.
+- A **Controller** has many **Devices**.
+- A **Puzzle** references one or more **Devices** (and therefore Controllers) as inputs/outputs.
+- A **Scene** references many **Puzzles**, and optionally Devices directly for environmental effects.
 - A **GameSession** belongs to a Room and is associated with many Events.
 
 ### 4.3 Global Naming Conventions (CRITICAL)
 
 All identifiers across the stack use **snake_case**:
 
-- Database table and column names  
-- MQTT topic segments  
-- API JSON fields  
-- Config files and scene definitions  
+- Database table and column names
+- MQTT topic segments
+- API JSON fields
+- Config files and scene definitions
 
 This avoids translation bugs and keeps mental overhead low.
 
@@ -224,27 +225,27 @@ All core services are **TypeScript/Node.js** applications, containerized with Do
 **Responsibilities:**
 
 - Client & venue management
-- Room, controller, device, puzzle, and scene configuration  
-- User, role, and permission management  
-- GameSession lifecycle APIs (create, start, stop, pause, resume)  
-- Auth (login, token issuance, session tracking)  
-- Querying historical events and analytics summaries  
+- Room, controller, device, puzzle, and scene configuration
+- User, role, and permission management
+- GameSession lifecycle APIs (create, start, stop, pause, resume)
+- Auth (login, token issuance, session tracking)
+- Querying historical events and analytics summaries
 
 **Tech:**
 
-- Node.js + TypeScript  
-- Framework: NestJS or Fastify (modular architecture)  
-- ORM: Prisma (PostgreSQL)  
-- Auth: JWT, bcrypt for password hashing  
+- Node.js + TypeScript
+- Framework: NestJS or Fastify (modular architecture)
+- ORM: Prisma (PostgreSQL)
+- Auth: JWT, bcrypt for password hashing
 
 **Key Example Endpoints:**
 
-- `POST /api/v1/auth/login`  
-- `GET /api/v1/clients/:client_id/rooms`  
-- `GET /api/v1/rooms/:room_id/controllers`  
-- `GET /api/v1/controllers/:controller_id/devices`  
-- `POST /api/v1/rooms/:room_id/game_sessions`  
-- `POST /api/v1/game_sessions/:id/halt`  
+- `POST /api/v1/auth/login`
+- `GET /api/v1/clients/:client_id/rooms`
+- `GET /api/v1/rooms/:room_id/controllers`
+- `GET /api/v1/controllers/:controller_id/devices`
+- `POST /api/v1/rooms/:room_id/game_sessions`
+- `POST /api/v1/game_sessions/:id/halt`
 
 ---
 
@@ -254,25 +255,25 @@ All core services are **TypeScript/Node.js** applications, containerized with Do
 
 **Responsibilities:**
 
-- Load room, controller, device, puzzle, and scene configuration from Postgres  
-- Maintain per-room state machines for active GameSessions  
-- Process events from controllers/devices (via MQTT Gateway)  
+- Load room, controller, device, puzzle, and scene configuration from Postgres
+- Maintain per-room state machines for active GameSessions
+- Process events from controllers/devices (via MQTT Gateway)
 - Apply game rules:
   - Puzzle gating and dependencies
   - Scene transitions
   - Timeouts and timed events
   - Safety/lockdown behaviors
-- Emit domain events (e.g., `puzzle_solved`, `scene_advanced`)  
-- Issue high-level commands to controllers/devices via MQTT Gateway  
+- Emit domain events (e.g., `puzzle_solved`, `scene_advanced`)
+- Issue high-level commands to controllers/devices via MQTT Gateway
 
 **Tech:**
 
-- Node.js + TypeScript  
+- Node.js + TypeScript
 - Domain-driven design:
-  - `domain/` – entities, value objects, domain events  
-  - `application/` – use cases, orchestrators, handlers  
-- Uses Redis pub/sub for real-time internal events  
-- Uses Postgres for persisted state and replayability  
+  - `domain/` – entities, value objects, domain events
+  - `application/` – use cases, orchestrators, handlers
+- Uses Redis pub/sub for real-time internal events
+- Uses Postgres for persisted state and replayability
 
 ---
 
@@ -282,17 +283,17 @@ All core services are **TypeScript/Node.js** applications, containerized with Do
 
 **Responsibilities:**
 
-- Connect to the Mosquitto MQTT broker  
-- Subscribe to all controller/device state topics  
-- Validate and normalize payloads (JSON schema, versioning)  
-- Convert low-level controller/device states into domain events for the Orchestrator  
+- Connect to the Mosquitto MQTT broker
+- Subscribe to all controller/device state topics
+- Validate and normalize payloads (JSON schema, versioning)
+- Convert low-level controller/device states into domain events for the Orchestrator
 - Accept outgoing commands from Orchestrator (via Redis) and publish to controller/device command topics
 
 **Tech:**
 
-- Node.js + TypeScript  
-- MQTT client library  
-- Redis pub/sub for communication with Orchestrator  
+- Node.js + TypeScript
+- MQTT client library
+- Redis pub/sub for communication with Orchestrator
 
 **Topic Patterns (Sentient v4 Standard):**
 
@@ -327,6 +328,7 @@ The category-first structure enables efficient MQTT broker filtering and system-
   - `sentient/system/register/device`
 
 **Rationale:**
+
 - **Category-first** enables efficient wildcard subscriptions: `paragon/+/commands/#` subscribes to all commands across all rooms
 - **Tenant scoping** (`paragon`, `sentient`) allows multi-tenancy on single broker
 - **Room isolation** prevents cross-room interference
@@ -370,13 +372,13 @@ Example sensor state payload:
 - Join clients to per-room / per-client channels
   - e.g., `room:<room_id>`, `client:<client_id>`
 - Listen for domain events via Redis pub/sub and fan-out to connected sockets
-- Accept control commands from UIs (skip puzzle, trigger hint, force open lock) and forward them to Orchestrator/API  
+- Accept control commands from UIs (skip puzzle, trigger hint, force open lock) and forward them to Orchestrator/API
 
 **Tech:**
 
-- Node.js + TypeScript  
-- WebSocket server (`ws` or `socket.io`)  
-- Redis pub/sub  
+- Node.js + TypeScript
+- WebSocket server (`ws` or `socket.io`)
+- Redis pub/sub
 
 ---
 
@@ -386,19 +388,19 @@ Example sensor state payload:
 
 **Responsibilities:**
 
-- Aggregate GameSession data into summaries  
-- Cleanup of old events/logs  
+- Aggregate GameSession data into summaries
+- Cleanup of old events/logs
 - Analytics for:
   - Hint usage
   - Puzzle bottlenecks
   - Room utilization
-- Optional exports to CSV or external BI tools  
+- Optional exports to CSV or external BI tools
 
 **Tech:**
 
-- Node.js + TypeScript  
-- Scheduling via `node-cron` or similar  
-- Talks directly to Postgres and Redis  
+- Node.js + TypeScript
+- Scheduling via `node-cron` or similar
+- Talks directly to Postgres and Redis
 
 ---
 
@@ -413,16 +415,19 @@ Example sensor state payload:
 **Features:**
 
 **Authentication:**
+
 - JWT-based login system with session persistence
 - Protected routes with automatic token validation and expiry handling
 
 **Network Visualization:**
+
 - Real-time network topology view with circular radial layout
 - Animated pulses showing controller/device communication
 - Room-based color coding and health status indicators
 - Live metrics sidebar with throughput graphs
 
 **Scene Editor:**
+
 - Flow-based visual programming interface using React Flow
 - Drag-and-drop node palette with 22+ component types:
   - Triggers (scene start, timers)
@@ -434,6 +439,7 @@ Example sensor state payload:
 - Properties panel for node/scene configuration
 
 **Configuration & Management:**
+
 - Client & venue management (CRUD operations)
 - Room configuration with hierarchical client → venue → room structure
 - User management with role-based access control (OWNER, GM, TECH, VIEWER)
@@ -441,6 +447,7 @@ Example sensor state payload:
 - Scene graphs and puzzle definitions
 
 **Live Game Master Operations:**
+
 - GM Console with real-time device monitoring
 - Event feed showing controller heartbeats and state changes
 - Session controls for active game rooms
@@ -468,16 +475,16 @@ Example sensor state payload:
 
 A **Controller** is any networked compute unit that:
 
-- Connects to the MQTT broker  
-- Manages one or more Devices  
-- Runs a lightweight Sentient “agent” or firmware  
+- Connects to the MQTT broker
+- Manages one or more Devices
+- Runs a lightweight Sentient “agent” or firmware
 - Exposes a consistent configuration model (controller_id, room_id, device map)
 
 Controllers can be:
 
-- Microcontrollers (Teensy 4.1, ESP32)  
-- Single-board computers (Raspberry Pi)  
-- Full PCs (Windows/Linux boxes running specialized control apps)  
+- Microcontrollers (Teensy 4.1, ESP32)
+- Single-board computers (Raspberry Pi)
+- Full PCs (Windows/Linux boxes running specialized control apps)
 
 ### 6.1.1 Teensy 4.1 Controllers
 
@@ -492,11 +499,13 @@ Controllers can be:
 **Command Handling with Acknowledgements:**
 
 When a controller receives a command:
+
 1. Execute the physical action (toggle relay, move motor, etc.)
 2. Publish acknowledgement to `<tenant>/<room>/acknowledgement/<controller>/<device>/<command>`
 3. Include new device state in acknowledgement payload
 
 Example acknowledgement payload:
+
 ```json
 {
   "v": 1,
@@ -512,45 +521,45 @@ Teensy firmware:
 
 - Does **not** contain puzzle logic
 - Only implements deterministic I/O behavior per configuration
-- **Must** publish acknowledgements after executing commands for real-time UI feedback  
+- **Must** publish acknowledgements after executing commands for real-time UI feedback
 
 ### 6.1.2 Pi / PC Controllers
 
 Used where more complex local behavior is needed:
 
-- Media playback  
-- Complex device protocols  
-- Bridging legacy hardware  
+- Media playback
+- Complex device protocols
+- Bridging legacy hardware
 
 They still follow the same model:
 
-- Identify as a controller in Sentient  
-- Manage devices (logical)  
-- Communicate via MQTT using the same topic structure  
+- Identify as a controller in Sentient
+- Manage devices (logical)
+- Communicate via MQTT using the same topic structure
 
 ### 6.2 Devices
 
 Devices are physical endpoints attached to controllers:
 
-- Inputs: switches, sensors, encoders, RFID readers, keypads  
-- Outputs: relays, LEDs, DMX channels, audio triggers, motors  
+- Inputs: switches, sensors, encoders, RFID readers, keypads
+- Outputs: relays, LEDs, DMX channels, audio triggers, motors
 
 From the Sentient Engine perspective, Devices are:
 
-- Defined and configured in the API / Admin UI  
-- Known by `device_id` and `controller_id`  
-- Exposed over MQTT as per-topic state/command channels  
+- Defined and configured in the API / Admin UI
+- Known by `device_id` and `controller_id`
+- Exposed over MQTT as per-topic state/command channels
 
 ### 6.3 Safety & Maglocks
 
 Safety is enforced by both hardware and software layers:
 
-- Maglock circuits wired to **fail safe** on power loss or hard emergency stop  
-- Safety relays and e-stop circuits are **hardware-domain**, not just software  
+- Maglock circuits wired to **fail safe** on power loss or hard emergency stop
+- Safety relays and e-stop circuits are **hardware-domain**, not just software
 - Sentient can:
   - release doors
   - drop power to locks
-  - log safety events  
+  - log safety events
 
 …but cannot prevent a physical e-stop from releasing them.
 
@@ -562,19 +571,19 @@ Safety is enforced by both hardware and software layers:
 
 PostgreSQL holds all persistent data:
 
-- Clients, venues, rooms  
-- Controllers, controller types, controller configs  
-- Devices, device types, device configs  
-- Puzzles, scenes, scene graphs  
-- GameSessions (metadata)  
-- Events (fine-grained logs)  
-- Users, roles, permissions  
-- Audit logs  
+- Clients, venues, rooms
+- Controllers, controller types, controller configs
+- Devices, device types, device configs
+- Puzzles, scenes, scene graphs
+- GameSessions (metadata)
+- Events (fine-grained logs)
+- Users, roles, permissions
+- Audit logs
 
 Access layer:
 
-- Prisma schemas in `infra/migrations` and `apps/api-service`  
-- Migrations versioned and applied through a controlled pipeline  
+- Prisma schemas in `infra/migrations` and `apps/api-service`
+- Migrations versioned and applied through a controlled pipeline
 
 ### 7.2 Redis (Cache & Event Bus)
 
@@ -603,7 +612,7 @@ Redis is used for:
 2. MQTT Gateway receives acknowledgement and publishes `device_state_changed` to Redis
 3. HeartbeatEventHandler in API Service receives event and persists state to PostgreSQL
 4. Realtime Gateway receives event and pushes to connected WebSocket clients
-5. UI updates in real-time; page refresh loads persisted state from database  
+5. UI updates in real-time; page refresh loads persisted state from database
 
 ---
 
@@ -630,6 +639,7 @@ All topics follow the pattern: `<tenant>/<room_id>/<category>/<controller_id>/<d
   - Example: `paragon/clockwork/status/power_control_upper_right/heartbeat`
 
 **Benefits of category-first structure:**
+
 - System-wide monitoring: `paragon/+/commands/#` captures all commands across all rooms
 - Security/ACL by message type: Grant services access only to specific categories
 - Better MQTT broker performance with fewer subscription trees
@@ -641,12 +651,12 @@ All topics follow the pattern: `<tenant>/<room_id>/<category>/<controller_id>/<d
 
 ### 8.2 HTTP / WebSocket
 
-- REST endpoints under `/api/v1/...` on API Service.  
+- REST endpoints under `/api/v1/...` on API Service.
 - Realtime Gateway exposes a WebSocket endpoint like:
-  - `wss://sentientengine.local/ws`  
+  - `wss://sentientengine.local/ws`
 - Clients:
   - Authenticate using JWT on connection
-  - Subscribe to room/client channels for live updates  
+  - Subscribe to room/client channels for live updates
 
 ---
 
@@ -656,18 +666,18 @@ All topics follow the pattern: `<tenant>/<room_id>/<category>/<controller_id>/<d
 
 **Core VLANs:**
 
-- **VLAN 20 – Sentient Services**  
-  - `192.168.20.0/24`  
+- **VLAN 20 – Sentient Services**
+  - `192.168.20.0/24`
   - Hosts: Sentient server, Docker stack (Postgres, Mosquitto, API, ORCH, RTGW, etc.)
 
-- **VLAN 30 – Controllers (Teensy / Pi / PCs)**  
-  - `192.168.30.0/24`  
-  - All controllers and room displays  
+- **VLAN 30 – Controllers (Teensy / Pi / PCs)**
+  - `192.168.30.0/24`
+  - All controllers and room displays
   - Limited, controlled access to Services VLAN only
 
-- **VLAN 50 – Staff (GM / Tech)**  
-  - GM PCs, tablets, tech machines  
-  - Access to Sentient Web UIs and SSH to server  
+- **VLAN 50 – Staff (GM / Tech)**
+  - GM PCs, tablets, tech machines
+  - Access to Sentient Web UIs and SSH to server
 
 Guest WiFi, cameras, and other networks remain isolated.
 
@@ -678,7 +688,7 @@ Simplified LAN IN rules (e.g., UDM Pro):
 1. **ALLOW** VLAN 30 → VLAN 20 for:
    - TCP 1883 (MQTT)
    - TCP 80/443 (HTTP/HTTPS for APIs/room UI)
-2. **DENY** lateral traffic within VLAN 30 except ESTABLISHED/RELATED.  
+2. **DENY** lateral traffic within VLAN 30 except ESTABLISHED/RELATED.
 3. **ALLOW** VLAN 50 → VLAN 20 for:
    - Web UI (80/443)
    - SSH (22) for admins
@@ -735,14 +745,14 @@ docker compose down           # Stop all services
 ### 10.1 Authentication & Authorization
 
 - JWT-based auth for all UIs and API clients.
-- Tokens include: `user_id`, `role`, `client_id`, `iat`, `exp`.  
+- Tokens include: `user_id`, `role`, `client_id`, `iat`, `exp`.
 - Sessions tracked in DB for revocation and auditing.
 
 **Example roles:**
 
-- `OWNER` – Full client control.  
-- `GM` – Operate rooms and sessions.  
-- `TECH` – Configure controllers/devices/puzzles.  
+- `OWNER` – Full client control.
+- `GM` – Operate rooms and sessions.
+- `TECH` – Configure controllers/devices/puzzles.
 - `VIEWER` – Read-only access.
 
 Authorization enforced at the API layer, with all operations scoped by client and room.
@@ -767,35 +777,35 @@ Secrets are loaded via `env_file: .env.sentient` in docker-compose.yml.
 
 ### 11.1 Logging
 
-- All services log in **structured JSON** to stdout.  
-- `promtail` or equivalent ships logs to `loki`.  
+- All services log in **structured JSON** to stdout.
+- `promtail` or equivalent ships logs to `loki`.
 - Grafana provides per-service and cross-service log views.
 
 ### 11.2 Metrics
 
 Prometheus scrapes metrics from:
 
-- API Service – request latency, error rates  
-- Orchestrator – events processed, active sessions per room  
-- MQTT Gateway – message rates, disconnects, error counts  
-- Realtime Gateway – connection counts, events per room  
+- API Service – request latency, error rates
+- Orchestrator – events processed, active sessions per room
+- MQTT Gateway – message rates, disconnects, error counts
+- Realtime Gateway – connection counts, events per room
 - System – CPU, memory, disk, network
 
 Grafana dashboards include:
 
-- Room & controller heartbeat  
-- MQTT broker health  
-- Game session performance (average time, hints, fail rates)  
-- System resource utilization on Sentient server  
+- Room & controller heartbeat
+- MQTT broker health
+- Game session performance (average time, hints, fail rates)
+- System resource utilization on Sentient server
 
 ### 11.3 Alerts (Future)
 
 Prometheus alert rules for:
 
-- Broker unreachable  
-- Controller offline > X minutes  
-- Orchestrator crash loops  
-- DB connection pool saturation  
+- Broker unreachable
+- Controller offline > X minutes
+- Orchestrator crash loops
+- DB connection pool saturation
 
 Alerts can be routed via email, SMS, Slack/Discord, etc.
 
@@ -818,22 +828,43 @@ Sentient/                      # repo root
     sentient-ui/               # Unified Admin & GM Console
     device-simulators/
   packages/
+    core-domain/
+    shared-config/
+    shared-logging/
+    shared-messaging/
     shared-types/
   hardware/
     Controller Code Teensy/    # Teensy firmware projects
+    Custom Libraries/          # Arduino libraries
+    Raspberry Pis/             # Pi launchers & scripts
+    HEX_OUTPUT/                # Compiled firmware
   nginx/
     nginx.conf
     sites/
     ssl/
   docs/
-    SYSTEM_ARCHITECTURE_v4.md
-    NETWORK_DESIGN.md
-    HARDWARE_STANDARDS.md
-    OPERATIONS_RUNBOOK.md
+    SYSTEM_ARCHITECTURE_v4.md  # System architecture (this file)
+    SENTIENT_DATA_FLOW.md      # Event flows and MQTT topics
+    DEPLOYMENT.md              # Production deployment guide
+    Sentient_Engine_Deployment_Guide.md  # Server setup guide
+    Mac_Studio_Sentient_Setup_Guide.md   # Local dev setup
+    BRANDING.md                # Brand guidelines
+    UI_PAGES.md                # UI page specifications
+    UI_Tasks_and_Procedures.md # UI operational docs
+    Sentient_Admin_Topology_Dashboard_Spec.md  # Dashboard specs
+    Performance_Enhancements.md # Performance optimization analysis
+    CLAUDE.md                  # AI agent quick reference
+    UI_BUILD_VARIABLES.md      # Vite environment config
+  diagrams/                    # Mermaid diagram sources
+  scripts/                     # Deployment & monitoring scripts
+  UI_Prototype/                # UI design prototypes
+  mosquitto/                   # MQTT broker config
   .env.sentient.example        # Template for environment config
   .env.sentient                # Actual config (gitignored)
   docker-compose.yml           # Single unified compose file
-  deploy.sh                    # Production deployment script
+  docker-compose.dev.yml       # Dev overrides
+  deploy.local.sh              # Local deployment script
+  deploy.prod.sh               # Production deployment script
   package.json
   pnpm-workspace.yaml
   tsconfig.base.json
@@ -912,18 +943,18 @@ apps/orchestrator-service/
 
 ### 12.4 Shared Packages
 
-- `packages/core-domain/` – shared domain models, enums, events.  
-- `packages/shared-types/` – DTOs, API interfaces, WS payload types.  
-- `packages/shared-config/` – env loading and validation helpers.  
-- `packages/shared-logging/` – logging utilities.  
+- `packages/core-domain/` – shared domain models, enums, events.
+- `packages/shared-types/` – DTOs, API interfaces, WS payload types.
+- `packages/shared-config/` – env loading and validation helpers.
+- `packages/shared-logging/` – logging utilities.
 - `packages/shared-messaging/` – MQTT/Redis channel conventions and schemas.
 
 ---
 
 ## 13. Document Status
 
-- This file represents the **ideal unified architecture** of **Sentient Engine**.  
-- Implementation should converge toward this design over time.  
+- This file represents the **ideal unified architecture** of **Sentient Engine**.
+- Implementation should converge toward this design over time.
 - Deviations must be intentional and documented in follow-up design notes.
 
 **Maintainer:** Sentient Engine Architecture  
