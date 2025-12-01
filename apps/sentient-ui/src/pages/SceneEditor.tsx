@@ -625,7 +625,7 @@ function SceneEditorInner() {
                       }
                       
                       const device = devices.find(d => d.id === nodeConfig.deviceId);
-                      const action = device?.actions.find(a => a.action_id === nodeConfig.action);
+                      const action = device?.actions?.find(a => a.action_id === nodeConfig.action);
                       
                       console.log(`🎬 Video command: ${device?.friendly_name} - ${action?.friendly_name || nodeConfig.action}`);
                       

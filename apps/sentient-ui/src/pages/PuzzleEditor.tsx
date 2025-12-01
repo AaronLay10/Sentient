@@ -311,7 +311,10 @@ function PuzzleEditorInner() {
   };
 
   const handleDetailsUpdate = (details: { name: string; description: string; timeout_seconds?: number; hint_text: string }) => {
-    setPuzzleInfo(details);
+    setPuzzleInfo({
+      ...details,
+      timeout_seconds: details.timeout_seconds,
+    });
     setShowDetailsModal(false);
   };
 
