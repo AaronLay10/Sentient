@@ -144,6 +144,26 @@ export interface Scene {
   updated_at: string;
 }
 
+export interface PuzzleGraph {
+  nodes: SceneNode[];
+  edges: SceneEdge[];
+}
+
+export interface Puzzle {
+  id: string;
+  clientId: string;
+  roomId: string;
+  name: string;
+  description?: string;
+  graph: PuzzleGraph;
+  timeout_seconds?: number;
+  hint_text?: string;
+  active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export const api = {
   // Controllers
   async getControllers(): Promise<Controller[]> {
@@ -317,6 +337,52 @@ export const api = {
       command,
       payload: payload || {},
     });
+    return response.data;
+  },
+
+  // Puzzles
+  async getPuzzles(clientId: string, roomId: string): Promise<Puzzle[]> {
+    const response = await client.get(`/clients/${clientId}/rooms/${roomId}/puzzles`);
+    return response.data;
+  },
+
+  async getPuzzle(clientId: string, roomId: string, puzzleId: string): Promise<Puzzle> {
+    const response = await client.get(`/clients/${clientId}/rooms/${roomId}/puzzles/${puzzleId}`);
+    return response.data;
+  },
+
+  async createPuzzle(clientId: string, roomId: string, data: {
+    name: string;
+    description?: string;
+    graph: PuzzleGraph;
+    timeout_seconds?: number;
+    hint_text?: string;
+    active?: boolean;
+    order?: number;
+  }): Promise<Puzzle> {
+    const response = await client.post(`/clients/${clientId}/rooms/${roomId}/puzzles`, data);
+    return response.data;
+  },
+
+  async updatePuzzle(clientId: string, roomId: string, puzzleId: string, data: {
+    name?: string;
+    description?: string;
+    graph?: PuzzleGraph;
+    timeout_seconds?: number;
+    hint_text?: string;
+    active?: boolean;
+    order?: number;
+  }): Promise<Puzzle> {
+    const response = await client.patch(`/clients/${clientId}/rooms/${roomId}/puzzles/${puzzleId}`, data);
+    return response.data;
+  },
+
+  async deletePuzzle(clientId: string, roomId: string, puzzleId: string): Promise<void> {
+    await client.delete(`/clients/${clientId}/rooms/${roomId}/puzzles/${puzzleId}`);
+  },
+
+  async duplicatePuzzle(clientId: string, roomId: string, puzzleId: string): Promise<Puzzle> {
+    const response = await client.post(`/clients/${clientId}/rooms/${roomId}/puzzles/${puzzleId}/duplicate`);
     return response.data;
   },
 };

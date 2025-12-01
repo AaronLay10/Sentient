@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { Eye, Cpu, Boxes, Building2, Users, Layout, Power, Clapperboard, LogOut, User, Network, Sun, Activity } from 'lucide-react';
+import { Cpu, Boxes, Building2, Users, Layout, Power, Clapperboard, LogOut, User, Sun, Activity, Puzzle } from 'lucide-react';
 import { getCurrentUser, logout } from '../ProtectedRoute';
 import './DashboardLayout.css';
 
@@ -30,16 +30,6 @@ export function DashboardLayout() {
             <span>Monitor</span>
           </NavLink>
 
-          <NavLink to="/overview" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            <Eye size={18} />
-            <span>Overview</span>
-          </NavLink>
-
-          <NavLink to="/topology" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            <Network size={18} />
-            <span>Topology</span>
-          </NavLink>
-
           <NavLink to="/power-control" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <Power size={18} />
             <span>Power</span>
@@ -55,6 +45,11 @@ export function DashboardLayout() {
           <NavLink to="/scenes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <Clapperboard size={18} />
             <span>Scenes</span>
+          </NavLink>
+
+          <NavLink to="/puzzles" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            <Puzzle size={18} />
+            <span>Puzzles</span>
           </NavLink>
 
           <NavLink to="/controllers" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>

@@ -17,6 +17,7 @@ import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
 import { KioskModule } from './kiosk/kiosk.module';
 import { ScenesModule } from './scenes/scenes.module';
+import { PuzzlesModule } from './puzzles/puzzles.module';
 import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.service';
 
 @Module({
@@ -54,7 +55,8 @@ import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.
     DevicesModule,
     AdminModule,
     KioskModule,
-    ScenesModule
+    ScenesModule,
+    PuzzlesModule
   ],
   controllers: [HealthController],
   providers: [HealthService, HeartbeatEventHandlerService],

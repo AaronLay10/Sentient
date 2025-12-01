@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Handle, Position, useReactFlow } from '@xyflow/react';
+import { useNavigate } from 'react-router-dom';
 import styles from './SceneNode.module.css';
 
 interface Device {
@@ -12,6 +13,12 @@ interface Device {
   }>;
 }
 
+interface PuzzleInfo {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 interface SceneNodeProps {
   id: string;
   data: {
@@ -22,6 +29,8 @@ interface SceneNodeProps {
     color: string;
     config?: any;
     devices?: Device[];
+    puzzles?: PuzzleInfo[];
+    roomId?: string;
     isRunning?: boolean;
     isAcknowledged?: boolean;
     onConfigChange?: (nodeId: string, config: any) => void;
@@ -32,6 +41,7 @@ interface SceneNodeProps {
 
 export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
   const { deleteElements } = useReactFlow();
+  const navigate = useNavigate();
   const hasInput = data.nodeType !== 'trigger' || data.subtype === 'timer';
   const hasMultipleOutputs = data.subtype === 'branch';
 
@@ -475,9 +485,56 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
             <div className={styles.value}>{data.config.audioFile}</div>
           </div>
         )}
-        
+
+        {/* Puzzle Node */}
+        {data.nodeType === 'puzzle' && data.subtype === 'puzzle-trigger' && (
+          <>
+            <div className={styles.field}>
+              <div className={styles.label}>Puzzle</div>
+              <select
+                className={`${styles.dropdown} nopan nodrag`}
+                value={data.config?.puzzleId || ''}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  const puzzle = data.puzzles?.find(p => p.id === e.target.value);
+                  data.onConfigChange?.(id, {
+                    puzzleId: e.target.value,
+                    puzzleName: puzzle?.name || ''
+                  });
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <option value="">Select puzzle...</option>
+                {data.puzzles?.map((puzzle) => (
+                  <option key={puzzle.id} value={puzzle.id}>
+                    {puzzle.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {data.config?.puzzleId && data.roomId && (
+              <div className={styles.field}>
+                <button
+                  className={`${styles.editButton} nopan nodrag`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/puzzles?roomId=${data.roomId}&puzzleId=${data.config.puzzleId}`);
+                  }}
+                >
+                  Edit Puzzle
+                </button>
+              </div>
+            )}
+            {(!data.puzzles || data.puzzles.length === 0) && (
+              <div className={styles.field}>
+                <div className={styles.hint}>No puzzles in this room. Create one in the Puzzle Editor.</div>
+              </div>
+            )}
+          </>
+        )}
+
         {/* Empty state for unconfigured nodes */}
-        {!data.config?.deviceName && !data.config?.device && !data.config?.duration && !data.config?.audioFile && !data.config?.deviceId && data.nodeType !== 'trigger' && (
+        {!data.config?.deviceName && !data.config?.device && !data.config?.duration && !data.config?.audioFile && !data.config?.deviceId && !data.config?.puzzleId && data.nodeType !== 'trigger' && data.nodeType !== 'puzzle' && (
           <div className={styles.field}>
             <div className={styles.label}>Status</div>
             <div className={styles.value}>Not configured</div>

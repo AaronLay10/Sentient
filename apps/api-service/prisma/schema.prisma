@@ -17,6 +17,7 @@ model Client {
   controllers Controller[]
   devices     Device[]
   scenes      Scene[]
+  puzzles     Puzzle[]
 }
 
 model Venue {
@@ -42,6 +43,7 @@ model Room {
   controllers Controller[]
   devices     Device[]
   scenes      Scene[]
+  puzzles     Puzzle[]
 
   @@unique([venueId, name])
   @@index([clientId])
@@ -144,6 +146,27 @@ model Scene {
   order       Int      @default(0)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([roomId])
+  @@unique([roomId, name])
+}
+
+model Puzzle {
+  id              String   @id @default(cuid())
+  clientId        String
+  roomId          String
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  room            Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  graph           Json     // Stores nodes and edges for puzzle logic flow
+  timeout_seconds Int?     // Optional timeout for puzzle
+  hint_text       String?  // Optional hint for players
+  active          Boolean  @default(true)
+  order           Int      @default(0)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   @@index([clientId])
   @@index([roomId])

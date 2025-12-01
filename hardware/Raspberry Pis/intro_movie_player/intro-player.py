@@ -326,7 +326,7 @@ class ClockworkIntroPlayer:
             '--audio-device=auto',
             '--audio-fallback-to-null=yes',
             '--no-audio-display',
-            '--loop-playlist',  # Loop whatever is in the playlist
+            '--loop-file=inf',  # Loop current file (controlled via IPC)
             '--input-ipc-server=' + self.ipc_socket,  # Enable IPC control
             '--keep-open=yes',  # Don't exit when file ends
             '--idle=yes',  # Stay open even with no file
@@ -366,13 +366,13 @@ class ClockworkIntroPlayer:
             return False
     
     def send_mpv_command(self, command):
-        """Send command to mpv via IPC socket"""
+        """Send command to mpv via IPC socket. Returns response or None on failure."""
         try:
             sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             sock.settimeout(2.0)
             sock.connect(self.ipc_socket)
             sock.send((json.dumps(command) + '\n').encode('utf-8'))
-            
+
             # Read response (may have multiple lines)
             response = b''
             sock.settimeout(0.5)
@@ -384,9 +384,9 @@ class ClockworkIntroPlayer:
                     response += chunk
             except socket.timeout:
                 pass  # Normal - we got all data
-            
+
             sock.close()
-            
+
             # Parse first JSON line (ignore event notifications)
             if response:
                 for line in response.decode('utf-8').strip().split('\n'):
@@ -394,56 +394,80 @@ class ClockworkIntroPlayer:
                         return json.loads(line)
                     except:
                         continue
-            return None
+            return {"error": "no_response"}
         except Exception as e:
-            logger.warning(f"IPC command issue: {e}")
+            logger.warning(f"IPC command failed: {e}")
             return None
+
+    def is_mpv_responsive(self):
+        """Check if mpv is running and responding to IPC commands"""
+        if not self.current_process or self.current_process.poll() is not None:
+            return False
+        if not os.path.exists(self.ipc_socket):
+            return False
+        # Try a simple command
+        result = self.send_mpv_command({"command": ["get_property", "pid"]})
+        return result is not None and "error" not in result
     
     def play_video(self, video_name):
         """Play specified video using seamless IPC control"""
         if video_name not in self.videos:
             logger.error(f"Unknown video: {video_name}")
             return
-            
+
         video_info = self.videos[video_name]
         video_path = video_info["file"]
-        
+
         if not video_path.exists():
             logger.error(f"Video not found: {video_path}")
             return
-            
+
         # Cancel return timer if exists
         if self.return_to_loop_timer:
             self.return_to_loop_timer.cancel()
             self.return_to_loop_timer = None
-        
-        # Check if mpv is running
-        if not self.current_process or self.current_process.poll() is not None:
-            logger.warning("MPV not running, restarting...")
+
+        # Check if mpv is running AND responsive
+        responsive = self.is_mpv_responsive()
+        logger.info(f"MPV responsive check: {responsive}")
+
+        if not responsive:
+            logger.warning("MPV not responsive, restarting...")
+            self.stop_video()
             self.start_mpv_player()
             time.sleep(0.5)
-        
-        # Clear playlist and load new video
+
         logger.info(f"▶ Switching to: {video_path.name}")
-        
-        # Clear current playlist
-        self.send_mpv_command({"command": ["playlist-clear"]})
-        
-        # Load new file (seamless transition)
-        self.send_mpv_command({
+
+        # Set loop mode BEFORE loading file
+        loop_value = "inf" if video_info["loop"] else "no"
+        loop_result = self.send_mpv_command({"command": ["set_property", "loop-file", loop_value]})
+        logger.info(f"Set loop-file={loop_value}, result: {loop_result}")
+
+        # Load new file
+        load_result = self.send_mpv_command({
             "command": ["loadfile", str(video_path), "replace"]
         })
-        
-        # Set loop mode
+        logger.info(f"Loadfile result: {load_result}")
+
+        # Verify command worked
+        if load_result is None:
+            logger.error("Failed to send loadfile command, restarting mpv...")
+            self.stop_video()
+            self.start_mpv_player()
+            # After restart, mpv is already playing loop - if we wanted intro, load it
+            if video_name == "intro":
+                time.sleep(0.3)
+                self.send_mpv_command({"command": ["set_property", "loop-file", "no"]})
+                self.send_mpv_command({"command": ["loadfile", str(video_path), "replace"]})
+
         if video_info["loop"]:
-            self.send_mpv_command({"command": ["set_property", "loop-file", "inf"]})
             logger.info(f"✓ Playing: {video_path.name} (looping)")
         else:
-            self.send_mpv_command({"command": ["set_property", "loop-file", "no"]})
             logger.info(f"✓ Playing: {video_path.name} ({video_info['duration']}s)")
-        
+
         self.current_video = video_name
-        
+
         # Schedule return to loop after intro
         if video_name == "intro":
             self.return_to_loop_timer = threading.Timer(
