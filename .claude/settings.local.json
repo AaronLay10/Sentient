@@ -48,7 +48,10 @@
       "Bash(./deploy.sh:*)",
       "Bash(PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\" which docker:*)",
       "Bash(docker-compose:*)",
-      "Bash(ssh techadmin@192.168.2.3:*)"
+      "Bash(ssh techadmin@192.168.2.3:*)",
+      "Bash(find:*)",
+      "Bash(arduino-cli compile:*)",
+      "Bash(./compile_teensy.sh:*)"
     ],
     "deny": [],
     "ask": []

@@ -18,3 +18,15 @@ nginx/ssl/
 # Docker volumes
 postgres_data/
 redis_data/
+
+# pnpm store
+.pnpm-store/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Hardware build artifacts
+hardware/HEX_OUTPUT/*.eep
+hardware/HEX_OUTPUT/*.elf
+hardware/HEX_OUTPUT/*.lst
+hardware/HEX_OUTPUT/*.sym
