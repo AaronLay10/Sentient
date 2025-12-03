@@ -176,6 +176,7 @@ SentientDeviceDef dev_green_box(
     DEV_GREEN_KEY_BOX,
     FRIENDLY_GREEN_KEY_BOX,
     "key_box",
+    naming::ACTION_TYPE_RELAY,
     green_box_commands, 3,
     green_box_sensors, 3);
 
@@ -183,6 +184,7 @@ SentientDeviceDef dev_yellow_box(
     DEV_YELLOW_KEY_BOX,
     FRIENDLY_YELLOW_KEY_BOX,
     "key_box",
+    naming::ACTION_TYPE_RELAY,
     yellow_box_commands, 3,
     yellow_box_sensors, 3);
 
@@ -190,6 +192,7 @@ SentientDeviceDef dev_blue_box(
     DEV_BLUE_KEY_BOX,
     FRIENDLY_BLUE_KEY_BOX,
     "key_box",
+    naming::ACTION_TYPE_RELAY,
     blue_box_commands, 3,
     blue_box_sensors, 3);
 
@@ -197,6 +200,7 @@ SentientDeviceDef dev_red_box(
     DEV_RED_KEY_BOX,
     FRIENDLY_RED_KEY_BOX,
     "key_box",
+    naming::ACTION_TYPE_RELAY,
     red_box_commands, 3,
     red_box_sensors, 3);
 

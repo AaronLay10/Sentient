@@ -96,12 +96,79 @@ export interface Device {
   friendly_name: string;
   device_type: string;
   device_category?: string;
+  action_type?: string;
   controller_id: string;
   status: 'operational' | 'warning' | 'error' | 'offline';
   properties?: Record<string, unknown>;
   actions?: DeviceAction[];
   created_at: string;
 }
+
+// Action type constants for device categorization
+export const ACTION_TYPES = {
+  // Input types
+  DIGITAL_SWITCH: 'digital_switch',
+  ANALOG_SENSOR: 'analog_sensor',
+  COUNTER: 'counter',
+  CODE_READER: 'code_reader',
+  // Output types
+  DIGITAL_RELAY: 'digital_relay',
+  ANALOG_PWM: 'analog_pwm',
+  RGB_LED: 'rgb_led',
+  POSITION_SERVO: 'position_servo',
+  POSITION_STEPPER: 'position_stepper',
+  MOTOR_CONTROL: 'motor_control',
+  TRIGGER: 'trigger',
+} as const;
+
+export type ActionType = typeof ACTION_TYPES[keyof typeof ACTION_TYPES];
+
+// Human-readable labels for action types
+export const ACTION_TYPE_LABELS: Record<string, string> = {
+  digital_switch: 'Digital Switch (On/Off Input)',
+  analog_sensor: 'Analog Sensor (Value Input)',
+  counter: 'Counter (Encoder)',
+  code_reader: 'Code Reader (RFID/IR)',
+  digital_relay: 'Digital Relay (On/Off Output)',
+  analog_pwm: 'PWM Dimmer (0-255)',
+  rgb_led: 'RGB LED Strip',
+  position_servo: 'Servo Motor',
+  position_stepper: 'Stepper Motor',
+  motor_control: 'Motor Control',
+  trigger: 'Trigger (One-Shot)',
+};
+
+// Icons for action types
+export const ACTION_TYPE_ICONS: Record<string, string> = {
+  digital_switch: '⏻',
+  analog_sensor: '📊',
+  counter: '🔄',
+  code_reader: '📡',
+  digital_relay: '🔌',
+  analog_pwm: '💡',
+  rgb_led: '🌈',
+  position_servo: '⚙️',
+  position_stepper: '📐',
+  motor_control: '🔧',
+  trigger: '⚡',
+};
+
+// Colors for action types
+export const ACTION_TYPE_COLORS: Record<string, string> = {
+  // Input types (green shades)
+  digital_switch: '#34d399',
+  analog_sensor: '#10b981',
+  counter: '#059669',
+  code_reader: '#047857',
+  // Output types (purple/pink shades)
+  digital_relay: '#8b5cf6',
+  analog_pwm: '#a78bfa',
+  rgb_led: '#f472b6',
+  position_servo: '#ec4899',
+  position_stepper: '#db2777',
+  motor_control: '#be185d',
+  trigger: '#ff8c42',
+};
 
 export interface Room {
   id: string;

@@ -109,6 +109,7 @@ model Device {
   friendly_name  String
   device_type    String
   device_category String?
+  action_type    String?
   properties     Json?
   current_state  Json?
   state_updated_at DateTime?
@@ -119,6 +120,7 @@ model Device {
   @@index([controllerId])
   @@index([clientId])
   @@index([roomId])
+  @@index([action_type])
   @@unique([controllerId, id])
 }
 

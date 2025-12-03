@@ -90,24 +90,24 @@ SentientDeviceDef dev_encoder_rb(naming::DEV_ENCODER_RB, "Encoder Right Bottom",
 
 // LED Ring devices (output)
 const char *led_commands[] = {naming::CMD_SET_COLOR};
-SentientDeviceDef dev_led_ring_a(naming::DEV_LED_RING_A, "LED Ring A", "led_ring", led_commands, 1);
-SentientDeviceDef dev_led_ring_b(naming::DEV_LED_RING_B, "LED Ring B", "led_ring", led_commands, 1);
-SentientDeviceDef dev_led_ring_c(naming::DEV_LED_RING_C, "LED Ring C", "led_ring", led_commands, 1);
-SentientDeviceDef dev_led_ring_d(naming::DEV_LED_RING_D, "LED Ring D", "led_ring", led_commands, 1);
-SentientDeviceDef dev_led_ring_e(naming::DEV_LED_RING_E, "LED Ring E", "led_ring", led_commands, 1);
-SentientDeviceDef dev_led_ring_f(naming::DEV_LED_RING_F, "LED Ring F", "led_ring", led_commands, 1);
+SentientDeviceDef dev_led_ring_a(naming::DEV_LED_RING_A, "LED Ring A", "led_ring", naming::ACTION_TYPE_RELAY, led_commands, 1);
+SentientDeviceDef dev_led_ring_b(naming::DEV_LED_RING_B, "LED Ring B", "led_ring", naming::ACTION_TYPE_RELAY, led_commands, 1);
+SentientDeviceDef dev_led_ring_c(naming::DEV_LED_RING_C, "LED Ring C", "led_ring", naming::ACTION_TYPE_RELAY, led_commands, 1);
+SentientDeviceDef dev_led_ring_d(naming::DEV_LED_RING_D, "LED Ring D", "led_ring", naming::ACTION_TYPE_RELAY, led_commands, 1);
+SentientDeviceDef dev_led_ring_e(naming::DEV_LED_RING_E, "LED Ring E", "led_ring", naming::ACTION_TYPE_RELAY, led_commands, 1);
+SentientDeviceDef dev_led_ring_f(naming::DEV_LED_RING_F, "LED Ring F", "led_ring", naming::ACTION_TYPE_RELAY, led_commands, 1);
 
 // Filament LED (output)
 const char *filament_commands[] = {naming::CMD_LED_ON, naming::CMD_LED_OFF};
-SentientDeviceDef dev_filament_led(naming::DEV_FILAMENT_LED, "Filament LED", "led", filament_commands, 2);
+SentientDeviceDef dev_filament_led(naming::DEV_FILAMENT_LED, "Filament LED", "led", naming::ACTION_TYPE_RELAY, filament_commands, 2);
 
 // Main Actuator (output)
 const char *actuator_commands[] = {naming::CMD_ACTUATOR_UP, naming::CMD_ACTUATOR_DOWN, naming::CMD_ACTUATOR_STOP};
-SentientDeviceDef dev_main_actuator(naming::DEV_MAIN_ACTUATOR, "Main Actuator", "actuator", actuator_commands, 3);
+SentientDeviceDef dev_main_actuator(naming::DEV_MAIN_ACTUATOR, "Main Actuator", "actuator", naming::ACTION_TYPE_MOTOR, actuator_commands, 3);
 
 // Forge Actuator (output)
 const char *forge_commands[] = {naming::CMD_FORGE_EXTEND, naming::CMD_FORGE_RETRACT};
-SentientDeviceDef dev_forge_actuator(naming::DEV_FORGE_ACTUATOR, "Forge Actuator", "actuator", forge_commands, 2);
+SentientDeviceDef dev_forge_actuator(naming::DEV_FORGE_ACTUATOR, "Forge Actuator", "actuator", naming::ACTION_TYPE_MOTOR, forge_commands, 2);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

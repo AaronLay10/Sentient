@@ -68,11 +68,11 @@ TVColor current_colors[4];
 
 const char *tv_commands[] = {naming::CMD_POWER_ON, naming::CMD_POWER_OFF, naming::CMD_SET_COLOR, naming::CMD_SET_BRIGHTNESS, naming::CMD_FLICKER};
 
-SentientDeviceDef dev_tv_vincent(naming::DEV_TV_VINCENT, "Vincent TV LEDs", "led_strip", tv_commands, 5);
-SentientDeviceDef dev_tv_edith(naming::DEV_TV_EDITH, "Edith TV LEDs", "led_strip", tv_commands, 5);
-SentientDeviceDef dev_tv_maks(naming::DEV_TV_MAKS, "Maks TV LEDs", "led_strip", tv_commands, 5);
-SentientDeviceDef dev_tv_oliver(naming::DEV_TV_OLIVER, "Oliver TV LEDs", "led_strip", tv_commands, 5);
-SentientDeviceDef dev_all_tvs(naming::DEV_ALL_TVS, "All TVs", "led_strip", tv_commands, 5);
+SentientDeviceDef dev_tv_vincent(naming::DEV_TV_VINCENT, "Vincent TV LEDs", "led_strip", naming::ACTION_TYPE_RGB, tv_commands, 5);
+SentientDeviceDef dev_tv_edith(naming::DEV_TV_EDITH, "Edith TV LEDs", "led_strip", naming::ACTION_TYPE_RGB, tv_commands, 5);
+SentientDeviceDef dev_tv_maks(naming::DEV_TV_MAKS, "Maks TV LEDs", "led_strip", naming::ACTION_TYPE_RGB, tv_commands, 5);
+SentientDeviceDef dev_tv_oliver(naming::DEV_TV_OLIVER, "Oliver TV LEDs", "led_strip", naming::ACTION_TYPE_RGB, tv_commands, 5);
+SentientDeviceDef dev_all_tvs(naming::DEV_ALL_TVS, "All TVs", "led_strip", naming::ACTION_TYPE_RGB, tv_commands, 5);
 
 SentientDeviceRegistry deviceRegistry;
 

@@ -102,6 +102,7 @@ SentientDeviceDef dev_button1(
     DEV_BUTTON_1,
     FRIENDLY_BUTTON_1,
     "button_sensor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     button1_sensors, 1);
 
@@ -109,6 +110,7 @@ SentientDeviceDef dev_button2(
     DEV_BUTTON_2,
     FRIENDLY_BUTTON_2,
     "button_sensor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     button2_sensors, 1);
 
@@ -116,6 +118,7 @@ SentientDeviceDef dev_button3(
     DEV_BUTTON_3,
     FRIENDLY_BUTTON_3,
     "button_sensor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     button3_sensors, 1);
 
@@ -123,6 +126,7 @@ SentientDeviceDef dev_button4(
     DEV_BUTTON_4,
     FRIENDLY_BUTTON_4,
     "button_sensor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     button4_sensors, 1);
 
@@ -130,6 +134,7 @@ SentientDeviceDef dev_button5(
     DEV_BUTTON_5,
     FRIENDLY_BUTTON_5,
     "button_sensor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     button5_sensors, 1);
 
@@ -137,6 +142,7 @@ SentientDeviceDef dev_button6(
     DEV_BUTTON_6,
     FRIENDLY_BUTTON_6,
     "button_sensor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     button6_sensors, 1);
 

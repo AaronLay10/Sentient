@@ -219,6 +219,7 @@ SentientDeviceDef dev_gauge_6(
     DEV_GAUGE_6,
     FRIENDLY_GAUGE_6,
     "gauge_assembly",
+    naming::ACTION_TYPE_STEPPER,
     gauge_6_commands, 4,
     gauge_6_sensors, 1);
 
@@ -226,6 +227,7 @@ SentientDeviceDef dev_lever_1_red(
     DEV_LEVER_1_RED,
     FRIENDLY_LEVER_1_RED,
     "photoresistor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     lever_state_sensors, 1);
 
@@ -233,6 +235,7 @@ SentientDeviceDef dev_lever_2_blue(
     DEV_LEVER_2_BLUE,
     FRIENDLY_LEVER_2_BLUE,
     "photoresistor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     lever_state_sensors, 1);
 
@@ -240,6 +243,7 @@ SentientDeviceDef dev_lever_3_green(
     DEV_LEVER_3_GREEN,
     FRIENDLY_LEVER_3_GREEN,
     "photoresistor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     lever_state_sensors, 1);
 
@@ -247,6 +251,7 @@ SentientDeviceDef dev_lever_4_white(
     DEV_LEVER_4_WHITE,
     FRIENDLY_LEVER_4_WHITE,
     "photoresistor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     lever_state_sensors, 1);
 
@@ -254,6 +259,7 @@ SentientDeviceDef dev_lever_5_orange(
     DEV_LEVER_5_ORANGE,
     FRIENDLY_LEVER_5_ORANGE,
     "photoresistor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     lever_state_sensors, 1);
 
@@ -261,6 +267,7 @@ SentientDeviceDef dev_lever_6_yellow(
     DEV_LEVER_6_YELLOW,
     FRIENDLY_LEVER_6_YELLOW,
     "photoresistor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     lever_state_sensors, 1);
 
@@ -268,6 +275,7 @@ SentientDeviceDef dev_lever_7_purple(
     DEV_LEVER_7_PURPLE,
     FRIENDLY_LEVER_7_PURPLE,
     "photoresistor",
+    naming::ACTION_TYPE_RELAY,
     nullptr, 0,
     lever_state_sensors, 1);
 
@@ -275,6 +283,7 @@ SentientDeviceDef dev_ceiling_leds(
     DEV_CEILING_LEDS,
     FRIENDLY_CEILING_LEDS,
     "led_strip",
+    naming::ACTION_TYPE_RGB,
     ceiling_led_commands, 4,
     nullptr, 0);
 
@@ -282,6 +291,7 @@ SentientDeviceDef dev_gauge_leds(
     DEV_GAUGE_LEDS,
     FRIENDLY_GAUGE_LEDS,
     "led_strip",
+    naming::ACTION_TYPE_RGB,
     gauge_led_commands, 6,
     nullptr, 0);
 

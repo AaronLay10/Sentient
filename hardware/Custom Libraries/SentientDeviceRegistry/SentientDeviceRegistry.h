@@ -34,6 +34,7 @@ struct SentientDeviceDef
   const char *friendly_name; // Human-readable name
   const char *device_type;   // Type: "relay", "sensor", "led_strip", etc.
   const char *category;      // "input", "output", "bidirectional"
+  const char *action_type;   // Action type: "digital_switch", "digital_relay", "analog_sensor", "analog_pwm", "rgb_led", "position_servo", "position_stepper", "motor_control", "counter", "code_reader", "trigger"
 
   // Commands this device responds to (output devices)
   const char *commands[MAX_TOPICS_PER_DEVICE];
@@ -43,11 +44,11 @@ struct SentientDeviceDef
   const char *sensors[MAX_TOPICS_PER_DEVICE];
   int sensor_count;
 
-  // Constructor for output device with commands
+  // Constructor for output device with commands (legacy - defaults action_type to nullptr)
   SentientDeviceDef(const char *id, const char *name, const char *type,
                     const char **cmds, int cmd_count)
       : device_id(id), friendly_name(name), device_type(type),
-        category("output"), command_count(cmd_count), sensor_count(0)
+        category("output"), action_type(nullptr), command_count(cmd_count), sensor_count(0)
   {
     for (int i = 0; i < cmd_count && i < MAX_TOPICS_PER_DEVICE; i++)
     {
@@ -63,11 +64,31 @@ struct SentientDeviceDef
     }
   }
 
-  // Constructor for input device with sensors
+  // Constructor for output device with commands AND action_type
+  SentientDeviceDef(const char *id, const char *name, const char *type, const char *act_type,
+                    const char **cmds, int cmd_count)
+      : device_id(id), friendly_name(name), device_type(type),
+        category("output"), action_type(act_type), command_count(cmd_count), sensor_count(0)
+  {
+    for (int i = 0; i < cmd_count && i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      commands[i] = cmds[i];
+    }
+    for (int i = cmd_count; i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      commands[i] = nullptr;
+    }
+    for (int i = 0; i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      sensors[i] = nullptr;
+    }
+  }
+
+  // Constructor for input device with sensors (legacy - defaults action_type to nullptr)
   SentientDeviceDef(const char *id, const char *name, const char *type,
                     const char **snsr, int snsr_count, bool is_input)
       : device_id(id), friendly_name(name), device_type(type),
-        category("input"), command_count(0), sensor_count(snsr_count)
+        category("input"), action_type(nullptr), command_count(0), sensor_count(snsr_count)
   {
     for (int i = 0; i < snsr_count && i < MAX_TOPICS_PER_DEVICE; i++)
     {
@@ -83,12 +104,57 @@ struct SentientDeviceDef
     }
   }
 
-  // Constructor for bidirectional device
+  // Constructor for input device with sensors AND action_type
+  SentientDeviceDef(const char *id, const char *name, const char *type, const char *act_type,
+                    const char **snsr, int snsr_count, bool is_input)
+      : device_id(id), friendly_name(name), device_type(type),
+        category("input"), action_type(act_type), command_count(0), sensor_count(snsr_count)
+  {
+    for (int i = 0; i < snsr_count && i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      sensors[i] = snsr[i];
+    }
+    for (int i = snsr_count; i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      sensors[i] = nullptr;
+    }
+    for (int i = 0; i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      commands[i] = nullptr;
+    }
+  }
+
+  // Constructor for bidirectional device (legacy - defaults action_type to nullptr)
   SentientDeviceDef(const char *id, const char *name, const char *type,
                     const char **cmds, int cmd_count,
                     const char **snsr, int snsr_count)
       : device_id(id), friendly_name(name), device_type(type),
-        category("bidirectional"), command_count(cmd_count), sensor_count(snsr_count)
+        category("bidirectional"), action_type(nullptr), command_count(cmd_count), sensor_count(snsr_count)
+  {
+    for (int i = 0; i < cmd_count && i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      commands[i] = cmds[i];
+    }
+    for (int i = cmd_count; i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      commands[i] = nullptr;
+    }
+    for (int i = 0; i < snsr_count && i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      sensors[i] = snsr[i];
+    }
+    for (int i = snsr_count; i < MAX_TOPICS_PER_DEVICE; i++)
+    {
+      sensors[i] = nullptr;
+    }
+  }
+
+  // Constructor for bidirectional device with action_type
+  SentientDeviceDef(const char *id, const char *name, const char *type, const char *act_type,
+                    const char **cmds, int cmd_count,
+                    const char **snsr, int snsr_count)
+      : device_id(id), friendly_name(name), device_type(type),
+        category("bidirectional"), action_type(act_type), command_count(cmd_count), sensor_count(snsr_count)
   {
     for (int i = 0; i < cmd_count && i < MAX_TOPICS_PER_DEVICE; i++)
     {
@@ -164,7 +230,7 @@ public:
       // Add device with primary command name (first command in the list)
       const char *primary_command = (dev->command_count > 0) ? dev->commands[0] : nullptr;
       manifest.add_device(dev->device_id, dev->friendly_name,
-                          dev->device_type, dev->category, primary_command);
+                          dev->device_type, dev->category, dev->action_type, primary_command);
 
       // Add command topics
       for (int j = 0; j < dev->command_count && j < MAX_TOPICS_PER_DEVICE; j++)
@@ -270,6 +336,8 @@ public:
       Serial.println(dev->device_type);
       Serial.print(F("  Category: "));
       Serial.println(dev->category);
+      Serial.print(F("  Action Type: "));
+      Serial.println(dev->action_type ? dev->action_type : "(not set)");
 
       if (dev->command_count > 0)
       {

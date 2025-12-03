@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { api, ACTION_TYPE_LABELS, ACTION_TYPE_ICONS, ACTION_TYPE_COLORS, type Device } from '../../lib/api';
 import styles from './NodePalette.module.css';
 
 interface NodePaletteProps {
-  onAddNode: (type: string, subtype: string, label: string, icon: string, color: string) => void;
+  onAddNode: (type: string, subtype: string, label: string, icon: string, color: string, deviceId?: string) => void;
+  roomId?: string;
 }
 
 interface PaletteNode {
@@ -12,6 +15,7 @@ interface PaletteNode {
   description: string;
   icon: string;
   color: string;
+  deviceId?: string;
 }
 
 const NODE_CATEGORIES = {
@@ -49,10 +53,72 @@ const NODE_CATEGORIES = {
   ],
 };
 
-export function NodePalette({ onAddNode }: NodePaletteProps) {
+export function NodePalette({ onAddNode, roomId: _roomId }: NodePaletteProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showDevices, setShowDevices] = useState(false);
+
+  // Fetch devices for the room
+  const { data: devices = [] } = useQuery({
+    queryKey: ['devices'],
+    queryFn: api.getDevices,
+    staleTime: 30000,
+  });
+
+  // Group devices by action_type
+  const devicesByActionType = useMemo(() => {
+    const grouped: Record<string, Device[]> = {};
+
+    devices.forEach((device) => {
+      const actionType = device.action_type || 'unknown';
+      if (!grouped[actionType]) {
+        grouped[actionType] = [];
+      }
+      grouped[actionType].push(device);
+    });
+
+    return grouped;
+  }, [devices]);
+
+  // Create device nodes for palette
+  const deviceCategories = useMemo(() => {
+    const categories: Record<string, PaletteNode[]> = {};
+
+    Object.entries(devicesByActionType).forEach(([actionType, devicesInType]) => {
+      const label = ACTION_TYPE_LABELS[actionType] || actionType;
+      const icon = ACTION_TYPE_ICONS[actionType] || '🔧';
+      const color = ACTION_TYPE_COLORS[actionType] || '#6b7280';
+
+      categories[label] = devicesInType.map((device) => ({
+        type: 'device',
+        subtype: actionType,
+        label: device.friendly_name,
+        description: `${device.device_type} - ${device.id}`,
+        icon,
+        color,
+        deviceId: device.id,
+      }));
+    });
+
+    return categories;
+  }, [devicesByActionType]);
 
   const filteredCategories = Object.entries(NODE_CATEGORIES).reduce(
+    (acc, [category, nodes]) => {
+      const filtered = nodes.filter(
+        (node) =>
+          node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          node.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      if (filtered.length > 0) {
+        acc[category] = filtered;
+      }
+      return acc;
+    },
+    {} as Record<string, PaletteNode[]>
+  );
+
+  // Filter device categories by search
+  const filteredDeviceCategories = Object.entries(deviceCategories).reduce(
     (acc, [category, nodes]) => {
       const filtered = nodes.filter(
         (node) =>
@@ -78,61 +144,111 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        <div className={styles.toggleRow}>
+          <button
+            className={`${styles.toggleButton} ${!showDevices ? styles.active : ''}`}
+            onClick={() => setShowDevices(false)}
+          >
+            Nodes
+          </button>
+          <button
+            className={`${styles.toggleButton} ${showDevices ? styles.active : ''}`}
+            onClick={() => setShowDevices(true)}
+          >
+            Devices ({devices.length})
+          </button>
+        </div>
       </div>
 
       <div className={styles.content}>
-        {Object.entries(filteredCategories).map(([category, nodes]) => (
-          <div key={category} className={styles.section}>
-            <div className={styles.sectionTitle}>{category}</div>
-            {nodes.map((node) => (
-              <div
-                key={node.subtype}
-                className={styles.node}
-                draggable="true"
-                onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
-                  console.log('🎯 Drag started for node:', node.label);
-                  const data = JSON.stringify({
-                    type: node.type,
-                    subtype: node.subtype,
-                    label: node.label,
-                    icon: node.icon,
-                    color: node.color,
-                  });
-                  e.dataTransfer.setData('application/reactflow', data);
-                  e.dataTransfer.effectAllowed = 'move';
-                  e.stopPropagation();
-                }}
-                onDrag={() => {
-                  console.log('🔄 Dragging:', node.label);
-                }}
-                onDragEnd={() => {
-                  console.log('🎯 Drag ended for node:', node.label);
-                }}
-                onMouseDown={() => {
-                  console.log('🖱️ Mouse down on:', node.label);
-                }}
-                onClick={() => {
-                  console.log('👆 Click on:', node.label);
-                  onAddNode(node.type, node.subtype, node.label, node.icon, node.color);
-                }}
-              >
+        {!showDevices ? (
+          // Show standard node categories
+          Object.entries(filteredCategories).map(([category, nodes]) => (
+            <div key={category} className={styles.section}>
+              <div className={styles.sectionTitle}>{category}</div>
+              {nodes.map((node) => (
                 <div
-                  className={styles.nodeIcon}
-                  style={{
-                    background: `${node.color}33`,
-                    color: node.color,
+                  key={node.subtype}
+                  className={styles.node}
+                  draggable="true"
+                  onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
+                    const data = JSON.stringify({
+                      type: node.type,
+                      subtype: node.subtype,
+                      label: node.label,
+                      icon: node.icon,
+                      color: node.color,
+                    });
+                    e.dataTransfer.setData('application/reactflow', data);
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.stopPropagation();
+                  }}
+                  onClick={() => {
+                    onAddNode(node.type, node.subtype, node.label, node.icon, node.color);
                   }}
                 >
-                  {node.icon}
+                  <div
+                    className={styles.nodeIcon}
+                    style={{
+                      background: `${node.color}33`,
+                      color: node.color,
+                    }}
+                  >
+                    {node.icon}
+                  </div>
+                  <div className={styles.nodeInfo}>
+                    <div className={styles.nodeName}>{node.label}</div>
+                    <div className={styles.nodeDesc}>{node.description}</div>
+                  </div>
                 </div>
-                <div className={styles.nodeInfo}>
-                  <div className={styles.nodeName}>{node.label}</div>
-                  <div className={styles.nodeDesc}>{node.description}</div>
+              ))}
+            </div>
+          ))
+        ) : (
+          // Show devices grouped by action type
+          Object.entries(filteredDeviceCategories).map(([actionTypeLabel, deviceNodes]) => (
+            <div key={actionTypeLabel} className={styles.section}>
+              <div className={styles.sectionTitle}>{actionTypeLabel}</div>
+              {deviceNodes.map((node) => (
+                <div
+                  key={node.deviceId}
+                  className={styles.node}
+                  draggable="true"
+                  onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
+                    const data = JSON.stringify({
+                      type: node.type,
+                      subtype: node.subtype,
+                      label: node.label,
+                      icon: node.icon,
+                      color: node.color,
+                      deviceId: node.deviceId,
+                    });
+                    e.dataTransfer.setData('application/reactflow', data);
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.stopPropagation();
+                  }}
+                  onClick={() => {
+                    onAddNode(node.type, node.subtype, node.label, node.icon, node.color, node.deviceId);
+                  }}
+                >
+                  <div
+                    className={styles.nodeIcon}
+                    style={{
+                      background: `${node.color}33`,
+                      color: node.color,
+                    }}
+                  >
+                    {node.icon}
+                  </div>
+                  <div className={styles.nodeInfo}>
+                    <div className={styles.nodeName}>{node.label}</div>
+                    <div className={styles.nodeDesc}>{node.description}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))}
+              ))}
+            </div>
+          ))
+        )}
       </div>
     </aside>
   );

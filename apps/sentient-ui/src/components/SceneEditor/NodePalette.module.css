@@ -121,3 +121,34 @@
   color: var(--text-muted);
   pointer-events: none;
 }
+
+.toggleRow {
+  display: flex;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.toggleButton {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+  background: rgba(0, 217, 255, 0.1);
+  border-color: var(--border-glow);
+}
+
+.toggleButton.active {
+  background: rgba(0, 217, 255, 0.2);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}

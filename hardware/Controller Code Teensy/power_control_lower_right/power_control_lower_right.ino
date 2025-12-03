@@ -148,31 +148,31 @@ const char *controller_commands[] = {
     naming::CMD_REQUEST_STATUS};
 
 // Create device definitions for all 24 relays
-SentientDeviceDef dev_gear_24v(naming::DEV_GEAR_24V, naming::FRIENDLY_GEAR_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_gear_12v(naming::DEV_GEAR_12V, naming::FRIENDLY_GEAR_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_gear_5v(naming::DEV_GEAR_5V, naming::FRIENDLY_GEAR_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_floor_24v(naming::DEV_FLOOR_24V, naming::FRIENDLY_FLOOR_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_floor_12v(naming::DEV_FLOOR_12V, naming::FRIENDLY_FLOOR_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_floor_5v(naming::DEV_FLOOR_5V, naming::FRIENDLY_FLOOR_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_riddle_rpi_5v(naming::DEV_RIDDLE_RPI_5V, naming::FRIENDLY_RIDDLE_RPI_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_riddle_rpi_12v(naming::DEV_RIDDLE_RPI_12V, naming::FRIENDLY_RIDDLE_RPI_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_riddle_5v(naming::DEV_RIDDLE_5V, naming::FRIENDLY_RIDDLE_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_boiler_room_subpanel_24v(naming::DEV_BOILER_ROOM_SUBPANEL_24V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_boiler_room_subpanel_12v(naming::DEV_BOILER_ROOM_SUBPANEL_12V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_boiler_room_subpanel_5v(naming::DEV_BOILER_ROOM_SUBPANEL_5V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_lab_room_subpanel_24v(naming::DEV_LAB_ROOM_SUBPANEL_24V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_lab_room_subpanel_12v(naming::DEV_LAB_ROOM_SUBPANEL_12V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_lab_room_subpanel_5v(naming::DEV_LAB_ROOM_SUBPANEL_5V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_study_room_subpanel_24v(naming::DEV_STUDY_ROOM_SUBPANEL_24V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_study_room_subpanel_12v(naming::DEV_STUDY_ROOM_SUBPANEL_12V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_study_room_subpanel_5v(naming::DEV_STUDY_ROOM_SUBPANEL_5V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_gun_drawers_24v(naming::DEV_GUN_DRAWERS_24V, naming::FRIENDLY_GUN_DRAWERS_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_gun_drawers_12v(naming::DEV_GUN_DRAWERS_12V, naming::FRIENDLY_GUN_DRAWERS_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_gun_drawers_5v(naming::DEV_GUN_DRAWERS_5V, naming::FRIENDLY_GUN_DRAWERS_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_keys_5v(naming::DEV_KEYS_5V, naming::FRIENDLY_KEYS_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_empty_35(naming::DEV_EMPTY_35, naming::FRIENDLY_EMPTY_35, "relay", power_commands, 2);
-SentientDeviceDef dev_empty_34(naming::DEV_EMPTY_34, naming::FRIENDLY_EMPTY_34, "relay", power_commands, 2);
-SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", controller_commands, 5);
+SentientDeviceDef dev_gear_24v(naming::DEV_GEAR_24V, naming::FRIENDLY_GEAR_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gear_12v(naming::DEV_GEAR_12V, naming::FRIENDLY_GEAR_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gear_5v(naming::DEV_GEAR_5V, naming::FRIENDLY_GEAR_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_24v(naming::DEV_FLOOR_24V, naming::FRIENDLY_FLOOR_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_12v(naming::DEV_FLOOR_12V, naming::FRIENDLY_FLOOR_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_5v(naming::DEV_FLOOR_5V, naming::FRIENDLY_FLOOR_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_riddle_rpi_5v(naming::DEV_RIDDLE_RPI_5V, naming::FRIENDLY_RIDDLE_RPI_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_riddle_rpi_12v(naming::DEV_RIDDLE_RPI_12V, naming::FRIENDLY_RIDDLE_RPI_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_riddle_5v(naming::DEV_RIDDLE_5V, naming::FRIENDLY_RIDDLE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_boiler_room_subpanel_24v(naming::DEV_BOILER_ROOM_SUBPANEL_24V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_boiler_room_subpanel_12v(naming::DEV_BOILER_ROOM_SUBPANEL_12V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_boiler_room_subpanel_5v(naming::DEV_BOILER_ROOM_SUBPANEL_5V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lab_room_subpanel_24v(naming::DEV_LAB_ROOM_SUBPANEL_24V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lab_room_subpanel_12v(naming::DEV_LAB_ROOM_SUBPANEL_12V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lab_room_subpanel_5v(naming::DEV_LAB_ROOM_SUBPANEL_5V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_study_room_subpanel_24v(naming::DEV_STUDY_ROOM_SUBPANEL_24V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_study_room_subpanel_12v(naming::DEV_STUDY_ROOM_SUBPANEL_12V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_study_room_subpanel_5v(naming::DEV_STUDY_ROOM_SUBPANEL_5V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gun_drawers_24v(naming::DEV_GUN_DRAWERS_24V, naming::FRIENDLY_GUN_DRAWERS_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gun_drawers_12v(naming::DEV_GUN_DRAWERS_12V, naming::FRIENDLY_GUN_DRAWERS_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gun_drawers_5v(naming::DEV_GUN_DRAWERS_5V, naming::FRIENDLY_GUN_DRAWERS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_keys_5v(naming::DEV_KEYS_5V, naming::FRIENDLY_KEYS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_empty_35(naming::DEV_EMPTY_35, naming::FRIENDLY_EMPTY_35, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_empty_34(naming::DEV_EMPTY_34, naming::FRIENDLY_EMPTY_34, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 5);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

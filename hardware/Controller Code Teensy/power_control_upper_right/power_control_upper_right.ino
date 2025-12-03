@@ -150,32 +150,32 @@ const char *controller_commands[] = {
     naming::CMD_RESET,
     naming::CMD_REQUEST_STATUS};
 
-// Create device definitions for all 24 relays
-SentientDeviceDef dev_main_lighting_24v(naming::DEV_MAIN_LIGHTING_24V, naming::FRIENDLY_MAIN_LIGHTING_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_main_lighting_12v(naming::DEV_MAIN_LIGHTING_12V, naming::FRIENDLY_MAIN_LIGHTING_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_main_lighting_5v(naming::DEV_MAIN_LIGHTING_5V, naming::FRIENDLY_MAIN_LIGHTING_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_gauges_12v_a(naming::DEV_GAUGES_12V_A, naming::FRIENDLY_GAUGES_12V_A, "relay", power_commands, 2);
-SentientDeviceDef dev_gauges_12v_b(naming::DEV_GAUGES_12V_B, naming::FRIENDLY_GAUGES_12V_B, "relay", power_commands, 2);
-SentientDeviceDef dev_gauges_5v(naming::DEV_GAUGES_5V, naming::FRIENDLY_GAUGES_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_lever_boiler_5v(naming::DEV_LEVER_BOILER_5V, naming::FRIENDLY_LEVER_BOILER_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_lever_boiler_12v(naming::DEV_LEVER_BOILER_12V, naming::FRIENDLY_LEVER_BOILER_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_pilot_light_5v(naming::DEV_PILOT_LIGHT_5V, naming::FRIENDLY_PILOT_LIGHT_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_kraken_controls_5v(naming::DEV_KRAKEN_CONTROLS_5V, naming::FRIENDLY_KRAKEN_CONTROLS_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_fuse_12v(naming::DEV_FUSE_12V, naming::FRIENDLY_FUSE_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_fuse_5v(naming::DEV_FUSE_5V, naming::FRIENDLY_FUSE_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_syringe_24v(naming::DEV_SYRINGE_24V, naming::FRIENDLY_SYRINGE_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_syringe_12v(naming::DEV_SYRINGE_12V, naming::FRIENDLY_SYRINGE_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_syringe_5v(naming::DEV_SYRINGE_5V, naming::FRIENDLY_SYRINGE_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_chemical_24v(naming::DEV_CHEMICAL_24V, naming::FRIENDLY_CHEMICAL_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_chemical_12v(naming::DEV_CHEMICAL_12V, naming::FRIENDLY_CHEMICAL_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_chemical_5v(naming::DEV_CHEMICAL_5V, naming::FRIENDLY_CHEMICAL_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_crawl_space_blacklight(naming::DEV_CRAWL_SPACE_BLACKLIGHT, naming::FRIENDLY_CRAWL_SPACE_BLACKLIGHT, "relay", power_commands, 2);
-SentientDeviceDef dev_floor_audio_amp(naming::DEV_FLOOR_AUDIO_AMP, naming::FRIENDLY_FLOOR_AUDIO_AMP, "relay", power_commands, 2);
-SentientDeviceDef dev_kraken_radar_amp(naming::DEV_KRAKEN_RADAR_AMP, naming::FRIENDLY_KRAKEN_RADAR_AMP, "relay", power_commands, 2);
-SentientDeviceDef dev_vault_24v(naming::DEV_VAULT_24V, naming::FRIENDLY_VAULT_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_vault_12v(naming::DEV_VAULT_12V, naming::FRIENDLY_VAULT_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_vault_5v(naming::DEV_VAULT_5V, naming::FRIENDLY_VAULT_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", controller_commands, 5);
+// Create device definitions for all 24 relays (with action_type for UI categorization)
+SentientDeviceDef dev_main_lighting_24v(naming::DEV_MAIN_LIGHTING_24V, naming::FRIENDLY_MAIN_LIGHTING_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_main_lighting_12v(naming::DEV_MAIN_LIGHTING_12V, naming::FRIENDLY_MAIN_LIGHTING_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_main_lighting_5v(naming::DEV_MAIN_LIGHTING_5V, naming::FRIENDLY_MAIN_LIGHTING_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gauges_12v_a(naming::DEV_GAUGES_12V_A, naming::FRIENDLY_GAUGES_12V_A, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gauges_12v_b(naming::DEV_GAUGES_12V_B, naming::FRIENDLY_GAUGES_12V_B, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gauges_5v(naming::DEV_GAUGES_5V, naming::FRIENDLY_GAUGES_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lever_boiler_5v(naming::DEV_LEVER_BOILER_5V, naming::FRIENDLY_LEVER_BOILER_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lever_boiler_12v(naming::DEV_LEVER_BOILER_12V, naming::FRIENDLY_LEVER_BOILER_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_pilot_light_5v(naming::DEV_PILOT_LIGHT_5V, naming::FRIENDLY_PILOT_LIGHT_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_kraken_controls_5v(naming::DEV_KRAKEN_CONTROLS_5V, naming::FRIENDLY_KRAKEN_CONTROLS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_fuse_12v(naming::DEV_FUSE_12V, naming::FRIENDLY_FUSE_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_fuse_5v(naming::DEV_FUSE_5V, naming::FRIENDLY_FUSE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_syringe_24v(naming::DEV_SYRINGE_24V, naming::FRIENDLY_SYRINGE_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_syringe_12v(naming::DEV_SYRINGE_12V, naming::FRIENDLY_SYRINGE_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_syringe_5v(naming::DEV_SYRINGE_5V, naming::FRIENDLY_SYRINGE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_chemical_24v(naming::DEV_CHEMICAL_24V, naming::FRIENDLY_CHEMICAL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_chemical_12v(naming::DEV_CHEMICAL_12V, naming::FRIENDLY_CHEMICAL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_chemical_5v(naming::DEV_CHEMICAL_5V, naming::FRIENDLY_CHEMICAL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_crawl_space_blacklight(naming::DEV_CRAWL_SPACE_BLACKLIGHT, naming::FRIENDLY_CRAWL_SPACE_BLACKLIGHT, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_audio_amp(naming::DEV_FLOOR_AUDIO_AMP, naming::FRIENDLY_FLOOR_AUDIO_AMP, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_kraken_radar_amp(naming::DEV_KRAKEN_RADAR_AMP, naming::FRIENDLY_KRAKEN_RADAR_AMP, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_vault_24v(naming::DEV_VAULT_24V, naming::FRIENDLY_VAULT_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_vault_12v(naming::DEV_VAULT_12V, naming::FRIENDLY_VAULT_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_vault_5v(naming::DEV_VAULT_5V, naming::FRIENDLY_VAULT_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 5);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

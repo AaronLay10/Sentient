@@ -145,28 +145,16 @@ const char *color_sensor_sensors[] = {
 
 // Create device definitions with canonical IDs and friendly names
 SentientDeviceDef dev_fire_leds(
-    naming::DEV_FIRE_LEDS,
-    naming::FRIENDLY_FIRE_LEDS,
-    "led_strip",
-    fire_leds_commands, 2);
+    naming::DEV_FIRE_LEDS, naming::FRIENDLY_FIRE_LEDS, "led_strip", naming::ACTION_TYPE_RGB, fire_leds_commands, 2);
 
 SentientDeviceDef dev_monitor_relay(
-    naming::DEV_MONITOR_POWER_RELAY,
-    naming::FRIENDLY_MONITOR_RELAY,
-    "relay",
-    monitor_commands, 2);
+    naming::DEV_MONITOR_POWER_RELAY, naming::FRIENDLY_MONITOR_RELAY, "relay", naming::ACTION_TYPE_RELAY, monitor_commands, 2);
 
 SentientDeviceDef dev_newell_relay(
-    naming::DEV_NEWELL_POWER_RELAY,
-    naming::FRIENDLY_NEWELL_RELAY,
-    "relay",
-    newell_commands, 2);
+    naming::DEV_NEWELL_POWER_RELAY, naming::FRIENDLY_NEWELL_RELAY, "relay", naming::ACTION_TYPE_RELAY, newell_commands, 2);
 
 SentientDeviceDef dev_flange_leds(
-    naming::DEV_FLANGE_LEDS,
-    naming::FRIENDLY_FLANGE_LEDS,
-    "led_strip",
-    flange_commands, 2);
+    naming::DEV_FLANGE_LEDS, naming::FRIENDLY_FLANGE_LEDS, "led_strip", naming::ACTION_TYPE_RGB, flange_commands, 2);
 
 SentientDeviceDef dev_color_sensor(
     naming::DEV_PILOTLIGHT_COLOR_SENSOR,
@@ -175,10 +163,7 @@ SentientDeviceDef dev_color_sensor(
     color_sensor_sensors, 1, true); // true = input device
 
 SentientDeviceDef dev_controller(
-    naming::DEV_CONTROLLER,
-    naming::FRIENDLY_CONTROLLER,
-    "controller",
-    controller_commands, 2);
+    naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 2);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

@@ -165,6 +165,7 @@ SentientDeviceDef dev_lever_boiler(
     DEV_LEVER_BOILER,
     FRIENDLY_LEVER_BOILER,
     "lever_station",
+    naming::ACTION_TYPE_RELAY,
     boiler_commands, 4,
     boiler_sensors, 2);
 
@@ -172,6 +173,7 @@ SentientDeviceDef dev_lever_stairs(
     DEV_LEVER_STAIRS,
     FRIENDLY_LEVER_STAIRS,
     "lever_station",
+    naming::ACTION_TYPE_RELAY,
     stairs_commands, 4,
     stairs_sensors, 2);
 
@@ -179,6 +181,7 @@ SentientDeviceDef dev_newell_post(
     DEV_NEWELL_POST,
     FRIENDLY_NEWELL_POST,
     "newell_post",
+    naming::ACTION_TYPE_RELAY,
     newell_commands, 5,
     newell_sensors, 2);
 

@@ -63,12 +63,14 @@ SentientDeviceDef dev_encoder_a(
     naming::DEV_ENCODER_A,
     naming::FRIENDLY_ENCODER_A,
     "sensor",
+    naming::ACTION_TYPE_COUNTER,
     encoder_a_sensors, 1, true); // input only
 
 SentientDeviceDef dev_encoder_b(
     naming::DEV_ENCODER_B,
     naming::FRIENDLY_ENCODER_B,
     "sensor",
+    naming::ACTION_TYPE_COUNTER,
     encoder_b_sensors, 1, true); // input only
 
 // Create the device registry

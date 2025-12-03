@@ -103,6 +103,7 @@ SentientDeviceDef dev_rfid_reader(
     naming::DEV_RFID_READER,
     naming::FRIENDLY_RFID_READER,
     "rfid_reader",
+    naming::ACTION_TYPE_CODE_READER,
     rfid_sensors, 2, true); // Input only
 
 // Create the device registry

@@ -30,6 +30,17 @@ namespace naming
     constexpr const char *ITEM_HEARTBEAT = "heartbeat";
     constexpr const char *ITEM_HARDWARE = "hardware";
     constexpr const char *ITEM_COMMAND_ACK = "command_ack";
+
+    // ========================================================================
+    // ACTION TYPES (defines how devices interact - for UI categorization)
+    // ========================================================================
+    // Action type values:
+    //   INPUT:  digital_switch, analog_sensor, counter, code_reader
+    //   OUTPUT: digital_relay, analog_pwm, rgb_led, position_servo, position_stepper, motor_control, trigger
+
+    // TODO: Add appropriate action types based on kraken controller devices
+    // Likely includes sensors (digital_switch) and motors (motor_control)
+
 }
 
 #endif // CONTROLLER_NAMING_H

@@ -103,41 +103,41 @@ const char *rfid_c_sensors[] = {naming::SENSOR_RFID_TAG};
 const char *rfid_d_sensors[] = {naming::SENSOR_RFID_TAG};
 const char *rfid_e_sensors[] = {naming::SENSOR_RFID_TAG};
 
-SentientDeviceDef dev_rfid_a(naming::DEV_RFID_A, naming::FRIENDLY_RFID_A, "rfid_reader", rfid_a_sensors, 1, true);
-SentientDeviceDef dev_rfid_b(naming::DEV_RFID_B, naming::FRIENDLY_RFID_B, "rfid_reader", rfid_b_sensors, 1, true);
-SentientDeviceDef dev_rfid_c(naming::DEV_RFID_C, naming::FRIENDLY_RFID_C, "rfid_reader", rfid_c_sensors, 1, true);
-SentientDeviceDef dev_rfid_d(naming::DEV_RFID_D, naming::FRIENDLY_RFID_D, "rfid_reader", rfid_d_sensors, 1, true);
-SentientDeviceDef dev_rfid_e(naming::DEV_RFID_E, naming::FRIENDLY_RFID_E, "rfid_reader", rfid_e_sensors, 1, true);
+SentientDeviceDef dev_rfid_a(naming::DEV_RFID_A, naming::FRIENDLY_RFID_A, "rfid_reader", naming::ACTION_TYPE_CODE_READER, rfid_a_sensors, 1, true);
+SentientDeviceDef dev_rfid_b(naming::DEV_RFID_B, naming::FRIENDLY_RFID_B, "rfid_reader", naming::ACTION_TYPE_CODE_READER, rfid_b_sensors, 1, true);
+SentientDeviceDef dev_rfid_c(naming::DEV_RFID_C, naming::FRIENDLY_RFID_C, "rfid_reader", naming::ACTION_TYPE_CODE_READER, rfid_c_sensors, 1, true);
+SentientDeviceDef dev_rfid_d(naming::DEV_RFID_D, naming::FRIENDLY_RFID_D, "rfid_reader", naming::ACTION_TYPE_CODE_READER, rfid_d_sensors, 1, true);
+SentientDeviceDef dev_rfid_e(naming::DEV_RFID_E, naming::FRIENDLY_RFID_E, "rfid_reader", naming::ACTION_TYPE_CODE_READER, rfid_e_sensors, 1, true);
 
 // Fuse sensors (input only)
 const char *fuse_a_sensors[] = {naming::SENSOR_RESISTOR_VALUE};
 const char *fuse_b_sensors[] = {naming::SENSOR_RESISTOR_VALUE};
 const char *fuse_c_sensors[] = {naming::SENSOR_RESISTOR_VALUE};
 
-SentientDeviceDef dev_fuse_a(naming::DEV_FUSE_A, naming::FRIENDLY_FUSE_A, "resistor_sensor", fuse_a_sensors, 1, true);
-SentientDeviceDef dev_fuse_b(naming::DEV_FUSE_B, naming::FRIENDLY_FUSE_B, "resistor_sensor", fuse_b_sensors, 1, true);
-SentientDeviceDef dev_fuse_c(naming::DEV_FUSE_C, naming::FRIENDLY_FUSE_C, "resistor_sensor", fuse_c_sensors, 1, true);
+SentientDeviceDef dev_fuse_a(naming::DEV_FUSE_A, naming::FRIENDLY_FUSE_A, "resistor_sensor", naming::ACTION_TYPE_ANALOG_SENSOR, fuse_a_sensors, 1, true);
+SentientDeviceDef dev_fuse_b(naming::DEV_FUSE_B, naming::FRIENDLY_FUSE_B, "resistor_sensor", naming::ACTION_TYPE_ANALOG_SENSOR, fuse_b_sensors, 1, true);
+SentientDeviceDef dev_fuse_c(naming::DEV_FUSE_C, naming::FRIENDLY_FUSE_C, "resistor_sensor", naming::ACTION_TYPE_ANALOG_SENSOR, fuse_c_sensors, 1, true);
 
 // Knife switch sensor (input only)
 const char *knife_switch_sensors[] = {naming::SENSOR_SWITCH_STATE};
-SentientDeviceDef dev_knife_switch(naming::DEV_KNIFE_SWITCH, naming::FRIENDLY_KNIFE_SWITCH, "switch", knife_switch_sensors, 1, true);
+SentientDeviceDef dev_knife_switch(naming::DEV_KNIFE_SWITCH, naming::FRIENDLY_KNIFE_SWITCH, "switch", naming::ACTION_TYPE_DIGITAL_SWITCH, knife_switch_sensors, 1, true);
 
 // Actuator (output device)
 const char *actuator_commands[] = {
     naming::CMD_ACTUATOR_FORWARD,
     naming::CMD_ACTUATOR_REVERSE,
     naming::CMD_ACTUATOR_STOP};
-SentientDeviceDef dev_actuator(naming::DEV_ACTUATOR, naming::FRIENDLY_ACTUATOR, "actuator", actuator_commands, 3);
+SentientDeviceDef dev_actuator(naming::DEV_ACTUATOR, naming::FRIENDLY_ACTUATOR, "actuator", naming::ACTION_TYPE_MOTOR, actuator_commands, 3);
 
 // Maglocks (output devices)
 const char *maglock_commands[] = {naming::CMD_DROP_PANEL};
-SentientDeviceDef dev_maglock_b(naming::DEV_MAGLOCK_B, naming::FRIENDLY_MAGLOCK_B, "maglock", maglock_commands, 1);
-SentientDeviceDef dev_maglock_c(naming::DEV_MAGLOCK_C, naming::FRIENDLY_MAGLOCK_C, "maglock", maglock_commands, 1);
-SentientDeviceDef dev_maglock_d(naming::DEV_MAGLOCK_D, naming::FRIENDLY_MAGLOCK_D, "maglock", maglock_commands, 1);
+SentientDeviceDef dev_maglock_b(naming::DEV_MAGLOCK_B, naming::FRIENDLY_MAGLOCK_B, "maglock", naming::ACTION_TYPE_RELAY, maglock_commands, 1);
+SentientDeviceDef dev_maglock_c(naming::DEV_MAGLOCK_C, naming::FRIENDLY_MAGLOCK_C, "maglock", naming::ACTION_TYPE_RELAY, maglock_commands, 1);
+SentientDeviceDef dev_maglock_d(naming::DEV_MAGLOCK_D, naming::FRIENDLY_MAGLOCK_D, "maglock", naming::ACTION_TYPE_RELAY, maglock_commands, 1);
 
 // Metal gate (output device)
 const char *metal_gate_commands[] = {naming::CMD_UNLOCK_GATE};
-SentientDeviceDef dev_metal_gate(naming::DEV_METAL_GATE, naming::FRIENDLY_METAL_GATE, "maglock", metal_gate_commands, 1);
+SentientDeviceDef dev_metal_gate(naming::DEV_METAL_GATE, naming::FRIENDLY_METAL_GATE, "maglock", naming::ACTION_TYPE_RELAY, metal_gate_commands, 1);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

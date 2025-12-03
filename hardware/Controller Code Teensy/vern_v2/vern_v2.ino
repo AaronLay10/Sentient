@@ -41,15 +41,15 @@ const unsigned long heartbeat_interval_ms = 5000;
 
 const char *output_commands[] = {naming::CMD_OUTPUT_ON, naming::CMD_OUTPUT_OFF};
 
-SentientDeviceDef dev_output_one(naming::DEV_OUTPUT_ONE, "Output 1", "digital_output", output_commands, 2);
-SentientDeviceDef dev_output_two(naming::DEV_OUTPUT_TWO, "Output 2", "digital_output", output_commands, 2);
-SentientDeviceDef dev_output_three(naming::DEV_OUTPUT_THREE, "Output 3", "digital_output", output_commands, 2);
-SentientDeviceDef dev_output_four(naming::DEV_OUTPUT_FOUR, "Output 4", "digital_output", output_commands, 2);
-SentientDeviceDef dev_output_five(naming::DEV_OUTPUT_FIVE, "Output 5", "digital_output", output_commands, 2);
-SentientDeviceDef dev_output_six(naming::DEV_OUTPUT_SIX, "Output 6", "digital_output", output_commands, 2);
-SentientDeviceDef dev_output_seven(naming::DEV_OUTPUT_SEVEN, "Output 7", "digital_output", output_commands, 2);
-SentientDeviceDef dev_output_eight(naming::DEV_OUTPUT_EIGHT, "Output 8", "digital_output", output_commands, 2);
-SentientDeviceDef dev_power_switch(naming::DEV_POWER_SWITCH, "Power Switch", "digital_output", output_commands, 2);
+SentientDeviceDef dev_output_one(naming::DEV_OUTPUT_ONE, "Output 1", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_output_two(naming::DEV_OUTPUT_TWO, "Output 2", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_output_three(naming::DEV_OUTPUT_THREE, "Output 3", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_output_four(naming::DEV_OUTPUT_FOUR, "Output 4", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_output_five(naming::DEV_OUTPUT_FIVE, "Output 5", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_output_six(naming::DEV_OUTPUT_SIX, "Output 6", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_output_seven(naming::DEV_OUTPUT_SEVEN, "Output 7", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_output_eight(naming::DEV_OUTPUT_EIGHT, "Output 8", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
+SentientDeviceDef dev_power_switch(naming::DEV_POWER_SWITCH, "Power Switch", "digital_output", naming::ACTION_TYPE_RELAY, output_commands, 2);
 
 SentientDeviceRegistry deviceRegistry;
 

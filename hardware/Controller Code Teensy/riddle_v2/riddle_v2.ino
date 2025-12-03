@@ -188,28 +188,16 @@ const char *button_sensors[] = {
 
 // Device definitions
 SentientDeviceDef dev_door(
-    naming::DEV_DOOR,
-    naming::FRIENDLY_DOOR,
-    "actuator",
-    door_commands, 3);
+    naming::DEV_DOOR, naming::FRIENDLY_DOOR, "actuator", naming::ACTION_TYPE_MOTOR, door_commands, 3);
 
 SentientDeviceDef dev_maglock(
-    naming::DEV_MAGLOCK,
-    naming::FRIENDLY_MAGLOCK,
-    "relay",
-    maglock_commands, 2);
+    naming::DEV_MAGLOCK, naming::FRIENDLY_MAGLOCK, "relay", naming::ACTION_TYPE_RELAY, maglock_commands, 2);
 
 SentientDeviceDef dev_leds(
-    naming::DEV_LED_STRIP,
-    naming::FRIENDLY_LED_STRIP,
-    "led_strip",
-    led_commands, 3);
+    naming::DEV_LED_STRIP, naming::FRIENDLY_LED_STRIP, "led_strip", naming::ACTION_TYPE_RGB, led_commands, 3);
 
 SentientDeviceDef dev_controller(
-    naming::CONTROLLER_ID,
-    naming::CONTROLLER_FRIENDLY_NAME,
-    "controller",
-    controller_commands, 2);
+    naming::CONTROLLER_ID, naming::CONTROLLER_FRIENDLY_NAME, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 2);
 
 SentientDeviceDef dev_door_sensors(
     naming::DEV_DOOR,

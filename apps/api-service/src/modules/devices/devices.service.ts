@@ -32,6 +32,7 @@ export class DevicesService {
       friendly_name: device.friendly_name,
       device_type: device.device_type,
       device_category: device.device_category,
+      action_type: device.action_type,
       controller_id: device.controllerId,
       status: 'operational' as const,
       properties: device.properties,
@@ -64,6 +65,7 @@ export class DevicesService {
         friendly_name: dto.friendly_name ?? dto.device_id,
         device_type: dto.device_type,
         device_category: dto.device_category,
+        action_type: dto.action_type,
         properties: (dto.properties ?? undefined) as any
       },
       create: {
@@ -74,6 +76,7 @@ export class DevicesService {
         friendly_name: dto.friendly_name ?? dto.device_id,
         device_type: dto.device_type,
         device_category: dto.device_category,
+        action_type: dto.action_type,
         properties: (dto.properties ?? undefined) as any
       }
     });

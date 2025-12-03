@@ -37,6 +37,11 @@ export class RegisterDeviceDto {
   device_category?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  action_type?: string;
+
+  @IsOptional()
   properties?: Record<string, unknown>;
 
   @IsOptional()

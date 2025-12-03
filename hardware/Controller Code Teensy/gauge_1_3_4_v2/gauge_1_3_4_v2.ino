@@ -169,6 +169,7 @@ SentientDeviceDef dev_gauge_1(
     naming::DEV_GAUGE_1,
     naming::FRIENDLY_GAUGE_1,
     "gauge_assembly",
+    naming::ACTION_TYPE_STEPPER,
     gauge_commands, 4,
     gauge_1_sensors, 1);
 
@@ -176,6 +177,7 @@ SentientDeviceDef dev_gauge_3(
     naming::DEV_GAUGE_3,
     naming::FRIENDLY_GAUGE_3,
     "gauge_assembly",
+    naming::ACTION_TYPE_STEPPER,
     gauge_commands, 4,
     gauge_3_sensors, 1);
 
@@ -183,6 +185,7 @@ SentientDeviceDef dev_gauge_4(
     naming::DEV_GAUGE_4,
     naming::FRIENDLY_GAUGE_4,
     "gauge_assembly",
+    naming::ACTION_TYPE_STEPPER,
     gauge_commands, 4,
     gauge_4_sensors, 1);
 

@@ -71,17 +71,17 @@ const char *motor_commands[] = {naming::CMD_START, naming::CMD_STOP, naming::CMD
 const char *power_commands[] = {naming::CMD_ON, naming::CMD_OFF};
 const char *fog_commands[] = {naming::CMD_ON, naming::CMD_OFF, naming::CMD_FOG_TRIGGER};
 
-SentientDeviceDef dev_study_fan(naming::DEV_STUDY_FAN, "Study Fan", "stepper_motor", motor_commands, 4);
-SentientDeviceDef dev_wall_gear_1(naming::DEV_WALL_GEAR_1, "Wall Gear 1", "stepper_motor", motor_commands, 4);
-SentientDeviceDef dev_wall_gear_2(naming::DEV_WALL_GEAR_2, "Wall Gear 2", "stepper_motor", motor_commands, 4);
-SentientDeviceDef dev_wall_gear_3(naming::DEV_WALL_GEAR_3, "Wall Gear 3", "stepper_motor", motor_commands, 4);
-SentientDeviceDef dev_tv_1(naming::DEV_TV_1, "TV 1", "power_control", power_commands, 2);
-SentientDeviceDef dev_tv_2(naming::DEV_TV_2, "TV 2", "power_control", power_commands, 2);
-SentientDeviceDef dev_makservo(naming::DEV_MAKSERVO, "Makservo", "power_control", power_commands, 2);
-SentientDeviceDef dev_fog_machine(naming::DEV_FOG_MACHINE, "Fog Machine", "fog_control", fog_commands, 3);
-SentientDeviceDef dev_study_fan_light(naming::DEV_STUDY_FAN_LIGHT, "Study Fan Light", "light", power_commands, 2);
-SentientDeviceDef dev_blacklights(naming::DEV_BLACKLIGHTS, "Blacklights", "light", power_commands, 2);
-SentientDeviceDef dev_nixie_leds(naming::DEV_NIXIE_LEDS, "Nixie LEDs", "light", power_commands, 2);
+SentientDeviceDef dev_study_fan(naming::DEV_STUDY_FAN, "Study Fan", "stepper_motor", naming::ACTION_TYPE_STEPPER, motor_commands, 4);
+SentientDeviceDef dev_wall_gear_1(naming::DEV_WALL_GEAR_1, "Wall Gear 1", "stepper_motor", naming::ACTION_TYPE_STEPPER, motor_commands, 4);
+SentientDeviceDef dev_wall_gear_2(naming::DEV_WALL_GEAR_2, "Wall Gear 2", "stepper_motor", naming::ACTION_TYPE_STEPPER, motor_commands, 4);
+SentientDeviceDef dev_wall_gear_3(naming::DEV_WALL_GEAR_3, "Wall Gear 3", "stepper_motor", naming::ACTION_TYPE_STEPPER, motor_commands, 4);
+SentientDeviceDef dev_tv_1(naming::DEV_TV_1, "TV 1", "power_control", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_tv_2(naming::DEV_TV_2, "TV 2", "power_control", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_makservo(naming::DEV_MAKSERVO, "Makservo", "power_control", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_fog_machine(naming::DEV_FOG_MACHINE, "Fog Machine", "fog_control", naming::ACTION_TYPE_TRIGGER, fog_commands, 3);
+SentientDeviceDef dev_study_fan_light(naming::DEV_STUDY_FAN_LIGHT, "Study Fan Light", "light", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_blacklights(naming::DEV_BLACKLIGHTS, "Blacklights", "light", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_nixie_leds(naming::DEV_NIXIE_LEDS, "Nixie LEDs", "light", naming::ACTION_TYPE_RELAY, power_commands, 2);
 
 SentientDeviceRegistry deviceRegistry;
 

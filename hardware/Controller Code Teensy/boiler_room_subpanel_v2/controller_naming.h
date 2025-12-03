@@ -157,6 +157,25 @@ namespace naming
     constexpr const char *CAT_ACKNOWLEDGEMENT = "acknowledgement";
     constexpr const char *ITEM_HEARTBEAT = "heartbeat";
     constexpr const char *ITEM_HARDWARE = "hardware";
+
+    // ========================================================================
+    // ACTION TYPES (defines how devices interact - for UI categorization)
+    // ========================================================================
+    // Action type values:
+    //   INPUT:  digital_switch, analog_sensor, counter, code_reader
+    //   OUTPUT: digital_relay, analog_pwm, rgb_led, position_servo, position_stepper, motor_control, trigger
+
+    // IR sensor (code reader input)
+    constexpr const char *ACTION_TYPE_CODE_READER = "code_reader";
+    // Fog machine (trigger output)
+    constexpr const char *ACTION_TYPE_TRIGGER = "trigger";
+    // Motors (TV lift, motor control output)
+    constexpr const char *ACTION_TYPE_MOTOR = "motor_control";
+    // Maglocks and power relays (digital relay output)
+    constexpr const char *ACTION_TYPE_RELAY = "digital_relay";
+    // LED strips (RGB LED output)
+    constexpr const char *ACTION_TYPE_RGB = "rgb_led";
+
 } // namespace naming
 
 #endif // CONTROLLER_NAMING_H

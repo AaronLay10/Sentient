@@ -176,48 +176,56 @@ SentientDeviceDef dev_rfid_a(
     naming::DEV_RFID_A,
     naming::FRIENDLY_RFID_A,
     "sensor",
+    naming::ACTION_TYPE_CODE_READER,
     rfid_a_sensors, 2, true); // true = input device (sensor only)
 
 SentientDeviceDef dev_rfid_b(
     naming::DEV_RFID_B,
     naming::FRIENDLY_RFID_B,
     "sensor",
+    naming::ACTION_TYPE_CODE_READER,
     rfid_b_sensors, 2, true); // true = input device (sensor only)
 
 SentientDeviceDef dev_rfid_c(
     naming::DEV_RFID_C,
     naming::FRIENDLY_RFID_C,
     "sensor",
+    naming::ACTION_TYPE_CODE_READER,
     rfid_c_sensors, 2, true); // true = input device (sensor only)
 
 SentientDeviceDef dev_rfid_d(
     naming::DEV_RFID_D,
     naming::FRIENDLY_RFID_D,
     "sensor",
+    naming::ACTION_TYPE_CODE_READER,
     rfid_d_sensors, 2, true); // true = input device (sensor only)
 
 SentientDeviceDef dev_rfid_e(
     naming::DEV_RFID_E,
     naming::FRIENDLY_RFID_E,
     "sensor",
+    naming::ACTION_TYPE_CODE_READER,
     rfid_e_sensors, 2, true); // true = input device (sensor only)
 
 SentientDeviceDef dev_rfid_f(
     naming::DEV_RFID_F,
     naming::FRIENDLY_RFID_F,
     "sensor",
+    naming::ACTION_TYPE_CODE_READER,
     rfid_f_sensors, 2, true); // true = input device (sensor only)
 
 SentientDeviceDef dev_actuator(
     naming::DEV_ACTUATOR,
     naming::FRIENDLY_ACTUATOR,
     "actuator",
+    naming::ACTION_TYPE_MOTOR,
     actuator_commands, 3);
 
 SentientDeviceDef dev_maglocks(
     naming::DEV_MAGLOCKS,
     naming::FRIENDLY_MAGLOCKS,
     "relay",
+    naming::ACTION_TYPE_RELAY,
     maglock_commands, 2);
 
 // Create the device registry

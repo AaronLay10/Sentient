@@ -32,7 +32,7 @@ export const PuzzleNode = memo(({ id, data, selected }: PuzzleNodeProps) => {
   // Sensors have outputs only, Logic has inputs and outputs, Output (Puzzle Solved) has input only
   // Audio nodes have both inputs and outputs (they're in-line effects in the flow)
   const hasInput = data.nodeType !== 'sensor';
-  const hasOutput = data.nodeType !== 'output' || data.nodeType === 'audio';
+  const hasOutput = data.nodeType !== 'output';
 
   // Get current device state value
   const getCurrentValue = () => {

@@ -80,10 +80,7 @@ SentientDeviceDef dev_encoder_b(
     encoder_b_sensors, 1, true); // input only
 
 SentientDeviceDef dev_controller(
-    naming::DEV_CONTROLLER,
-    naming::FRIENDLY_CONTROLLER,
-    "controller",
-    controller_commands, 4);
+    naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 4);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

@@ -42,10 +42,10 @@ const char *drawer_commands[] = {
     naming::CMD_LOCK_DRAWER};
 
 // Individual drawer devices
-SentientDeviceDef dev_drawer_elegant(naming::DEV_DRAWER_ELEGANT, naming::FRIENDLY_DRAWER_ELEGANT, "electromagnet", drawer_commands, 2);
-SentientDeviceDef dev_drawer_alchemist(naming::DEV_DRAWER_ALCHEMIST, naming::FRIENDLY_DRAWER_ALCHEMIST, "electromagnet", drawer_commands, 2);
-SentientDeviceDef dev_drawer_bounty(naming::DEV_DRAWER_BOUNTY, naming::FRIENDLY_DRAWER_BOUNTY, "electromagnet", drawer_commands, 2);
-SentientDeviceDef dev_drawer_mechanic(naming::DEV_DRAWER_MECHANIC, naming::FRIENDLY_DRAWER_MECHANIC, "electromagnet", drawer_commands, 2);
+SentientDeviceDef dev_drawer_elegant(naming::DEV_DRAWER_ELEGANT, naming::FRIENDLY_DRAWER_ELEGANT, "electromagnet", naming::ACTION_TYPE_RELAY, drawer_commands, 2);
+SentientDeviceDef dev_drawer_alchemist(naming::DEV_DRAWER_ALCHEMIST, naming::FRIENDLY_DRAWER_ALCHEMIST, "electromagnet", naming::ACTION_TYPE_RELAY, drawer_commands, 2);
+SentientDeviceDef dev_drawer_bounty(naming::DEV_DRAWER_BOUNTY, naming::FRIENDLY_DRAWER_BOUNTY, "electromagnet", naming::ACTION_TYPE_RELAY, drawer_commands, 2);
+SentientDeviceDef dev_drawer_mechanic(naming::DEV_DRAWER_MECHANIC, naming::FRIENDLY_DRAWER_MECHANIC, "electromagnet", naming::ACTION_TYPE_RELAY, drawer_commands, 2);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

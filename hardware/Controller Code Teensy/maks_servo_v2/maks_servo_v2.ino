@@ -43,7 +43,7 @@ int current_position = CLOSED_POSITION;
 // ══════════════════════════════════════════════════════════════════════════════
 
 const char *servo_commands[] = {naming::CMD_OPEN, naming::CMD_CLOSE, naming::CMD_SET_POSITION};
-SentientDeviceDef dev_servo(naming::DEV_SERVO, naming::FRIENDLY_SERVO, "servo", servo_commands, 3);
+SentientDeviceDef dev_servo(naming::DEV_SERVO, naming::FRIENDLY_SERVO, "servo", naming::ACTION_TYPE_SERVO, servo_commands, 3);
 
 SentientDeviceRegistry deviceRegistry;
 

@@ -150,6 +150,16 @@ namespace naming
     constexpr const char *ITEM_HARDWARE = "hardware";
     constexpr const char *ITEM_COMMAND_ACK = "command_ack";
 
+    // ========================================================================
+    // ACTION TYPES (defines how devices interact - for UI categorization)
+    // ========================================================================
+    // Action type values:
+    //   INPUT:  digital_switch, analog_sensor, counter, code_reader
+    //   OUTPUT: digital_relay, analog_pwm, rgb_led, position_servo, position_stepper, motor_control, trigger
+
+    // All devices on this controller are power relays (digital on/off)
+    constexpr const char *ACTION_TYPE_RELAY = "digital_relay";
+
 } // namespace naming
 
 #endif // CONTROLLER_NAMING_H

@@ -85,6 +85,21 @@ namespace naming
     constexpr const char *ITEM_HEARTBEAT = "heartbeat";
     constexpr const char *ITEM_HARDWARE = "hardware";
     constexpr const char *ITEM_COMMAND_ACK = "command_ack";
+
+    // ========================================================================
+    // ACTION TYPES (defines how devices interact - for UI categorization)
+    // ========================================================================
+    // Action type values:
+    //   INPUT:  digital_switch, analog_sensor, counter, code_reader
+    //   OUTPUT: digital_relay, analog_pwm, rgb_led, position_servo, position_stepper, motor_control, trigger
+
+    // Color sensor (analog sensor input)
+    constexpr const char *ACTION_TYPE_ANALOG_SENSOR = "analog_sensor";
+    // LED strips (RGB LED output)
+    constexpr const char *ACTION_TYPE_RGB = "rgb_led";
+    // Power relays (digital relay output)
+    constexpr const char *ACTION_TYPE_RELAY = "digital_relay";
+
 } // namespace naming
 
 #endif // CONTROLLER_NAMING_H

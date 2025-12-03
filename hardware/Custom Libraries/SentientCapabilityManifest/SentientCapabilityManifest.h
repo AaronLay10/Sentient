@@ -62,6 +62,7 @@ public:
    */
   void add_device(const char *device_id, const char *friendly_name,
                   const char *device_type, const char *device_category,
+                  const char *action_type = nullptr,
                   const char *primary_command = nullptr)
   {
     JsonObject device = devices.add<JsonObject>();
@@ -69,6 +70,10 @@ public:
     device["friendly_name"] = friendly_name;
     device["device_type"] = device_type;
     device["device_category"] = device_category;
+    if (action_type && action_type[0] != '\0')
+    {
+      device["action_type"] = action_type;
+    }
     if (primary_command && primary_command[0] != '\0')
     {
       device["device_command_name"] = primary_command;
@@ -155,6 +160,10 @@ public:
         manifest_device["device_type"] = device["device_type"];
         manifest_device["friendly_name"] = device["friendly_name"];
         manifest_device["device_category"] = device["device_category"];
+        if (device.containsKey("action_type"))
+        {
+          manifest_device["action_type"] = device["action_type"];
+        }
       }
 
       String payload;

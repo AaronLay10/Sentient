@@ -91,13 +91,13 @@ const char *controller_commands[] = {
     naming::CMD_REQUEST_STATUS};
 
 // Create device definitions for all 6 relays
-SentientDeviceDef dev_lever_riddle_cube_24v(naming::DEV_LEVER_RIDDLE_CUBE_24V, naming::FRIENDLY_LEVER_RIDDLE_CUBE_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_lever_riddle_cube_12v(naming::DEV_LEVER_RIDDLE_CUBE_12V, naming::FRIENDLY_LEVER_RIDDLE_CUBE_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_lever_riddle_cube_5v(naming::DEV_LEVER_RIDDLE_CUBE_5V, naming::FRIENDLY_LEVER_RIDDLE_CUBE_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_clock_24v(naming::DEV_CLOCK_24V, naming::FRIENDLY_CLOCK_24V, "relay", power_commands, 2);
-SentientDeviceDef dev_clock_12v(naming::DEV_CLOCK_12V, naming::FRIENDLY_CLOCK_12V, "relay", power_commands, 2);
-SentientDeviceDef dev_clock_5v(naming::DEV_CLOCK_5V, naming::FRIENDLY_CLOCK_5V, "relay", power_commands, 2);
-SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", controller_commands, 5);
+SentientDeviceDef dev_lever_riddle_cube_24v(naming::DEV_LEVER_RIDDLE_CUBE_24V, naming::FRIENDLY_LEVER_RIDDLE_CUBE_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lever_riddle_cube_12v(naming::DEV_LEVER_RIDDLE_CUBE_12V, naming::FRIENDLY_LEVER_RIDDLE_CUBE_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lever_riddle_cube_5v(naming::DEV_LEVER_RIDDLE_CUBE_5V, naming::FRIENDLY_LEVER_RIDDLE_CUBE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_clock_24v(naming::DEV_CLOCK_24V, naming::FRIENDLY_CLOCK_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_clock_12v(naming::DEV_CLOCK_12V, naming::FRIENDLY_CLOCK_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_clock_5v(naming::DEV_CLOCK_5V, naming::FRIENDLY_CLOCK_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 5);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;

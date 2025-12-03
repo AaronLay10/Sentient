@@ -120,28 +120,22 @@ const char *crawlspace_lights_commands[] = {
 
 // Create device definitions with friendly names
 SentientDeviceDef dev_study_lights(
-    naming::DEV_STUDY_LIGHTS, naming::FRIENDLY_STUDY_LIGHTS, "dimmer",
-    study_lights_commands, 1);
+    naming::DEV_STUDY_LIGHTS, naming::FRIENDLY_STUDY_LIGHTS, "dimmer", naming::ACTION_TYPE_PWM, study_lights_commands, 1);
 
 SentientDeviceDef dev_boiler_lights(
-    naming::DEV_BOILER_LIGHTS, naming::FRIENDLY_BOILER_LIGHTS, "dimmer",
-    boiler_lights_commands, 1);
+    naming::DEV_BOILER_LIGHTS, naming::FRIENDLY_BOILER_LIGHTS, "dimmer", naming::ACTION_TYPE_PWM, boiler_lights_commands, 1);
 
 SentientDeviceDef dev_lab_lights_squares(
-    naming::DEV_LAB_LIGHTS_SQUARES, naming::FRIENDLY_LAB_LIGHTS_SQUARES, "led_strip",
-    lab_lights_squares_commands, 2);
+    naming::DEV_LAB_LIGHTS_SQUARES, naming::FRIENDLY_LAB_LIGHTS_SQUARES, "led_strip", naming::ACTION_TYPE_RGB, lab_lights_squares_commands, 2);
 
 SentientDeviceDef dev_lab_lights_grates(
-    naming::DEV_LAB_LIGHTS_GRATES, naming::FRIENDLY_LAB_LIGHTS_GRATES, "led_strip",
-    lab_lights_grates_commands, 2);
+    naming::DEV_LAB_LIGHTS_GRATES, naming::FRIENDLY_LAB_LIGHTS_GRATES, "led_strip", naming::ACTION_TYPE_RGB, lab_lights_grates_commands, 2);
 
 SentientDeviceDef dev_sconces(
-    naming::DEV_SCONCES, naming::FRIENDLY_SCONCES, "relay",
-    sconces_commands, 2);
+    naming::DEV_SCONCES, naming::FRIENDLY_SCONCES, "relay", naming::ACTION_TYPE_RELAY, sconces_commands, 2);
 
 SentientDeviceDef dev_crawlspace_lights(
-    naming::DEV_CRAWLSPACE_LIGHTS, naming::FRIENDLY_CRAWLSPACE_LIGHTS, "relay",
-    crawlspace_lights_commands, 2);
+    naming::DEV_CRAWLSPACE_LIGHTS, naming::FRIENDLY_CRAWLSPACE_LIGHTS, "relay", naming::ACTION_TYPE_RELAY, crawlspace_lights_commands, 2);
 
 // Create the device registry (manifest builder will use these IDs and names)
 SentientDeviceRegistry deviceRegistry;

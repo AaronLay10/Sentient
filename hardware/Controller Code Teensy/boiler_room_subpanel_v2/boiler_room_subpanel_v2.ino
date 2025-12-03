@@ -136,39 +136,48 @@ const char *ir_sensor_sensors[] = {"ir_code"};
 // Create device definitions with friendly names
 SentientDeviceDef dev_intro_tv_power(
     naming::DEV_INTRO_TV_POWER, naming::FRIENDLY_INTRO_TV_POWER, naming::TYPE_INTRO_TV_POWER,
+    naming::ACTION_TYPE_RELAY,
     intro_tv_power_commands, 2);
 
 SentientDeviceDef dev_intro_tv_lift(
     naming::DEV_INTRO_TV_LIFT, naming::FRIENDLY_INTRO_TV_LIFT, naming::TYPE_INTRO_TV_LIFT,
+    naming::ACTION_TYPE_MOTOR,
     intro_tv_lift_commands, 3);
 
 SentientDeviceDef dev_fog_power(
     naming::DEV_FOG_POWER, naming::FRIENDLY_FOG_POWER, naming::TYPE_FOG_POWER,
+    naming::ACTION_TYPE_RELAY,
     fog_power_commands, 2);
 
 SentientDeviceDef dev_fog_trigger(
     naming::DEV_FOG_TRIGGER, naming::FRIENDLY_FOG_TRIGGER, naming::TYPE_FOG_TRIGGER,
+    naming::ACTION_TYPE_TRIGGER,
     fog_trigger_commands, 1);
 
 SentientDeviceDef dev_fog_ultrasonic(
     naming::DEV_FOG_ULTRASONIC, naming::FRIENDLY_FOG_ULTRASONIC, naming::TYPE_FOG_ULTRASONIC,
+    naming::ACTION_TYPE_RELAY,
     fog_ultrasonic_commands, 2);
 
 SentientDeviceDef dev_barrel(
     naming::DEV_BOILER_ROOM_BARREL, naming::FRIENDLY_BOILER_ROOM_BARREL, naming::TYPE_BOILER_ROOM_BARREL,
+    naming::ACTION_TYPE_RELAY,
     barrel_commands, 2);
 
 SentientDeviceDef dev_ir_sensor(
     naming::DEV_IR_SENSOR, naming::FRIENDLY_IR_SENSOR, naming::TYPE_IR_SENSOR,
+    naming::ACTION_TYPE_CODE_READER,
     ir_sensor_commands, 2,
     ir_sensor_sensors, 1);
 
 SentientDeviceDef dev_study_door(
     naming::DEV_STUDY_DOOR, naming::FRIENDLY_STUDY_DOOR, naming::TYPE_STUDY_DOOR,
+    naming::ACTION_TYPE_RELAY,
     study_door_commands, 2);
 
 SentientDeviceDef dev_gauge_chest(
     naming::DEV_GAUGE_PROGRESS_CHEST, naming::FRIENDLY_GAUGE_PROGRESS_CHEST, naming::TYPE_GAUGE_PROGRESS_CHEST,
+    naming::ACTION_TYPE_RGB,
     gauge_chest_commands, 4);
 
 // Create the device registry (manifest builder will use these IDs and names)
