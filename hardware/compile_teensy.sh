@@ -85,10 +85,13 @@ echo -e "${BLUE}Version:${NC} ${NEW_VERSION}"
 echo -e "${BLUE}Output:${NC} ${OUTPUT_DIR}"
 echo ""
 
-# Initialize arduino-cli config if needed
-if [ ! -f ~/Library/Arduino15/arduino-cli.yaml ]; then
+# Initialize arduino-cli config if needed (macOS: ~/Library/Arduino15, Linux: ~/.arduino15)
+LINUX_CONFIG="$HOME/.arduino15/arduino-cli.yaml"
+MAC_CONFIG="$HOME/Library/Arduino15/arduino-cli.yaml"
+
+if [ ! -f "$LINUX_CONFIG" ] && [ ! -f "$MAC_CONFIG" ]; then
     echo -e "${YELLOW}Initializing arduino-cli...${NC}"
-    arduino-cli config init
+    arduino-cli config init || true
 fi
 
 # Add Teensy board URL if not already added

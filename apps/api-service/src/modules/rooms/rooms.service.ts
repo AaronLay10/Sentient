@@ -34,7 +34,8 @@ export class RoomsService {
         data: {
           clientId,
           venueId,
-          name: dto.name
+          name: dto.name,
+          room_id: dto.room_id
         }
       });
     } catch (error) {
@@ -54,8 +55,8 @@ export class RoomsService {
     try {
       return await this.prisma.room.update({
         where: { id: roomId },
-        data: { name: dto.name },
-        select: { id: true, name: true, clientId: true, venueId: true, created_at: true }
+        data: { name: dto.name, room_id: dto.room_id },
+        select: { id: true, name: true, room_id: true, clientId: true, venueId: true, created_at: true }
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

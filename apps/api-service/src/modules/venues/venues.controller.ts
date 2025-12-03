@@ -13,9 +13,10 @@ export class VenuesController {
   @Get()
   async list(
     @Param('clientId') clientId: string,
-    @Query() query: ListVenuesDto
+    @Query() query?: ListVenuesDto
   ) {
-    return this.venuesService.listByClient(clientId, query);
+    // Default to empty query if not provided
+    return this.venuesService.listByClient(clientId, query || {});
   }
 
   @Get(':id')

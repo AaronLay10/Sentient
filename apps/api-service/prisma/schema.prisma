@@ -25,6 +25,10 @@ model Venue {
   clientId   String
   client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   name       String
+  address    String?
+  city       String?
+  state      String?
+  zipCode    String?
   created_at DateTime @default(now())
   rooms      Room[]
 
@@ -39,6 +43,7 @@ model Room {
   client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   venue      Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
   name       String
+  room_id    String?  @unique
   created_at DateTime @default(now())
   controllers Controller[]
   devices     Device[]

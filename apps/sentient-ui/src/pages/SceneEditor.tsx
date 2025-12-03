@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ReactFlow,
@@ -14,10 +15,12 @@ import {
 import type { Node as FlowNode, Connection } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { NodePalette } from '../components/SceneEditor/NodePalette';
+import { SceneDetailsModal } from '../components/SceneEditor/SceneDetailsModal';
 import { PropertiesPanel } from '../components/SceneEditor/PropertiesPanel';
 import { SceneNode } from '../components/SceneEditor/SceneNode';
 import { api, type Room, type Device, type Scene, type Puzzle } from '../lib/api';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { useRoomContext } from '../contexts/RoomContext';
 import styles from './SceneEditor.module.css';
 
 const nodeTypes = {
@@ -44,18 +47,31 @@ const initialNodes: FlowNode[] = [
 const initialEdges: Array<{ id: string; type: 'default'; animated: boolean; style: { stroke: string; strokeWidth: number }; source: string; target: string; sourceHandle: string | null; targetHandle: string | null }> = [];
 
 function SceneEditorInner() {
+  const { roomId } = useParams<{ roomId: string }>();
+  const navigate = useNavigate();
+  const { selectedClientId, selectedRoomId: contextRoomId } = useRoomContext();
   const queryClient = useQueryClient();
   const { screenToFlowPosition, fitView } = useReactFlow();
+  
+  // Use roomId from URL or context
+  const activeRoomId = roomId || contextRoomId;
+  
+  // Redirect to monitor if no room selected
+  useEffect(() => {
+    if (!activeRoomId) {
+      navigate('/monitor');
+    }
+  }, [activeRoomId, navigate]);
+  
   const [nodes, setNodes] = useState<FlowNode[]>(initialNodes);
   const [edges, setEdges] = useState<Array<{ id: string; type: 'default'; animated: boolean; style: { stroke: string; strokeWidth: number }; source: string; target: string; sourceHandle: string | null; targetHandle: string | null }>>(initialEdges);
   const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
-  const [selectedRoomId, setSelectedRoomId] = useState<string>('');
-  const selectedClientId = 'cmif0rz0400001352aazr47j8'; // Default to Paragon
   const [sceneInfo, setSceneInfo] = useState({
     name: 'New Scene',
     description: '',
   });
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [autoSaveEnabled] = useState(true); // Auto-save enabled by default
   const [runningNodeId, setRunningNodeId] = useState<string | null>(null);
@@ -120,7 +136,7 @@ function SceneEditorInner() {
   
   const { events } = useWebSocket({
     url: WS_URL,
-    roomId: selectedRoomId || undefined,
+    roomId: activeRoomId || undefined,
     onEvent: handleWebSocketEvent,
   });
 
@@ -212,16 +228,16 @@ function SceneEditorInner() {
 
   // Fetch scenes for selected room
   const { data: scenes = [] } = useQuery<Scene[]>({
-    queryKey: ['scenes', selectedClientId, selectedRoomId],
-    queryFn: () => api.getScenes(selectedClientId, selectedRoomId),
-    enabled: !!selectedClientId && !!selectedRoomId,
+    queryKey: ['scenes', selectedClientId, activeRoomId],
+    queryFn: () => api.getScenes(selectedClientId!, activeRoomId!),
+    enabled: !!selectedClientId && !!activeRoomId,
   });
 
   // Fetch puzzles for selected room
   const { data: puzzles = [] } = useQuery<Puzzle[]>({
-    queryKey: ['puzzles', selectedClientId, selectedRoomId],
-    queryFn: () => api.getPuzzles(selectedClientId, selectedRoomId),
-    enabled: !!selectedClientId && !!selectedRoomId,
+    queryKey: ['puzzles', selectedClientId, activeRoomId],
+    queryFn: () => api.getPuzzles(selectedClientId!, activeRoomId!),
+    enabled: !!selectedClientId && !!activeRoomId,
   });
 
   // Load a specific scene
@@ -235,12 +251,7 @@ function SceneEditorInner() {
     setSelectedSceneId(scene.id);
   }, []);
 
-  // Set first room as default
-  useEffect(() => {
-    if (rooms.length > 0 && !selectedRoomId) {
-      setSelectedRoomId(rooms[0].id);
-    }
-  }, [rooms, selectedRoomId]);
+  // Room is now managed by context and URL params, no need to set it here
 
   // Load first scene automatically when scenes are loaded
   useEffect(() => {
@@ -302,13 +313,13 @@ function SceneEditorInner() {
       },
       active: true,
     };      if (selectedSceneId) {
-        return api.updateScene(selectedClientId, selectedRoomId, selectedSceneId, sceneData);
+        return api.updateScene(selectedClientId!, activeRoomId!, selectedSceneId, sceneData);
       } else {
-        return api.createScene(selectedClientId, selectedRoomId, sceneData);
+        return api.createScene(selectedClientId!, activeRoomId!, sceneData);
       }
     },
     onSuccess: (savedScene) => {
-      queryClient.invalidateQueries({ queryKey: ['scenes', selectedClientId, selectedRoomId] });
+      queryClient.invalidateQueries({ queryKey: ['scenes', selectedClientId, activeRoomId] });
       setSelectedSceneId(savedScene.id);
       setLastSaved(new Date());
     },
@@ -320,7 +331,7 @@ function SceneEditorInner() {
 
   // Auto-save on nodes/edges change (debounced)
   useEffect(() => {
-    if (!autoSaveEnabled || !selectedRoomId || !selectedSceneId) return;
+    if (!autoSaveEnabled || !activeRoomId || !selectedSceneId) return;
     
     const debounceTimer = setTimeout(() => {
       console.log('Auto-saving scene...');
@@ -328,7 +339,7 @@ function SceneEditorInner() {
     }, 3000); // Save 3 seconds after last change
 
     return () => clearTimeout(debounceTimer);
-  }, [nodes, edges, sceneInfo, autoSaveEnabled, selectedRoomId, selectedSceneId]);
+  }, [nodes, edges, sceneInfo, autoSaveEnabled, activeRoomId, selectedSceneId]);
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -455,7 +466,7 @@ function SceneEditorInner() {
       ...node.data,
       devices,
       puzzles: puzzles.map(p => ({ id: p.id, name: p.name, description: p.description })),
-      roomId: selectedRoomId,
+      roomId: activeRoomId,
       onConfigChange: updateNodeConfig,
       onDataChange: updateNodeData,
       isRunning: node.id === runningNodeId,
@@ -464,7 +475,7 @@ function SceneEditorInner() {
   }));
 
   const handleSave = () => {
-    if (!selectedRoomId) {
+    if (!activeRoomId) {
       alert('Please select a room first');
       return;
     }
@@ -485,22 +496,6 @@ function SceneEditorInner() {
         <div className={styles.topLeft}>
           <h1 className={styles.title}>Scene Editor</h1>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <select
-              className={styles.roomSelect}
-              value={selectedRoomId}
-              onChange={(e) => {
-                setSelectedRoomId(e.target.value);
-                setSelectedSceneId(null);
-                handleNewScene();
-              }}
-            >
-              <option value="">Select Room...</option>
-              {rooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.name}
-                </option>
-              ))}
-            </select>
             {scenes.length > 0 && (
               <select
                 className={styles.sceneSelect}
@@ -524,6 +519,16 @@ function SceneEditorInner() {
               </select>
             )}
             <span className={styles.subtitle}>{sceneInfo.name}</span>
+            <button 
+              className={styles.btnEdit}
+              onClick={() => setShowDetailsModal(true)}
+              title="Edit scene details"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
             {lastSaved && (
               <span style={{ fontSize: '12px', color: '#52525b' }}>
                 Last saved: {lastSaved.toLocaleTimeString()}
@@ -764,6 +769,26 @@ function SceneEditorInner() {
                       const latencyMs = Date.now() - commandSentAt;
                       console.log(`⚡ Video command acknowledged (${latencyMs}ms latency)`);
                       
+                    } else if (node.data.nodeType === 'audio') {
+                      // Audio node - send cue command to SCS Audio Server
+                      const nodeConfig = node.data.config as any;
+                      const cueId = nodeConfig?.cueId;
+                      const command = nodeConfig?.command || 'play';
+
+                      if (!cueId && command !== 'stop_all' && command !== 'fade_all') {
+                        throw new Error('Audio cue ID must be configured');
+                      }
+
+                      console.log(`🔊 Audio: ${command} ${cueId ? `cue ${cueId}` : ''}`);
+
+                      await api.sendAudioCommand(activeRoomId || '', {
+                        cue_id: cueId || '',
+                        command,
+                        triggered_by: 'scene'
+                      });
+
+                      console.log('✅ Audio command sent');
+
                     } else {
                       // Other node types - immediate execution
                       console.log('⏭️  Non-device node, proceeding immediately');
@@ -854,11 +879,21 @@ function SceneEditorInner() {
           onNodeDataChange={updateNodeData}
           devices={devices}
           rooms={rooms}
-          selectedRoomId={selectedRoomId}
+          selectedRoomId={activeRoomId || ''}
           nodes={nodes}
           edges={edges}
         />
       </div>
+
+      <SceneDetailsModal
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        sceneInfo={sceneInfo}
+        onSave={(info) => {
+          setSceneInfo(info);
+          // Note: Auto-save will trigger automatically if enabled and scene has changes
+        }}
+      />
     </div>
   );
 }

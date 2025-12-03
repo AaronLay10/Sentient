@@ -17,6 +17,11 @@ export class AdminController {
     return this.adminService.getAllRooms();
   }
 
+  @Get('controllers')
+  async getAllControllers() {
+    return this.adminService.getAllControllers();
+  }
+
   @Get('devices')
   async getAllDevices() {
     return this.adminService.getAllDevices();

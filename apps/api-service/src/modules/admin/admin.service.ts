@@ -223,6 +223,20 @@ export class AdminService {
     });
   }
 
+  async getAllControllers() {
+    return this.prisma.controller.findMany({
+      select: {
+        id: true,
+        friendly_name: true,
+        controller_type: true,
+        roomId: true,
+        last_seen: true,
+        created_at: true,
+      },
+      orderBy: { friendly_name: 'asc' },
+    });
+  }
+
   async getAllDevices() {
     const devices = await this.prisma.device.findMany({
       include: {

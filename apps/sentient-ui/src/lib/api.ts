@@ -3,6 +3,9 @@ import { getAuthToken } from '../components/ProtectedRoute';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+// Flag to prevent multiple redirects and stop subsequent requests
+let isRedirectingToLogin = false;
+
 const client = axios.create({
   baseURL: API_URL,
   headers: {
@@ -13,6 +16,14 @@ const client = axios.create({
 // Add request interceptor to include auth token
 client.interceptors.request.use(
   (config) => {
+    // Don't make requests if we're already redirecting to login
+    if (isRedirectingToLogin) {
+      const controller = new AbortController();
+      controller.abort();
+      config.signal = controller.signal;
+      return config;
+    }
+
     const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -32,17 +43,32 @@ client.interceptors.request.use(
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Clear auth and redirect to login
+    // Only redirect once, ignore if already redirecting or if request was cancelled
+    if (error.response?.status === 401 && !isRedirectingToLogin && !axios.isCancel(error)) {
+      isRedirectingToLogin = true;
+
+      // Clear auth
       localStorage.removeItem('sentient_token');
       sessionStorage.removeItem('sentient_token');
       localStorage.removeItem('sentient_user');
       sessionStorage.removeItem('sentient_user');
-      window.location.href = '/login';
+
+      // Use replace to prevent back button issues
+      window.location.replace('/login');
     }
     return Promise.reject(error);
   }
 );
+
+// Helper to check if an error is an auth error (useful for React Query retry logic)
+export const isAuthError = (error: unknown): boolean => {
+  return axios.isAxiosError(error) && error.response?.status === 401;
+};
+
+// Reset the redirect flag (call this on successful login)
+export const resetAuthRedirectFlag = (): void => {
+  isRedirectingToLogin = false;
+};
 
 export interface Controller {
   id: string;
@@ -82,7 +108,9 @@ export interface Room {
   name: string;
   description?: string;
   venue_id: string;
+  venueId: string;
   tenant_id: string;
+  room_id?: string;
   photo_url?: string;
   created_at: string;
 }
@@ -231,6 +259,22 @@ export const api = {
   },
 
   // Tenants
+  // Clients
+  async getClients(): Promise<Tenant[]> {
+    const response = await client.get('/clients');
+    return response.data;
+  },
+
+  async getClient(id: string): Promise<Tenant> {
+    const response = await client.get(`/clients/${id}`);
+    return response.data;
+  },
+
+  async getClientVenues(clientId: string) {
+    const response = await client.get(`/clients/${clientId}/venues`);
+    return response.data;
+  },
+
   async getTenants(): Promise<Tenant[]> {
     const response = await client.get('/tenants');
     return response.data;
@@ -336,6 +380,21 @@ export const api = {
       device_id: deviceId,
       command,
       payload: payload || {},
+    });
+    return response.data;
+  },
+
+  // Audio Command Execution (SCS Audio Server via audio-gateway)
+  async sendAudioCommand(roomId: string, data: {
+    cue_id: string;
+    command: 'play' | 'stop' | 'hotkey' | 'hotkey_on' | 'hotkey_off' | 'stop_all' | 'fade_all';
+    triggered_by?: 'scene' | 'puzzle' | 'gm' | 'system';
+  }): Promise<{ success: boolean }> {
+    const response = await client.post(`/audio/command`, {
+      room_id: roomId,
+      cue_id: data.cue_id,
+      command: data.command,
+      triggered_by: data.triggered_by || 'scene',
     });
     return response.data;
   },

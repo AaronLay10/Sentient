@@ -5,6 +5,9 @@ import { Activity, AlertTriangle, CheckCircle2, XCircle, Wifi, WifiOff, Clock, Z
 import type { DomainEvent } from '../types/events';
 import styles from './SystemMonitor.module.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
+
 interface Controller {
   id: string;
   friendly_name: string;
@@ -62,7 +65,7 @@ export function SystemMonitor() {
     queryKey: ['controllers'],
     queryFn: async () => {
       const token = getAuthToken();
-      const response = await fetch('http://localhost:3001/api/controllers', {
+      const response = await fetch(`${API_URL}/admin/controllers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Failed to fetch controllers');
@@ -75,7 +78,7 @@ export function SystemMonitor() {
     queryKey: ['devices'],
     queryFn: async () => {
       const token = getAuthToken();
-      const response = await fetch('http://localhost:3001/api/devices', {
+      const response = await fetch(`${API_URL}/admin/devices`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Failed to fetch devices');
@@ -88,7 +91,7 @@ export function SystemMonitor() {
     queryKey: ['rooms'],
     queryFn: async () => {
       const token = getAuthToken();
-      const response = await fetch('http://localhost:3001/api/rooms', {
+      const response = await fetch(`${API_URL}/admin/rooms`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Failed to fetch rooms');
@@ -98,7 +101,7 @@ export function SystemMonitor() {
 
   // WebSocket connection
   useWebSocket({
-    url: 'ws://sentientengine.ai:3002',
+    url: WS_URL,
     onEvent: (event) => {
       setRecentActivity((prev) => [event, ...prev].slice(0, 20));
     },

@@ -23,6 +23,7 @@ const NODE_CATEGORIES = {
     { type: 'sensor', subtype: 'keypad', label: 'Keypad', description: 'Numeric/code entry', icon: '⌨', color: '#34d399' },
     { type: 'sensor', subtype: 'proximity', label: 'Proximity', description: 'Object detection', icon: '◎', color: '#34d399' },
     { type: 'sensor', subtype: 'magnetic', label: 'Magnetic Contact', description: 'Door/drawer open/close', icon: '⌗', color: '#34d399' },
+    { type: 'sensor', subtype: 'light', label: 'Light Detection', description: 'Light level threshold sensor', icon: '☀', color: '#34d399' },
   ],
   Logic: [
     { type: 'logic', subtype: 'sequence', label: 'Sequence Check', description: 'Inputs must occur in order', icon: '⧉', color: '#6366f1' },
@@ -33,6 +34,12 @@ const NODE_CATEGORIES = {
   ],
   Output: [
     { type: 'output', subtype: 'puzzle-solved', label: 'Puzzle Solved', description: 'Marks puzzle as complete', icon: '✓', color: '#22c55e' },
+  ],
+  'Audio/Effects': [
+    { type: 'audio', subtype: 'sfx', label: 'Sound Effect', description: 'Play sound effect cue', icon: '♫', color: '#00d9ff' },
+    { type: 'audio', subtype: 'music', label: 'Music Cue', description: 'Play music/score cue', icon: '♪', color: '#00d9ff' },
+    { type: 'audio', subtype: 'voice', label: 'Voice/Narration', description: 'Play voice narration cue', icon: '🗣', color: '#00d9ff' },
+    { type: 'audio', subtype: 'stop', label: 'Stop Audio', description: 'Stop audio cue or all', icon: '⏹', color: '#f97316' },
   ],
 };
 

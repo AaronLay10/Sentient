@@ -44,7 +44,7 @@ export class PuzzlesService {
           roomId,
           name: dto.name,
           description: dto.description,
-          graph: dto.graph as Prisma.JsonObject,
+          graph: dto.graph as unknown as Prisma.JsonObject,
           timeout_seconds: dto.timeout_seconds,
           hint_text: dto.hint_text,
           active: dto.active ?? true,
@@ -71,7 +71,7 @@ export class PuzzlesService {
         data: {
           name: dto.name,
           description: dto.description,
-          graph: dto.graph ? (dto.graph as Prisma.JsonObject) : undefined,
+          graph: dto.graph ? (dto.graph as unknown as Prisma.JsonObject) : undefined,
           timeout_seconds: dto.timeout_seconds,
           hint_text: dto.hint_text,
           active: dto.active,

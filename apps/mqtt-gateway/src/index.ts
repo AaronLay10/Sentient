@@ -13,8 +13,76 @@ const API_URL = process.env.API_URL || 'http://api-service:3000';
 const REDIS_URL = process.env.REDIS_URL || 'redis://redis:6379';
 const INTERNAL_TOKEN = process.env.INTERNAL_REG_TOKEN;
 
-// In-memory cache for device actions (device_id -> actions[])
-const deviceActionsCache = new Map<string, any[]>();
+// In-memory cache for device actions with TTL and max size
+interface CacheEntry {
+  actions: any[];
+  timestamp: number;
+}
+
+class DeviceActionsCache {
+  private cache = new Map<string, CacheEntry>();
+  private readonly maxSize: number;
+  private readonly ttlMs: number;
+
+  constructor(maxSize = 1000, ttlMinutes = 60) {
+    this.maxSize = maxSize;
+    this.ttlMs = ttlMinutes * 60 * 1000;
+
+    // Cleanup expired entries every 5 minutes
+    setInterval(() => this.cleanup(), 5 * 60 * 1000);
+  }
+
+  get(deviceId: string): any[] | undefined {
+    const entry = this.cache.get(deviceId);
+    if (!entry) return undefined;
+
+    // Check if expired
+    if (Date.now() - entry.timestamp > this.ttlMs) {
+      this.cache.delete(deviceId);
+      return undefined;
+    }
+
+    return entry.actions;
+  }
+
+  set(deviceId: string, actions: any[]): void {
+    // Enforce max size - remove oldest entries if at capacity
+    if (this.cache.size >= this.maxSize && !this.cache.has(deviceId)) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey) {
+        this.cache.delete(oldestKey);
+      }
+    }
+
+    this.cache.set(deviceId, {
+      actions,
+      timestamp: Date.now(),
+    });
+  }
+
+  private cleanup(): void {
+    const now = Date.now();
+    let expiredCount = 0;
+
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > this.ttlMs) {
+        this.cache.delete(key);
+        expiredCount++;
+      }
+    }
+
+    if (expiredCount > 0) {
+      console.log(`🧹 Cache cleanup: removed ${expiredCount} expired entries, ${this.cache.size} remaining`);
+    }
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+}
+
+// Device actions cache: max 1000 devices, 60 minute TTL
+const deviceActionsCache = new DeviceActionsCache(1000, 60);
 
 if (!INTERNAL_TOKEN) {
   console.error('❌ INTERNAL_REG_TOKEN not set in environment');

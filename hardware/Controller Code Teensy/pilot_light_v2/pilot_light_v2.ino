@@ -11,10 +11,10 @@
  * - Boiler Monitor Power Relay
  * - Newell Post Power Relay
  * - Flange Status LED Strip (WS2812B)
- * - TCS34725 Color Temperature & Lux Sensor
+ * - TCS34725 Color Temperature Sensor
  *
  * STATELESS ARCHITECTURE:
- * - Sensor REPORTS color temperature and lux changes (does NOT make decisions)
+ * - Sensor REPORTS color temperature changes (does NOT make decisions)
  * - Sentient decides all actions (power control, LED states, etc.)
  * - No autonomous behavior - pure input/output controller
  */
@@ -50,7 +50,7 @@
 // *** Newell Post Power Control - Relay with 1 output pin
 // *** Flange LED Strip - Single WS2812B LED strip for status indication
 // *** Boiler Monitor Power Control - Relay to control power to the boiler monitor
-// *** Color Sensor - TCS34725 for color temperature and lux measurement
+// *** Color Sensor - TCS34725 for color temperature measurement
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Pin Assignments
@@ -72,7 +72,6 @@ const int led_flange_pin = 24;     // Flange Status LED Strip
 const int num_leds = 34;
 const unsigned long heartbeat_interval_ms = 5000;
 const int color_temp_threshold = 50; // Change detection threshold for color sensor
-const int lux_threshold = 10;        // Change detection threshold for lux
 
 // ──────────────────────────────────────────────────────────────────────────────
 // MQTT Configuration
@@ -112,7 +111,6 @@ int flame[num_leds];
 Adafruit_TCS34725 tcs(TCS34725_INTEGRATIONTIME_154MS, TCS34725_GAIN_1X);
 bool color_sensor_available = false;
 uint16_t last_color_temp = 0;
-uint16_t last_lux = 0;
 unsigned long last_sensor_publish_time = 0;
 const unsigned long sensor_publish_interval_ms = 60000; // Publish every 60 seconds regardless of change
 
@@ -143,8 +141,7 @@ const char *controller_commands[] = {
 
 // Define sensor arrays
 const char *color_sensor_sensors[] = {
-    naming::SENSOR_COLOR_TEMP,
-    naming::SENSOR_LUX};
+    naming::SENSOR_COLOR_TEMP};
 
 // Create device definitions with canonical IDs and friendly names
 SentientDeviceDef dev_fire_leds(
@@ -175,7 +172,7 @@ SentientDeviceDef dev_color_sensor(
     naming::DEV_PILOTLIGHT_COLOR_SENSOR,
     naming::FRIENDLY_COLOR_SENSOR,
     "sensor",
-    color_sensor_sensors, 2, true); // true = input device
+    color_sensor_sensors, 1, true); // true = input device
 
 SentientDeviceDef dev_controller(
     naming::DEV_CONTROLLER,
@@ -740,20 +737,14 @@ void check_and_publish_sensor_changes()
     uint16_t r, g, b, c;
     tcs.getRawData(&r, &g, &b, &c);
     uint16_t color_temp = tcs.calculateColorTemperature_dn40(r, g, b, c);
-    uint16_t lux = tcs.calculateLux(r, g, b);
 
     // Check if values changed beyond threshold OR if it's been too long since last publish
     unsigned long current_time = millis();
     bool changed = false;
     bool force_publish = (current_time - last_sensor_publish_time >= sensor_publish_interval_ms);
 
-    // Check if either value changed beyond threshold
+    // Check if value changed beyond threshold
     if (abs((int)color_temp - (int)last_color_temp) >= color_temp_threshold)
-    {
-        changed = true;
-    }
-
-    if (abs((int)lux - (int)last_lux) >= lux_threshold)
     {
         changed = true;
     }
@@ -761,26 +752,17 @@ void check_and_publish_sensor_changes()
     // Publish if something changed OR if periodic interval has elapsed
     if (changed || force_publish)
     {
-        // Publish both sensor values using category/item format
+        // Publish sensor values using category/item format
         JsonDocument doc_temp;
         doc_temp["value"] = color_temp;
-        doc_temp["ts"] = millis();
-
-        JsonDocument doc_lux;
-        doc_lux["value"] = lux;
-        doc_lux["ts"] = millis();
 
         // Publish to MQTT using category and item
         // Category: sensors, Item: <device_id>/<sensor_name>
         String item_temp = String(naming::DEV_PILOTLIGHT_COLOR_SENSOR) + "/" + naming::SENSOR_COLOR_TEMP;
-        String item_lux = String(naming::DEV_PILOTLIGHT_COLOR_SENSOR) + "/" + naming::SENSOR_LUX;
-
         mqtt.publishJson(naming::CAT_SENSORS, item_temp.c_str(), doc_temp);
-        mqtt.publishJson(naming::CAT_SENSORS, item_lux.c_str(), doc_lux);
 
         // Update last published values
         last_color_temp = color_temp;
-        last_lux = lux;
         last_sensor_publish_time = current_time;
 
         if (force_publish)
@@ -791,8 +773,6 @@ void check_and_publish_sensor_changes()
         {
             Serial.print(F("[PilotLight] Sensor change detected - Color: "));
             Serial.print(color_temp);
-            Serial.print(F("K, Lux: "));
-            Serial.println(lux);
         }
     }
 }
@@ -823,12 +803,10 @@ void publish_full_status()
         uint16_t r, g, b, c;
         tcs.getRawData(&r, &g, &b, &c);
         doc["color_temp"] = tcs.calculateColorTemperature_dn40(r, g, b, c);
-        doc["lux"] = tcs.calculateLux(r, g, b);
     }
     else
     {
         doc["color_temp"] = 0;
-        doc["lux"] = 0;
     }
 
     // Current hardware state

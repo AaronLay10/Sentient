@@ -6,8 +6,8 @@ interface PuzzlePropertiesPanelProps {
   selectedNode: FlowNode | null;
   onNodeConfigChange: (nodeId: string, config: any) => void;
   devices: Device[];
-  rooms: Room[];
-  selectedRoomId: string;
+  rooms?: Room[];
+  selectedRoomId?: string;
   nodes: FlowNode[];
   edges: Edge[];
 }
@@ -16,8 +16,8 @@ export function PuzzlePropertiesPanel({
   selectedNode,
   onNodeConfigChange,
   devices,
-  rooms,
-  selectedRoomId,
+  rooms = [],
+  selectedRoomId = '',
   nodes,
   edges
 }: PuzzlePropertiesPanelProps) {

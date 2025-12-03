@@ -5,3 +5,5 @@ export * from './puzzle.events';
 export * from './scene.events';
 export * from './session.events';
 export * from './safety.events';
+export * from './gm.events';
+export * from './audio.events';

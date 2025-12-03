@@ -216,16 +216,53 @@
   backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 24px;
+  padding: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   transition: all 0.3s ease;
 }
 
 .clientCard:hover {
   border-color: var(--border-glow);
   box-shadow: 0 0 15px rgba(255, 170, 50, 0.1);
+}
+
+.clientHeader {
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.clientTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.chevronIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+}
+
+.venueCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  background: rgba(255, 170, 50, 0.2);
+  border: 1px solid var(--accent-orange);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-orange);
 }
 
 .clientInfo {
@@ -291,4 +328,149 @@
   background: rgba(239, 68, 68, 0.2);
   border-color: #f87171;
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Venue Management Styles */
+.venuesSection {
+  border-top: 1px solid var(--border-color);
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.venuesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.venuesTitle {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-orange);
+  margin: 0;
+}
+
+.addVenueButton {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid rgba(255, 170, 50, 0.5);
+  color: var(--accent-orange);
+}
+
+.addVenueButton:hover {
+  background: rgba(255, 170, 50, 0.1);
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 10px rgba(255, 170, 50, 0.2);
+}
+
+.venueFormCard {
+  background: rgba(26, 35, 50, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+}
+
+.venuesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.venueCard {
+  background: rgba(26, 35, 50, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+}
+
+.venueCard:hover {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.1);
+}
+
+.venueInfo {
+  flex: 1;
+}
+
+.venueName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.venueIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-cyan);
+}
+
+.venueAddress {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.venueId {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: 'Rajdhani', monospace;
+  margin: 0;
+}
+
+.venueActions {
+  display: flex;
+  gap: 6px;
+}
+
+.emptyVenues {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.emptyVenues svg {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+}
+
+.emptyVenues p {
+  margin: 0;
+  font-size: 0.875rem;
 }

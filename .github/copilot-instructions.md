@@ -1,77 +1,48 @@
-# Sentient Engine – AI Coding Agent Guide
+## Sentient Engine – AI Agent Playbook
 
-## Interaction Defaults
+### Interaction Defaults
 
-- Provide direct, high-signal answers with file paths and runnable commands; assume experienced developer context.
-- Pair reasoning with concrete steps; never restate prior context or invent architecture changes.
-- When debugging, request exact logs and trace end-to-end (API ↔ Orchestrator ↔ MQTT ↔ Redis ↔ UI ↔ controllers).
-- Deliverables flow: short summary → actionable steps → copy/paste commands → code → validation plan.
-- Before modifying cross-cutting concerns (EventType enum, MQTT topics, Redis channels), understand impact across all services.
+- Aim for direct, high-signal answers with file paths, runnable commands, and minimal recap.
+- When debugging, always trace the full pipeline (API ↔ Orchestrator ↔ MQTT ↔ Redis ↔ UI ↔ controller) before proposing fixes.
+- Deliverables order: concise summary → ordered action steps → copy/paste commands → code changes → validation plan.
+- Treat `EventType`, MQTT topics, Redis channels, and shared packages as global contracts—understand downstream impact before editing.
 
-## Architecture Snapshot
+### Architecture & Data Flow
 
-- **Sentient Engine** (see `docs/SYSTEM_ARCHITECTURE_v4.md`) is a theatrical control platform for escape rooms, coordinating Teensy 4.1, Raspberry Pi, ESP32 controllers plus connected devices (relays, sensors, maglocks, motors, lighting).
-- Controllers publish to topics (`sentient/<room>/<category>/…`); MQTT Gateway normalizes to `EventType` payloads → `sentient:events:domain`; Orchestrator and Realtime consume, UI mirrors via WS, commands return on `sentient:commands:device` → MQTT device command topics.
-- PostgreSQL holds clients/venues/rooms/controllers/devices via Prisma; Redis backs pub/sub and transient session state; MQTT broker lives at `sentientengine.ai:1883` (external, host-network binding locally).
-- Design principles: **hardware-dumb/software-smart** (all game logic centralized), event-driven, shared types across monorepo, **safety-first** (maglocks fail-safe, e-stop flows documented in `docs/SENTIENT_DATA_FLOW.md`).
+- Event-driven control stack (see `docs/SYSTEM_ARCHITECTURE_v4.md`) where hardware is dumb and orchestration lives centrally.
+- Controllers publish `sentient/<room>/<category>/…`; `apps/mqtt-gateway` normalizes to `EventType` payloads on `sentient:events:domain`.
+- `apps/orchestrator-service` consumes Redis events, mutates in-memory session state, and emits device commands on `sentient:commands:device`.
+- `apps/realtime-gateway` mirrors Redis messages to UI websockets; `apps/sentient-ui` expects shared types from `packages/shared-types`.
 
-## Repo & Runtime Basics
+### Services & Shared Packages
 
-- **Monorepo** managed with pnpm workspaces (`pnpm-workspace.yaml`); requires Node ≥22 and pnpm ≥10 (`pnpm install` once at root).
-- `pnpm -r dev` runs all service watchers in parallel; target single app with `pnpm --filter <app> dev`.
-- `docker-compose.yml` provisions Postgres 15, Redis 7, nginx, and every service container built from repo Dockerfiles.
-- `.env.sentient` or `.env.sentient.local` (not committed) seeds compose env vars; mirror it locally when bringing up services.
-- **Local deployment:** `./deploy.local.sh` (supports `--skip-build`, `--service <name>`, `--migrate` flags); production via `deploy.prod.sh`.
+- `apps/api-service` (NestJS + Prisma) seeds/reads Postgres; migrations via `pnpm --filter api-service prisma:migrate:dev`.
+- `apps/device-simulators` + `hardware/Controller Code Teensy` keep MQTT topics honest—use them when reproducing bugs without hardware.
+- `packages/core-domain` owns enums/entities; `packages/shared-messaging` exposes `MqttTopicBuilder` + `REDIS_CHANNELS`; `packages/shared-config` centralizes env parsing; `packages/shared-logging` provides the `createLogger({ service })` wrapper.
+- Always `pnpm -r build` after editing shared packages so downstream apps pick up the new artifacts (`workspace:*` linking is non-transpiled).
 
-## Core Services & Roles
+### Local Dev & Deployment Workflow
 
-- `apps/api-service` (NestJS + Prisma) exposes HTTP auth/config; schema lives in `apps/api-service/prisma/schema.prisma`; migrations via `pnpm --filter api-service prisma:migrate:dev`.
-- `apps/orchestrator-service` listens to Redis domain events, stores sessions in-memory, and emits commands through `EventPublisher`.
-- `apps/mqtt-gateway` bridges Mosquitto ↔ REST; subscribes to `sentient|paragon/<room>/<category>/…` topics, registers hardware via `/internal/*`, and publishes `sentient:events:domain`; requires `INTERNAL_REG_TOKEN`.
-- `apps/realtime-gateway` exposes WS on `WS_PORT` (3002 default) and rebroadcasts Redis events via `SentientWebSocketServer` for UI subscribers.
-- `apps/sentient-ui` (Vite/React) consumes API (port 3001) and WS 3002; components live under `apps/sentient-ui/src` and expect shared types.
-- `apps/device-simulators` mocks controllers/devices over MQTT using `MqttTopicBuilder` + `EventType`; use when hardware is offline.
+- Install once with `pnpm install`; run targeted dev servers via `pnpm --filter <app> dev` or the full stack with `pnpm -r dev`.
+- Use `./deploy.local.sh [--service <name>] [--skip-build] [--migrate]` to bring up Dockerized dependencies; production mirrors via `deploy.prod.sh`.
+- Compose expects `.env.sentient(.local)` for DB/Redis/MQTT credentials; never hardcode secrets in code.
+- Hardware builds live under `hardware/compile_teensy.sh` / `compile_all_v2.sh`; outputs drop into `hardware/HEX_OUTPUT` for flashing.
 
-## Shared Packages & Messaging
+### Debugging & Validation
 
-- `packages/core-domain` hosts enums/entities (`EventType` enum: `DEVICE_STATE_CHANGED`, `CONTROLLER_HEARTBEAT`, `PUZZLE_SOLVED`, etc.); **always import, never redefine** these constants.
-- `packages/shared-messaging` centralizes MQTT topic builders (`MqttTopicBuilder.deviceState()`, `MqttTopicBuilder.deviceCommand()`) and Redis channel helpers (`REDIS_CHANNELS.DOMAIN_EVENTS = 'sentient:events:domain'`, `REDIS_CHANNELS.DEVICE_COMMANDS = 'sentient:commands:device'`).
-- `packages/shared-config` exposes env schemas + builders for DB/Redis/MQTT; wire new services through these helpers.
-- `packages/shared-logging` wraps winston; use `createLogger({ service })` and `.child()` per component to keep structured metadata.
-- `packages/shared-types` contains TypeScript interfaces shared across services and UI.
-- **Critical:** All packages must `pnpm build` before consuming services can import them; monorepo uses workspace protocol (`workspace:*`).
+- Start with logs: `scripts/monitor.sh` aggregates services; fall back to `docker compose logs -f <service>`.
+- Inspect each hop: `mosquitto_sub -t 'sentient/#' -v`, `redis-cli MONITOR | grep sentient:events:domain`, `redis-cli PUBLISH …` to replay events, `docker exec sentient_postgres psql …` for DB state.
+- UI/WebSocket issues: publish a sample domain event and confirm it arrives in `apps/realtime-gateway` then `apps/sentient-ui` via browser devtools.
 
-## Data Flow & Env Contracts
+### Conventions & Safety
 
-- Postgres is the source of truth (clients/venues/rooms/controllers/devices defined in Prisma schema); API container runs `pnpm prisma:db:push` on boot.
-- Redis Pub/Sub is the backbone: MQTT Gateway publishes to `sentient:events:domain`, Orchestrator + Realtime subscribe, and commands flow back on `sentient:commands:*`.
-- MQTT broker runs externally at `sentientengine.ai:1883`; `mqtt-gateway` uses `network_mode: host`, so mind local port collisions.
-- Required env vars: `DATABASE_URL`, `REDIS_URL`, `MQTT_URL`, `INTERNAL_REG_TOKEN`, `API_PORT`, `WS_PORT`, `JWT_SECRET`, `MQTT_USERNAME`, `MQTT_PASSWORD`.
+- Keep logic server-side; edge controllers should only report state or execute commands from the Orchestrator.
+- Use `createLogger().child({ component })` per module for structured logs; do not `console.log` outside quick debugging.
+- When touching MQTT topics or Redis payloads, update both shared builders and downstream consumers (Orchestrator, UI, device simulators).
+- Preserve fail-safe behavior for maglocks/e-stop sequences described in `docs/SENTIENT_DATA_FLOW.md` before altering device routines.
 
-## Debugging Loop
+### References & Follow-Ups
 
-- Capture failing logs first (`scripts/monitor.sh` or `docker compose logs -f <service>`), trace the whole pipeline (controller → MQTT → gateway → Redis → orchestrator → UI).
-- Validate data at each hop: `redis-cli MONITOR | grep sentient:events:domain`, `redis-cli PUBLISH sentient:events:domain '{...}'` to repro UI behavior, `mqtt sub -t 'sentient/#'` to inspect controller chatter.
-- Verify DB state via `docker exec -it sentient_postgres psql -U postgres -d sentient -c "SELECT ..."` before assuming orchestration bugs.
-- Use `pnpm --filter <service> dev` for hot reload while iterating; restart dockerized dependents if env vars change.
-
-## Dev/Ops & Tooling
-
-- `pnpm -r build` before Docker builds; bring up targeted stacks with `docker compose up api-service orchestrator-service mqtt-gateway realtime-gateway sentient-ui`.
-- Deployments go through `deploy.local.sh` or `deploy.prod.sh`; `scripts/monitor.sh` provides live service/log dashboards, and `scripts/rollback.sh` handles image/db recovery.
-- Inspect services via `docker compose logs -f <service>` and DB via `docker exec -it sentient_postgres psql -U postgres -d sentient -c "SELECT ..."`.
-- UI/WebSocket validation: publish a fake event (`redis-cli PUBLISH sentient:events:domain '{...}'`) and confirm it lands in the browser DevTools feed.
-- Docker compose uses `docker-compose.yml` (base) + `docker-compose.dev.yml` (overrides); specify both with `-f` flags or rely on deploy scripts.
-
-## Hardware & Edge Controllers
-
-- Firmware resides under `hardware/Controller Code Teensy/*_v2`; compile with `./hardware/compile_teensy.sh "Controller Code Teensy/<ctrl>/<ctrl>.ino"` or `compile_all_v2.sh` (auto version bump to `hardware/HEX_OUTPUT`).
-- Clean artifacts via `hardware/clean_hex_output.sh`; flash with Teensy Loader or `teensy_loader_cli --mcu=TEENSY41 -w hardware/HEX_OUTPUT/<file>.hex`.
-- Firmware must register via `sentient/system/register/{controller|device}` topics before streaming. State topics follow `sentient/<room>/status/<controller>/<device>/state`; acknowledgements hit `…/acknowledgement/<command>` for UI immediacy.
-- Raspberry Pi launchers + MQTT config scripts live under `hardware/Raspberry Pis` and `hardware/scripts`; register nodes through API before field use.
-
-## Key References
-
-- `docs/SYSTEM_ARCHITECTURE_v4.md` holds canonical component boundaries and mermaid diagrams.
-- `docs/SENTIENT_DATA_FLOW.md`, `docs/Sentient_Engine_Deployment_Guide.md`, and `docs/Mac_Studio_Sentient_Setup_Guide.md` cover networking, deployment, and local setup specifics.
-- `docs/Sentient_Admin_Topology_Dashboard_Spec.md`, `docs/UI_PAGES.md`, and `docs/UI_Tasks_and_Procedures.md` define current UI behavior.
+- System diagrams live in `diagrams/*.mmd`; regenerate after architecture changes.
+- UI specs: `docs/UI_PAGES.md`, `docs/UI_Tasks_and_Procedures.md`; deployment ops: `docs/DEPLOYMENT.md`, `scripts/README.md`.
+- If anything in this guide feels incomplete, flag it in your reply so we can extend these instructions.

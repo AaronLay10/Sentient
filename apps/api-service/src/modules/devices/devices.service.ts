@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { RegisterDeviceDto } from './dto/register-device.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -7,6 +7,7 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class DevicesService {
+  private readonly logger = new Logger(DevicesService.name);
   private redisPublisher: Redis;
 
   constructor(
@@ -158,7 +159,7 @@ export class DevicesService {
   }
 
   async controlDevice(deviceId: string, state: boolean) {
-    console.log(`🎮 Control command received: ${deviceId} -> ${state ? 'ON' : 'OFF'}`);
+    this.logger.log(`Control command received: ${deviceId} -> ${state ? 'ON' : 'OFF'}`);
 
     const device = await this.prisma.device.findUnique({
       where: { id: deviceId },
@@ -173,16 +174,16 @@ export class DevicesService {
       throw new NotFoundException(`Device ${deviceId} not found`);
     }
 
-    // Use room name (lowercase) for MQTT topic, not the UUID
-    const roomName = device.room?.name?.toLowerCase() || device.roomId;
-    console.log(`📦 Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${roomName}`);
+    // Use room_id for MQTT topic (stable identifier), fallback to room name
+    const roomIdentifier = device.room?.room_id || device.room?.name?.toLowerCase() || device.roomId;
+    this.logger.debug(`Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${roomIdentifier}`);
 
     // Publish device command event to Redis
     const commandEvent = {
       event_type: 'device_command',
       controller_id: device.controllerId,
       device_id: deviceId,
-      room_id: roomName,
+      room_id: roomIdentifier,
       command: {
         device_id: deviceId,
         state: state
@@ -195,14 +196,14 @@ export class DevicesService {
       JSON.stringify(commandEvent)
     );
 
-    console.log(`✅ Published command to Redis: sentient:commands:device`);
+    this.logger.log(`Published command to Redis: sentient:commands:device`);
 
     return { success: true, device_id: deviceId, state };
   }
 
   // Generic command sender for lighting and other advanced controls
   async sendCommand(deviceId: string, command: string, payload?: Record<string, any>) {
-    console.log(`🎮 Send command: ${deviceId} -> ${command}`, payload);
+    this.logger.log(`Send command: ${deviceId} -> ${command}`, payload ? JSON.stringify(payload) : '');
 
     const device = await this.prisma.device.findUnique({
       where: { id: deviceId },
@@ -216,16 +217,16 @@ export class DevicesService {
       throw new NotFoundException(`Device ${deviceId} not found`);
     }
 
-    // Use room name (lowercase) for MQTT topic, not the UUID
-    const roomName = device.room?.name?.toLowerCase() || device.roomId;
-    console.log(`📦 Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${roomName}`);
+    // Use room_id for MQTT topic (stable identifier), fallback to room name
+    const roomIdentifier = device.room?.room_id || device.room?.name?.toLowerCase() || device.roomId;
+    this.logger.debug(`Device found: ${device.id}, Controller: ${device.controllerId}, Room: ${roomIdentifier}`);
 
     // Publish generic command event to Redis
     const commandEvent = {
       event_type: 'device_command_generic',
       controller_id: device.controllerId,
       device_id: deviceId,
-      room_id: roomName,
+      room_id: roomIdentifier,
       command: command,
       payload: payload || {},
       timestamp: new Date().toISOString()
@@ -236,7 +237,7 @@ export class DevicesService {
       JSON.stringify(commandEvent)
     );
 
-    console.log(`✅ Published generic command to Redis: sentient:commands:device_generic`);
+    this.logger.log(`Published generic command to Redis: sentient:commands:device_generic`);
 
     return { success: true, device_id: deviceId, command, payload };
   }

@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import * as path from 'path';
 import * as Joi from 'joi';
 import { HealthController } from './health.controller';
@@ -18,6 +20,7 @@ import { AdminModule } from './admin/admin.module';
 import { KioskModule } from './kiosk/kiosk.module';
 import { ScenesModule } from './scenes/scenes.module';
 import { PuzzlesModule } from './puzzles/puzzles.module';
+import { AudioModule } from './audio/audio.module';
 import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.service';
 
 @Module({
@@ -43,6 +46,11 @@ import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.
         JWT_EXPIRES_IN: Joi.alternatives().try(Joi.string(), Joi.number()).default('1d')
       })
     }),
+    // Rate limiting: 100 requests per minute per IP
+    ThrottlerModule.forRoot([{
+      ttl: 60000,  // 1 minute in milliseconds
+      limit: 100,  // 100 requests per minute
+    }]),
     PrismaModule,
     AuthModule,
     DatabaseModule,
@@ -56,9 +64,18 @@ import { HeartbeatEventHandlerService } from '../events/heartbeat-event-handler.
     AdminModule,
     KioskModule,
     ScenesModule,
-    PuzzlesModule
+    PuzzlesModule,
+    AudioModule
   ],
   controllers: [HealthController],
-  providers: [HealthService, HeartbeatEventHandlerService],
+  providers: [
+    HealthService,
+    HeartbeatEventHandlerService,
+    // Apply rate limiting globally
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

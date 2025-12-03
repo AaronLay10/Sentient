@@ -1,0 +1,26 @@
+{
+  "name": "audio-gateway",
+  "version": "1.0.0",
+  "description": "Audio Gateway - Bridges domain events to SCS Audio Server via OSC/UDP",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "start:dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn src/index.ts"
+  },
+  "dependencies": {
+    "@sentient/shared-messaging": "workspace:*",
+    "@sentient/shared-logging": "workspace:*",
+    "@sentient/core-domain": "workspace:*",
+    "dotenv": "^16.3.1",
+    "ioredis": "^5.3.2",
+    "osc": "^2.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0"
+  }
+}

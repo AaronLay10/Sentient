@@ -18,6 +18,12 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - sentient_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   redis:
     image: redis:7-alpine
@@ -30,6 +36,12 @@ services:
       - redisdata:/data
     networks:
       - sentient_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   # NOTE: MQTT broker runs externally at sentientengine.ai:1883
   # mqtt-gateway uses host network to connect to it
@@ -101,6 +113,12 @@ services:
       - redis
     networks:
       - sentient_net
+    healthcheck:
+      test: ["CMD", "node", "-e", "const Redis = require('ioredis'); const r = new Redis('redis://redis:6379'); r.ping().then(() => { r.quit(); process.exit(0); }).catch(() => process.exit(1));"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
 
   mqtt-gateway:
     build:
@@ -138,13 +156,46 @@ services:
       NODE_ENV: production
       REDIS_URL: redis://redis:6379
       WS_PORT: 3002
+      HEALTH_PORT: 3003
       LOG_LEVEL: debug
     depends_on:
       - redis
     ports:
       - "3002:3002"
+      - "3003:3003"
     networks:
       - sentient_net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  audio-gateway:
+    build:
+      context: .
+      dockerfile: apps/audio-gateway/Dockerfile
+    container_name: sentient_audio_gateway
+    restart: unless-stopped
+    env_file:
+      - .env.sentient
+    environment:
+      NODE_ENV: production
+      REDIS_URL: redis://redis:6379
+      SCS_HOST: audio.sentientengine.ai
+      SCS_PORT: 5000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      - redis
+    networks:
+      - sentient_net
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "node dist/index.js"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
 
   # =========================
   # Sentient UI (Unified Admin & GM Console)

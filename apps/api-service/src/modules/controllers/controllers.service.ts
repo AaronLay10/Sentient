@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { RegisterControllerDto } from './dto/register-controller.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +6,7 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class ControllersService {
+  private readonly logger = new Logger(ControllersService.name);
   private redisPublisher: Redis;
 
   constructor(
@@ -62,11 +63,18 @@ export class ControllersService {
   }
 
   async register(dto: RegisterControllerDto) {
-    // Try to find room by ID first, then by name (case-insensitive)
+    // Try to find room by room_id first, then by database ID, then by name (case-insensitive)
     let room = await this.prisma.room.findUnique({
-      where: { id: dto.room_id },
+      where: { room_id: dto.room_id },
       select: { id: true, clientId: true }
     });
+
+    if (!room) {
+      room = await this.prisma.room.findUnique({
+        where: { id: dto.room_id },
+        select: { id: true, clientId: true }
+      });
+    }
 
     if (!room) {
       room = await this.prisma.room.findFirst({
@@ -135,7 +143,7 @@ export class ControllersService {
           where: { id: { in: deviceIdsToRemove } }
         });
 
-        console.log(`🗑️  Removed ${devicesToRemove.length} orphaned device(s) from controller ${controller.id}:`, deviceIdsToRemove);
+        this.logger.log(`Removed ${devicesToRemove.length} orphaned device(s) from controller ${controller.id}: ${deviceIdsToRemove.join(', ')}`);
       }
     }
 
@@ -143,7 +151,7 @@ export class ControllersService {
   }
 
   async requestStatus(controllerId: string) {
-    console.log(`📋 Status request for controller: ${controllerId}`);
+    this.logger.log(`Status request for controller: ${controllerId}`);
 
     const controller = await this.prisma.controller.findUnique({
       where: { id: controllerId },
@@ -154,14 +162,14 @@ export class ControllersService {
       throw new NotFoundException(`Controller ${controllerId} not found`);
     }
 
-    // Use room name (lowercase) for MQTT topic, not the UUID
-    const roomName = controller.room?.name?.toLowerCase() || controller.roomId;
+    // Use room_id for MQTT topic (stable identifier), fallback to room name
+    const roomIdentifier = controller.room?.room_id || controller.room?.name?.toLowerCase() || controller.roomId;
 
     // Publish status request event to Redis
     const requestEvent = {
       event_type: 'status_request',
       controller_id: controllerId,
-      room_id: roomName,
+      room_id: roomIdentifier,
       timestamp: new Date().toISOString()
     };
 
@@ -170,7 +178,7 @@ export class ControllersService {
       JSON.stringify(requestEvent)
     );
 
-    console.log(`✅ Published status request to Redis for ${controllerId}`);
+    this.logger.log(`Published status request to Redis for ${controllerId}`);
 
     return { success: true, controller_id: controllerId, message: 'Status request sent' };
   }

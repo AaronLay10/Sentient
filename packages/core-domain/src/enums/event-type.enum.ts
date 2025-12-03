@@ -43,4 +43,14 @@ export enum EventType {
   EMERGENCY_STOP_CLEARED = 'emergency_stop_cleared',
   MAGLOCK_RELEASED = 'maglock_released',
   SAFETY_ALERT = 'safety_alert',
+
+  // Audio Events
+  AUDIO_CUE_PLAY = 'audio_cue_play',
+  AUDIO_CUE_STOP = 'audio_cue_stop',
+  AUDIO_HOTKEY_PLAY = 'audio_hotkey_play',
+  AUDIO_HOTKEY_ON = 'audio_hotkey_on',
+  AUDIO_HOTKEY_OFF = 'audio_hotkey_off',
+  AUDIO_STOP_ALL = 'audio_stop_all',
+  AUDIO_FADE_ALL = 'audio_fade_all',
+  AUDIO_SET_MASTER_VOLUME = 'audio_set_master_volume',
 }

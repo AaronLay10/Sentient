@@ -179,3 +179,83 @@
   border-color: #6366f1;
   background: #6366f1;
 }
+
+.currentValue {
+  padding: 8px 10px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 4px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.valueText {
+  font-size: 14px;
+  font-weight: 600;
+  color: #a5b4fc;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.noValue {
+  font-size: 11px;
+  color: #52525b;
+  font-style: italic;
+}
+
+.conditionRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.operatorSelect {
+  flex: 0 0 55px;
+  min-width: 55px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.valueInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.rangeInputs {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
+}
+
+.rangeInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.rangeAnd {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a1a1aa;
+  padding: 0 2px;
+}
+
+.testButton {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #00d9ff;
+  background: rgba(0, 217, 255, 0.1);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.testButton:hover {
+  background: rgba(0, 217, 255, 0.2);
+  border-color: rgba(0, 217, 255, 0.5);
+}

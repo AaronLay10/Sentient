@@ -3,6 +3,7 @@ import { EventSubscriber, RedisChannelBuilder } from '@sentient/shared-messaging
 import { SentientWebSocketServer } from './websocket/websocket-server';
 import { RedisSubscriberAdapter } from './redis-adapter';
 import Redis from 'ioredis';
+import { createServer, IncomingMessage, ServerResponse } from 'http';
 
 async function bootstrap() {
   const logger = createLogger({
@@ -14,6 +15,7 @@ async function bootstrap() {
   logger.info('Starting Realtime Gateway');
 
   const wsPort = parseInt(process.env.WS_PORT || '3002');
+  const healthPort = parseInt(process.env.HEALTH_PORT || '3003');
   const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
 
   // Initialize WebSocket server
@@ -23,6 +25,63 @@ async function bootstrap() {
   const redisInstance = new Redis(redisUrl);
   const redisSubscriber = new RedisSubscriberAdapter(redisInstance);
   const eventSubscriber = new EventSubscriber(redisSubscriber);
+
+  // Track Redis connection status
+  let redisConnected = false;
+  redisInstance.on('connect', () => {
+    redisConnected = true;
+    logger.info('Redis connected');
+  });
+  redisInstance.on('error', (err) => {
+    redisConnected = false;
+    logger.error('Redis connection error', err);
+  });
+  redisInstance.on('close', () => {
+    redisConnected = false;
+    logger.warn('Redis connection closed');
+  });
+
+  // Create HTTP health check server
+  const healthServer = createServer((req: IncomingMessage, res: ServerResponse) => {
+    if (req.url === '/health' && req.method === 'GET') {
+      const stats = wsServer.getStats();
+      const health = {
+        status: redisConnected ? 'ok' : 'degraded',
+        service: 'realtime-gateway',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        redis: {
+          connected: redisConnected,
+          url: redisUrl.replace(/\/\/.*@/, '//*****@'), // Mask credentials
+        },
+        websocket: {
+          port: wsPort,
+          clients: stats.total_clients,
+          rooms: stats.rooms.length,
+        },
+      };
+
+      const statusCode = redisConnected ? 200 : 503;
+      res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(health, null, 2));
+    } else if (req.url === '/ready' && req.method === 'GET') {
+      // Readiness probe - only ready if Redis is connected
+      if (redisConnected) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ready: true }));
+      } else {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ready: false, reason: 'Redis not connected' }));
+      }
+    } else {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Not found' }));
+    }
+  });
+
+  healthServer.listen(healthPort, () => {
+    logger.info('Health check server started', { port: healthPort });
+  });
 
   // Subscribe to all domain events and broadcast to WebSocket clients
   await eventSubscriber.subscribeToDomainEvents(async (event) => {
@@ -73,6 +132,15 @@ async function bootstrap() {
   // Graceful shutdown
   const shutdown = async () => {
     logger.info('Shutting down Realtime Gateway');
+
+    // Close health server first
+    await new Promise<void>((resolve) => {
+      healthServer.close(() => {
+        logger.info('Health server closed');
+        resolve();
+      });
+    });
+
     await wsServer.close();
     await redisInstance.quit();
     process.exit(0);

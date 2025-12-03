@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sentient Engine - Production Deployment Script
-# Usage: ./deploy.sh [--skip-build] [--service <name>]
+# Usage: ./deploy.prod.sh [--skip-build] [--service <name>]
 set -e
 
 # Colors for output
@@ -13,16 +13,33 @@ NC='\033[0m' # No Color
 SKIP_BUILD=false
 SINGLE_SERVICE=""
 
-# Default environment selection (override via ENV_FILE / UI_VITE_* when calling script)
+# Default environment selection (override via ENV_FILE when calling script)
 ENV_FILE="${ENV_FILE:-.env.sentient.prod}"
 
-# Load UI build variables from env file if they exist, otherwise use defaults
+# Load UI build variables from env file - more reliable parsing
 if [ -f "$ENV_FILE" ]; then
-  source <(grep "^UI_VITE_" "$ENV_FILE" | sed 's/^/export /')
+  # Extract and export UI_VITE_* variables directly
+  while IFS='=' read -r key value; do
+    # Remove any quotes from value
+    value="${value%\"}"
+    value="${value#\"}"
+    value="${value%\'}"
+    value="${value#\'}"
+    export "$key=$value"
+  done < <(grep "^UI_VITE_" "$ENV_FILE")
 fi
 
-UI_VITE_API_URL="${UI_VITE_API_URL:-https://sentientengine.ai/api}"
-UI_VITE_WS_URL="${UI_VITE_WS_URL:-wss://sentientengine.ai/ws}"
+# Production defaults - these should always point to production URLs
+if [ -z "$UI_VITE_API_URL" ]; then
+  echo -e "${YELLOW}Warning: UI_VITE_API_URL not set in $ENV_FILE, using production default${NC}"
+  UI_VITE_API_URL="https://sentientengine.ai/api"
+fi
+
+if [ -z "$UI_VITE_WS_URL" ]; then
+  echo -e "${YELLOW}Warning: UI_VITE_WS_URL not set in $ENV_FILE, using production default${NC}"
+  UI_VITE_WS_URL="wss://sentientengine.ai/ws"
+fi
+
 export UI_VITE_API_URL UI_VITE_WS_URL
 
 while [[ $# -gt 0 ]]; do

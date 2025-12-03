@@ -19,6 +19,7 @@ interface Venue {
 interface Room {
   id: string;
   name: string;
+  room_id?: string;
   clientId: string;
   venueId: string;
   created_at: string;
@@ -32,8 +33,9 @@ export function Rooms() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    room_id: '',
     clientId: '',
-    venueId: '',
+    venueId: ''
   });
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -111,7 +113,7 @@ export function Rooms() {
       if (response.ok) {
         await fetchData();
         setShowForm(false);
-        setFormData({ name: '', clientId: '', venueId: '' });
+        setFormData({ name: '', room_id: '', clientId: '', venueId: '' });
         setEditingId(null);
       }
     } catch (error) {
@@ -122,8 +124,9 @@ export function Rooms() {
   const handleEdit = (room: Room) => {
     setFormData({
       name: room.name,
+      room_id: room.room_id || '',
       clientId: room.clientId,
-      venueId: room.venueId,
+      venueId: room.venueId
     });
     setEditingId(room.id);
     setShowForm(true);
@@ -152,7 +155,7 @@ export function Rooms() {
 
   const handleCancel = () => {
     setShowForm(false);
-    setFormData({ name: '', clientId: '', venueId: '' });
+    setFormData({ name: '', room_id: '', clientId: '', venueId: '' });
     setEditingId(null);
   };
 
@@ -233,6 +236,36 @@ export function Rooms() {
                 className={styles.input}
                 placeholder="Enter room name"
               />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Room ID (for controllers)</label>
+              <input
+                type="text"
+                value={formData.room_id}
+                onChange={(e) => setFormData({ ...formData, room_id: e.target.value })}
+                className={styles.input}
+                placeholder="e.g., clockwork, aztec (lowercase, no spaces)"
+                pattern="[a-z0-9_-]+"
+              />
+              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
+                Controllers use this ID to register. Leave blank to use room name.
+              </small>
+            </div>
+
+            <div className={styles.formActions}>
+              <label className={styles.label}>Room ID (for controllers)</label>
+              <input
+                type="text"
+                value={formData.room_id}
+                onChange={(e) => setFormData({ ...formData, room_id: e.target.value })}
+                className={styles.input}
+                placeholder="e.g., clockwork, aztec (lowercase, no spaces)"
+                pattern="[a-z0-9_-]+"
+              />
+              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
+                Controllers use this ID to register. Leave blank to use room name.
+              </small>
             </div>
 
             <div className={styles.formActions}>

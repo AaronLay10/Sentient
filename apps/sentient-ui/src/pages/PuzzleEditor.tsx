@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ReactFlow,
   Background,
@@ -18,7 +18,10 @@ import { PuzzleNodePalette } from '../components/PuzzleEditor/PuzzleNodePalette'
 import { PuzzlePropertiesPanel } from '../components/PuzzleEditor/PuzzlePropertiesPanel';
 import { PuzzleNode } from '../components/PuzzleEditor/PuzzleNode';
 import { PuzzleDetailsModal } from '../components/PuzzleEditor/PuzzleDetailsModal';
-import { api, type Room, type Device, type Puzzle } from '../lib/api';
+import { api, type Device, type Puzzle } from '../lib/api';
+import { useRoomContext } from '../contexts/RoomContext';
+import { useWebSocket } from '../hooks/useWebSocket';
+import type { DomainEvent } from '../types/events';
 import styles from './PuzzleEditor.module.css';
 
 const nodeTypes = {
@@ -31,14 +34,14 @@ const initialEdges: Array<{ id: string; type: 'default'; animated: boolean; styl
 function PuzzleEditorInner() {
   const queryClient = useQueryClient();
   const { screenToFlowPosition, fitView } = useReactFlow();
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
+  const { selectedClientId, selectedRoomId: contextRoomId } = useRoomContext();
 
   const [nodes, setNodes] = useState<FlowNode[]>(initialNodes);
   const [edges, setEdges] = useState<Array<{ id: string; type: 'default'; animated: boolean; style: { stroke: string; strokeWidth: number }; source: string; target: string; sourceHandle: string | null; targetHandle: string | null }>>(initialEdges);
   const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
   const [selectedPuzzleId, setSelectedPuzzleId] = useState<string | null>(null);
-  const [selectedRoomId, setSelectedRoomId] = useState<string>('');
-  const selectedClientId = 'cmif0rz0400001352aazr47j8'; // Default to Paragon
   const [puzzleInfo, setPuzzleInfo] = useState({
     name: 'New Puzzle',
     description: '',
@@ -48,12 +51,17 @@ function PuzzleEditorInner() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [autoSaveEnabled] = useState(true);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [deviceStates, setDeviceStates] = useState<Record<string, any>>({});
 
-  // Fetch rooms
-  const { data: rooms = [] } = useQuery<Room[]>({
-    queryKey: ['rooms'],
-    queryFn: api.getRooms,
-  });
+  // Use roomId from URL or context
+  const activeRoomId = roomId || contextRoomId;
+
+  // Redirect if no room selected
+  useEffect(() => {
+    if (!activeRoomId) {
+      navigate('/monitor');
+    }
+  }, [activeRoomId, navigate]);
 
   // Fetch devices
   const { data: devices = [] } = useQuery<Device[]>({
@@ -63,11 +71,31 @@ function PuzzleEditorInner() {
     staleTime: 0,
   });
 
-  // Fetch puzzles for selected room
+  // WebSocket connection for live device states
+  const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3002';
+
+  const handleWebSocketEvent = useCallback((event: DomainEvent) => {
+    if (event.type === 'device_state_changed' && event.device_id) {
+      const latestState = event.payload?.new_state || event.payload;
+      setDeviceStates(prev => ({
+        ...prev,
+        [event.device_id!]: latestState,
+      }));
+    }
+  }, []);
+
+  useWebSocket({
+    url: WS_URL,
+    roomId: activeRoomId || undefined,
+    onEvent: handleWebSocketEvent,
+    onConnect: () => console.log('[PuzzleEditor] WebSocket connected to:', WS_URL, 'room:', activeRoomId),
+    onDisconnect: () => console.log('[PuzzleEditor] WebSocket disconnected'),
+  });
+  // Fetch puzzles for active room
   const { data: puzzles = [] } = useQuery<Puzzle[]>({
-    queryKey: ['puzzles', selectedClientId, selectedRoomId],
-    queryFn: () => api.getPuzzles(selectedClientId, selectedRoomId),
-    enabled: !!selectedClientId && !!selectedRoomId,
+    queryKey: ['puzzles', selectedClientId, activeRoomId],
+    queryFn: () => api.getPuzzles(selectedClientId!, activeRoomId!),
+    enabled: !!selectedClientId && !!activeRoomId,
   });
 
   // Load a specific puzzle
@@ -83,32 +111,12 @@ function PuzzleEditorInner() {
     setSelectedPuzzleId(puzzle.id);
   }, []);
 
-  // Set first room as default or from URL params
-  useEffect(() => {
-    const roomIdFromUrl = searchParams.get('roomId');
-    const puzzleIdFromUrl = searchParams.get('puzzleId');
-
-    if (roomIdFromUrl) {
-      setSelectedRoomId(roomIdFromUrl);
-    } else if (rooms.length > 0 && !selectedRoomId) {
-      setSelectedRoomId(rooms[0].id);
-    }
-
-    // If puzzleId is in URL, load it once puzzles are available
-    if (puzzleIdFromUrl && puzzles.length > 0) {
-      const puzzle = puzzles.find(p => p.id === puzzleIdFromUrl);
-      if (puzzle) {
-        loadPuzzle(puzzle);
-      }
-    }
-  }, [rooms, selectedRoomId, searchParams, puzzles, loadPuzzle]);
-
   // Load first puzzle automatically when puzzles are loaded
   useEffect(() => {
-    if (puzzles.length > 0 && !selectedPuzzleId && !searchParams.get('puzzleId')) {
+    if (puzzles.length > 0 && !selectedPuzzleId) {
       loadPuzzle(puzzles[0]);
     }
-  }, [puzzles, selectedPuzzleId, loadPuzzle, searchParams]);
+  }, [puzzles, selectedPuzzleId, loadPuzzle]);
 
   // Fit view when nodes change
   useEffect(() => {
@@ -122,11 +130,10 @@ function PuzzleEditorInner() {
   // Save puzzle mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const puzzleData = {
+      const puzzleData: any = {
         name: puzzleInfo.name,
-        description: puzzleInfo.description,
-        timeout_seconds: puzzleInfo.timeout_seconds,
-        hint_text: puzzleInfo.hint_text,
+        description: puzzleInfo.description || '',
+        hint_text: puzzleInfo.hint_text || '',
         graph: {
           nodes: nodes.map(n => ({
             id: n.id,
@@ -152,26 +159,35 @@ function PuzzleEditorInner() {
         active: true,
       };
 
+      // Only include timeout_seconds if it's defined
+      if (puzzleInfo.timeout_seconds !== undefined && puzzleInfo.timeout_seconds !== null) {
+        puzzleData.timeout_seconds = puzzleInfo.timeout_seconds;
+      }
+
+      console.log('[PuzzleEditor] Saving puzzle data:', JSON.stringify(puzzleData, null, 2));
+
       if (selectedPuzzleId) {
-        return api.updatePuzzle(selectedClientId, selectedRoomId, selectedPuzzleId, puzzleData);
+        return api.updatePuzzle(selectedClientId!, activeRoomId!, selectedPuzzleId, puzzleData);
       } else {
-        return api.createPuzzle(selectedClientId, selectedRoomId, puzzleData);
+        return api.createPuzzle(selectedClientId!, activeRoomId!, puzzleData);
       }
     },
-    onSuccess: (savedPuzzle) => {
-      queryClient.invalidateQueries({ queryKey: ['puzzles', selectedClientId, selectedRoomId] });
+    onSuccess: (savedPuzzle: Puzzle) => {
+      queryClient.invalidateQueries({ queryKey: ['puzzles', selectedClientId, activeRoomId] });
       setSelectedPuzzleId(savedPuzzle.id);
       setLastSaved(new Date());
+      console.log('[PuzzleEditor] Puzzle saved successfully:', savedPuzzle.id);
     },
-    onError: (error) => {
-      console.error('Failed to save puzzle:', error);
-      alert('Failed to save puzzle. Please try again.');
+    onError: (error: any) => {
+      console.error('[PuzzleEditor] Failed to save puzzle:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Unknown error';
+      alert(`Failed to save puzzle: ${errorMessage}`);
     },
   });
 
   // Auto-save on nodes/edges change (debounced)
   useEffect(() => {
-    if (!autoSaveEnabled || !selectedRoomId || !selectedPuzzleId) return;
+    if (!autoSaveEnabled || !activeRoomId || !selectedPuzzleId) return;
 
     const debounceTimer = setTimeout(() => {
       console.log('Auto-saving puzzle...');
@@ -179,7 +195,7 @@ function PuzzleEditorInner() {
     }, 3000);
 
     return () => clearTimeout(debounceTimer);
-  }, [nodes, edges, puzzleInfo, autoSaveEnabled, selectedRoomId, selectedPuzzleId]);
+  }, [nodes, edges, puzzleInfo, autoSaveEnabled, activeRoomId, selectedPuzzleId]);
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -285,19 +301,27 @@ function PuzzleEditorInner() {
     );
   }, []);
 
-  // Enhance nodes with devices and callbacks
+  // Enhance nodes with devices, callbacks, and live device states
   const enhancedNodes = nodes.map(node => ({
     ...node,
     data: {
       ...node.data,
       devices,
+      deviceStates,
+      roomId: activeRoomId,
       onConfigChange: updateNodeConfig,
     }
   }));
 
   const handleSave = () => {
-    if (!selectedRoomId) {
-      alert('Please select a room first');
+    console.log('[PuzzleEditor] handleSave called');
+    console.log('[PuzzleEditor] selectedClientId:', selectedClientId);
+    console.log('[PuzzleEditor] activeRoomId:', activeRoomId);
+    console.log('[PuzzleEditor] selectedPuzzleId:', selectedPuzzleId);
+    
+    if (!selectedClientId || !activeRoomId) {
+      console.error('[PuzzleEditor] No room context!');
+      alert('Please select a room first using the room selector button');
       return;
     }
     saveMutation.mutate();
@@ -325,22 +349,6 @@ function PuzzleEditorInner() {
         <div className={styles.topLeft}>
           <h1 className={styles.title}>Puzzle Editor</h1>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <select
-              className={styles.roomSelect}
-              value={selectedRoomId}
-              onChange={(e) => {
-                setSelectedRoomId(e.target.value);
-                setSelectedPuzzleId(null);
-                handleNewPuzzle();
-              }}
-            >
-              <option value="">Select Room...</option>
-              {rooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.name}
-                </option>
-              ))}
-            </select>
             {puzzles.length > 0 && (
               <select
                 className={styles.puzzleSelect}
@@ -348,7 +356,7 @@ function PuzzleEditorInner() {
                 onChange={(e) => {
                   const puzzleId = e.target.value;
                   if (puzzleId) {
-                    const puzzle = puzzles.find(p => p.id === puzzleId);
+                    const puzzle = puzzles.find((p: Puzzle) => p.id === puzzleId);
                     if (puzzle) loadPuzzle(puzzle);
                   } else {
                     handleNewPuzzle();
@@ -356,7 +364,7 @@ function PuzzleEditorInner() {
                 }}
               >
                 <option value="">New Puzzle...</option>
-                {puzzles.map((puzzle) => (
+                {puzzles.map((puzzle: Puzzle) => (
                   <option key={puzzle.id} value={puzzle.id}>
                     {puzzle.name}
                   </option>
@@ -444,8 +452,6 @@ function PuzzleEditorInner() {
           selectedNode={selectedNode}
           onNodeConfigChange={updateNodeConfig}
           devices={devices}
-          rooms={rooms}
-          selectedRoomId={selectedRoomId}
           nodes={nodes}
           edges={edges}
         />

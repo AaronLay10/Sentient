@@ -3,11 +3,14 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  HttpStatus
+  HttpStatus,
+  Logger
 } from '@nestjs/common';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
@@ -21,6 +24,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const message = isHttpException
       ? exception.getResponse()
       : 'Internal server error';
+
+    // Log validation errors and bad requests for debugging
+    if (status === 400) {
+      this.logger.warn(`Validation error on ${request.method} ${request.url}`);
+      this.logger.warn(JSON.stringify(message, null, 2));
+      this.logger.warn(`Request body: ${JSON.stringify(request.body, null, 2)}`);
+    }
 
     response.status(status).json({
       statusCode: status,

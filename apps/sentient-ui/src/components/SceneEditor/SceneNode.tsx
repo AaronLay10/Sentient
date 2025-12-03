@@ -52,7 +52,9 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
 
   const handleTest = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if ((data.nodeType === 'device' || (data.nodeType === 'media' && data.subtype === 'video')) && 
+
+    // Device or Video node test
+    if ((data.nodeType === 'device' || (data.nodeType === 'media' && data.subtype === 'video')) &&
         data.config?.deviceId && data.config?.action) {
       try {
         const commandSentAt = Date.now();
@@ -63,21 +65,47 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
           payload: data.config.payload || {},
           timestamp: new Date(commandSentAt).toISOString()
         });
-        
+
         // Import api dynamically
         const { api } = await import('../../lib/api');
-        
+
         // Call the new sendDeviceCommand API
         const result = await api.sendDeviceCommand(
           data.config.deviceId,
           data.config.action,
           data.config.payload || {}
         );
-        
+
         console.log('✅ Command sent successfully:', result);
         console.log('⏱️  Waiting for acknowledgement from controller...');
       } catch (error) {
         console.error('❌ Error sending command:', error);
+      }
+    }
+
+    // Audio node test - send audio cue command
+    if (data.nodeType === 'audio' && data.config?.cueId) {
+      try {
+        const { api } = await import('../../lib/api');
+        const command = data.config.command || 'play';
+
+        console.log(`🔊 Audio command:`, {
+          cueId: data.config.cueId,
+          command,
+          subtype: data.subtype,
+          timestamp: new Date().toISOString()
+        });
+
+        // Send audio command via API (which publishes to Redis)
+        await api.sendAudioCommand(data.roomId || '', {
+          cue_id: data.config.cueId,
+          command,
+          triggered_by: 'scene'
+        });
+
+        console.log('✅ Audio command sent successfully');
+      } catch (error) {
+        console.error('❌ Error sending audio command:', error);
       }
     }
   };
@@ -128,9 +156,10 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
         {selected && (
           <div style={{ display: 'flex', gap: '4px', marginLeft: 'auto' }}>
             {((data.nodeType === 'device' && data.config?.deviceId && data.config?.action) ||
-              (data.nodeType === 'media' && data.subtype === 'video' && data.config?.deviceId && data.config?.action)) && (
-              <div 
-                className={styles.testBtn} 
+              (data.nodeType === 'media' && data.subtype === 'video' && data.config?.deviceId && data.config?.action) ||
+              (data.nodeType === 'audio' && data.config?.cueId)) && (
+              <div
+                className={styles.testBtn}
                 title="Test this node"
                 onClick={handleTest}
               >
@@ -481,12 +510,60 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
           </>
         )}
         
-        {/* Audio Node */}
-        {data.nodeType === 'audio' && data.config?.audioFile && (
-          <div className={styles.field}>
-            <div className={styles.label}>Audio</div>
-            <div className={styles.value}>{data.config.audioFile}</div>
-          </div>
+        {/* Audio Node - SCS Audio Server Integration */}
+        {data.nodeType === 'audio' && (
+          <>
+            <div className={styles.field}>
+              <div className={styles.label}>Cue ID</div>
+              <input
+                type="text"
+                className={`${styles.dropdown} nopan nodrag`}
+                value={data.config?.cueId || ''}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  data.onConfigChange?.(id, {
+                    ...data.config,
+                    cueId: e.target.value
+                  });
+                }}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                placeholder="e.g., Q1, Q17, Q32..."
+              />
+            </div>
+            <div className={styles.field}>
+              <div className={styles.label}>Command</div>
+              <select
+                className={`${styles.dropdown} nopan nodrag`}
+                value={data.config?.command || 'play'}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  data.onConfigChange?.(id, {
+                    ...data.config,
+                    command: e.target.value
+                  });
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <option value="play">Play Cue</option>
+                <option value="stop">Stop Cue</option>
+                <option value="hotkey">Play Hotkey</option>
+                <option value="hotkey_on">Hotkey On</option>
+                <option value="hotkey_off">Hotkey Off</option>
+                <option value="stop_all">Stop All</option>
+                <option value="fade_all">Fade All</option>
+              </select>
+            </div>
+            {data.config?.cueId && (
+              <div className={styles.field}>
+                <div className={styles.hint} style={{ fontSize: '10px', color: '#6b7280' }}>
+                  {data.subtype === 'sfx' && '🔊 Sound effect'}
+                  {data.subtype === 'music' && '♫ Background music'}
+                  {data.subtype === 'voice' && '🎤 Voice/narration'}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Puzzle Node */}

@@ -222,16 +222,15 @@ export function Overview() {
         }
       });
 
-      // Determine overall health
-      // TODO: Temporarily forced to 'healthy' - restore logic later
+      // Determine overall health based on actual system state
       let overall: SystemHealth['overall'] = 'healthy';
-      // if (issues.some(i => i.severity === 'critical')) {
-      //   overall = 'critical';
-      // } else if (issues.length > 0) {
-      //   overall = 'warning';
-      // } else if (onlineControllers === 0) {
-      //   overall = 'offline';
-      // }
+      if (issues.some(i => i.severity === 'critical')) {
+        overall = 'critical';
+      } else if (issues.length > 0) {
+        overall = 'warning';
+      } else if (onlineControllers === 0 && controllers.length > 0) {
+        overall = 'offline';
+      }
 
       return {
         overall,
