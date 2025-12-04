@@ -6,6 +6,16 @@ interface ProtectedRouteProps {
   children: ReactNode;
 }
 
+export interface CurrentUser {
+  id: string;
+  email: string;
+  clientId: string;
+  role: string;
+  isSentientAdmin?: boolean;
+  emulatingClientId?: string;
+  emulatingClientName?: string;
+}
+
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -35,6 +45,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         sessionStorage.removeItem('sentient_token');
         localStorage.removeItem('sentient_user');
         sessionStorage.removeItem('sentient_user');
+        localStorage.removeItem('sentient_emulating');
+        sessionStorage.removeItem('sentient_emulating');
         setIsAuthenticated(false);
         return;
       }
@@ -85,16 +97,71 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   return <>{children}</>;
 }
 
-// Utility function to get current user
-export function getCurrentUser() {
+// Utility function to get current user with emulation info
+export function getCurrentUser(): CurrentUser | null {
   const userStr = localStorage.getItem('sentient_user') || sessionStorage.getItem('sentient_user');
   if (!userStr) return null;
 
   try {
-    return JSON.parse(userStr);
+    const user = JSON.parse(userStr) as CurrentUser;
+
+    // Check for emulation state
+    const emulatingStr = localStorage.getItem('sentient_emulating') || sessionStorage.getItem('sentient_emulating');
+    if (emulatingStr) {
+      const emulating = JSON.parse(emulatingStr);
+      user.emulatingClientId = emulating.clientId;
+      user.emulatingClientName = emulating.clientName;
+    }
+
+    return user;
   } catch {
     return null;
   }
+}
+
+// Check if current user is a Sentient admin
+export function isSentientAdmin(): boolean {
+  const user = getCurrentUser();
+  return user?.isSentientAdmin === true || user?.role === 'SENTIENT_ADMIN';
+}
+
+// Check if currently emulating a client
+export function isEmulating(): boolean {
+  const emulatingStr = localStorage.getItem('sentient_emulating') || sessionStorage.getItem('sentient_emulating');
+  return !!emulatingStr;
+}
+
+// Get the effective client ID (emulated client or actual client)
+export function getEffectiveClientId(): string | null {
+  const user = getCurrentUser();
+  if (!user) return null;
+
+  // If emulating, use the emulated client ID
+  if (user.emulatingClientId) {
+    return user.emulatingClientId;
+  }
+
+  return user.clientId;
+}
+
+// Start emulating a client (Sentient admin only)
+export function startEmulating(clientId: string, clientName: string) {
+  const user = getCurrentUser();
+  if (!user?.isSentientAdmin) {
+    console.error('Only Sentient admins can emulate clients');
+    return false;
+  }
+
+  const emulating = { clientId, clientName };
+  localStorage.setItem('sentient_emulating', JSON.stringify(emulating));
+  sessionStorage.setItem('sentient_emulating', JSON.stringify(emulating));
+  return true;
+}
+
+// Stop emulating a client
+export function stopEmulating() {
+  localStorage.removeItem('sentient_emulating');
+  sessionStorage.removeItem('sentient_emulating');
 }
 
 // Utility function to get auth token
@@ -108,5 +175,7 @@ export function logout() {
   sessionStorage.removeItem('sentient_token');
   localStorage.removeItem('sentient_user');
   sessionStorage.removeItem('sentient_user');
+  localStorage.removeItem('sentient_emulating');
+  sessionStorage.removeItem('sentient_emulating');
   window.location.href = '/login';
 }

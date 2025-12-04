@@ -109,14 +109,14 @@ export class SentientWebSocketServer {
       authenticated = payload !== null;
     }
 
-    // In production, reject unauthenticated connections
+    // In production, log unauthenticated connections but still allow them
+    // Kiosk pages need real-time updates but don't have user auth
+    // They can receive broadcasts but cannot subscribe to rooms or perform actions
     if (this.requireAuth && !authenticated) {
-      this.logger.warn('Rejected unauthenticated WebSocket connection', {
+      this.logger.info('Anonymous WebSocket connection allowed (kiosk mode)', {
         client_id: clientId,
         ip: req.socket.remoteAddress
       });
-      ws.close(1008, 'Authentication required');
-      return;
     }
 
     const client: AuthenticatedClient = {

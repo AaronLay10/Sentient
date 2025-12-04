@@ -152,14 +152,9 @@ export function LightingKiosk() {
 
       {/* Main Content */}
       <main className="kiosk-main">
-        {/* Eye Section */}
+        {/* Eye Section - matches sidebar style without HUD decoration */}
         <div className="eye-section">
-          <SentientEye health={{
-            overall: wsConnected && controllerOnline ? 'healthy' : 'offline',
-            controllers: { total: 1, online: controllerOnline ? 1 : 0, offline: controllerOnline ? 0 : 1, warnings: 0, errors: 0 },
-            devices: { total: 6, operational: devices.filter(d => d.state).length, warnings: 0, errors: 0 },
-            issues: []
-          }} />
+          <SentientEye />
         </div>
 
         {/* Status Bar */}
@@ -207,7 +202,7 @@ export function LightingKiosk() {
         .kiosk-root {
           width: 1280px;
           height: 800px;
-          background: linear-gradient(135deg, #0a0a12 0%, #0d1117 50%, #0a0a12 100%);
+          background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
           display: flex;
           flex-direction: column;
           overflow: hidden;
@@ -219,8 +214,8 @@ export function LightingKiosk() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(0, 217, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px);
+            linear-gradient(var(--border-color) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
           background-size: 50px 50px;
           pointer-events: none;
         }
@@ -231,7 +226,7 @@ export function LightingKiosk() {
           left: 0;
           right: 0;
           height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.4), transparent);
+          background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
           animation: scan 4s linear infinite;
           pointer-events: none;
         }
@@ -248,7 +243,7 @@ export function LightingKiosk() {
           justify-content: space-between;
           align-items: center;
           padding: 16px 32px;
-          border-bottom: 1px solid rgba(0, 217, 255, 0.15);
+          border-bottom: 1px solid var(--border-color);
           background: rgba(0, 0, 0, 0.3);
           position: relative;
           z-index: 10;
@@ -262,14 +257,14 @@ export function LightingKiosk() {
         .logo-text {
           font-size: 24px;
           font-weight: 700;
-          color: #00d9ff;
+          color: var(--accent-primary);
           letter-spacing: 6px;
-          text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+          text-shadow: var(--glow-primary);
         }
 
         .subtitle {
           font-size: 12px;
-          color: rgba(0, 217, 255, 0.6);
+          color: var(--text-muted);
           letter-spacing: 4px;
           margin-top: 2px;
         }
@@ -288,13 +283,13 @@ export function LightingKiosk() {
         .status-pill.online {
           background: rgba(16, 185, 129, 0.15);
           border: 1px solid rgba(16, 185, 129, 0.4);
-          color: #10b981;
+          color: var(--status-success);
         }
 
         .status-pill.offline {
           background: rgba(239, 68, 68, 0.15);
           border: 1px solid rgba(239, 68, 68, 0.4);
-          color: #ef4444;
+          color: var(--status-error);
         }
 
         .status-dot {
@@ -348,14 +343,14 @@ export function LightingKiosk() {
 
         .status-badge.healthy {
           background: rgba(16, 185, 129, 0.15);
-          border: 2px solid #10b981;
-          color: #10b981;
+          border: 2px solid var(--status-success);
+          color: var(--status-success);
         }
 
         .status-badge.offline {
           background: rgba(107, 114, 128, 0.15);
-          border: 2px solid #6b7280;
-          color: #6b7280;
+          border: 2px solid var(--status-offline);
+          color: var(--status-offline);
         }
 
         .badge-dot {
@@ -429,14 +424,16 @@ export function LightingKiosk() {
         }
 
         .light-btn.on {
-          background: linear-gradient(135deg, rgba(0, 217, 255, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%);
-          border-color: #00d9ff;
-          box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+          background: var(--gradient-primary);
+          background-size: 200% 200%;
+          opacity: 0.9;
+          border-color: var(--accent-primary);
+          box-shadow: var(--glow-primary);
         }
 
         .light-btn.off {
-          background: rgba(30, 41, 59, 0.6);
-          border-color: rgba(100, 116, 139, 0.3);
+          background: var(--bg-card);
+          border-color: var(--border-color);
         }
 
         .light-btn.pending {
@@ -452,7 +449,7 @@ export function LightingKiosk() {
         .light-name {
           font-size: 16px;
           font-weight: 700;
-          color: #e0e7ff;
+          color: var(--text-primary);
           letter-spacing: 1.5px;
           text-align: center;
         }
@@ -466,13 +463,13 @@ export function LightingKiosk() {
         }
 
         .light-btn.on .light-status {
-          background: #00d9ff;
-          color: #0a0a12;
+          background: var(--accent-primary);
+          color: var(--bg-primary);
         }
 
         .light-btn.off .light-status {
-          background: #475569;
-          color: #94a3b8;
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
         }
       `}</style>
     </div>

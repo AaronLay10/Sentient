@@ -6,6 +6,7 @@ dist
 .env.sentient.prod
 !.env.sentient.example
 .DS_Store
+._.DS_Store
 
 # Runtime data and logs
 mosquitto/data/

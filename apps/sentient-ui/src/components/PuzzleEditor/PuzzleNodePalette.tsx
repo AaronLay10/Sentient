@@ -77,24 +77,45 @@ export function PuzzleNodePalette({ onAddNode, roomId: _roomId }: PuzzleNodePale
     return grouped;
   }, [devices]);
 
-  // Create device nodes for palette
-  const deviceCategories = useMemo(() => {
-    const categories: Record<string, PaletteNode[]> = {};
+  // Define display order for input action types
+  const INPUT_ACTION_TYPE_ORDER = [
+    'digital_switch',
+    'analog_sensor',
+    'counter',
+    'code_reader',
+    'unknown',
+  ];
 
-    Object.entries(devicesByActionType).forEach(([actionType, devicesInType]) => {
+  // Create device nodes for palette with category metadata
+  const deviceCategories = useMemo(() => {
+    const categories: Record<string, { icon: string; color: string; nodes: PaletteNode[] }> = {};
+
+    // Sort action types by defined order
+    const sortedActionTypes = Object.keys(devicesByActionType).sort((a, b) => {
+      const aIndex = INPUT_ACTION_TYPE_ORDER.indexOf(a);
+      const bIndex = INPUT_ACTION_TYPE_ORDER.indexOf(b);
+      return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+    });
+
+    sortedActionTypes.forEach((actionType) => {
+      const devicesInType = devicesByActionType[actionType];
       const label = ACTION_TYPE_LABELS[actionType] || actionType;
       const icon = ACTION_TYPE_ICONS[actionType] || '📡';
       const color = ACTION_TYPE_COLORS[actionType] || '#34d399';
 
-      categories[label] = devicesInType.map((device) => ({
-        type: 'sensor',
-        subtype: actionType,
-        label: device.friendly_name,
-        description: `${device.device_type} - ${device.id}`,
+      categories[label] = {
         icon,
         color,
-        deviceId: device.id,
-      }));
+        nodes: devicesInType.map((device) => ({
+          type: 'sensor',
+          subtype: actionType,
+          label: device.friendly_name,
+          description: `${device.controller_id} · ${device.device_type}`,
+          icon,
+          color,
+          deviceId: device.id,
+        })),
+      };
     });
 
     return categories;
@@ -117,18 +138,21 @@ export function PuzzleNodePalette({ onAddNode, roomId: _roomId }: PuzzleNodePale
 
   // Filter device categories by search
   const filteredDeviceCategories = Object.entries(deviceCategories).reduce(
-    (acc, [category, nodes]) => {
-      const filtered = nodes.filter(
+    (acc, [category, categoryData]) => {
+      const filtered = categoryData.nodes.filter(
         (node) =>
           node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
           node.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
       if (filtered.length > 0) {
-        acc[category] = filtered;
+        acc[category] = {
+          ...categoryData,
+          nodes: filtered,
+        };
       }
       return acc;
     },
-    {} as Record<string, PaletteNode[]>
+    {} as Record<string, { icon: string; color: string; nodes: PaletteNode[] }>
   );
 
   return (
@@ -203,11 +227,38 @@ export function PuzzleNodePalette({ onAddNode, roomId: _roomId }: PuzzleNodePale
             </div>
           ))
         ) : (
-          // Show devices grouped by action type (sensors only)
-          Object.entries(filteredDeviceCategories).map(([actionTypeLabel, deviceNodes]) => (
-            <div key={actionTypeLabel} className={styles.section}>
-              <div className={styles.sectionTitle}>{actionTypeLabel}</div>
-              {deviceNodes.map((node) => (
+          // Show devices grouped by action type with category icons and colors
+          Object.entries(filteredDeviceCategories).map(([actionTypeLabel, categoryData]) => (
+            <div
+              key={actionTypeLabel}
+              className={styles.section}
+              style={{ borderLeft: `3px solid ${categoryData.color}` }}
+            >
+              <div
+                className={styles.sectionTitle}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '4px',
+                    background: `${categoryData.color}33`,
+                    color: categoryData.color,
+                    fontSize: '12px',
+                  }}
+                >
+                  {categoryData.icon}
+                </span>
+                <span>{actionTypeLabel}</span>
+                <span style={{ color: '#6b7280', fontSize: '11px', marginLeft: 'auto' }}>
+                  ({categoryData.nodes.length})
+                </span>
+              </div>
+              {categoryData.nodes.map((node) => (
                 <div
                   key={node.deviceId}
                   className={styles.node}

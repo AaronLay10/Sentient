@@ -10,7 +10,11 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(clientId: string, query: ListUsersDto) {
-    const where: any = { clientId };
+    const where: any = {
+      clientId,
+      // Always exclude SENTIENT_ADMIN users from client user lists
+      role: { not: 'SENTIENT_ADMIN' }
+    };
 
     if (query.role) {
       where.role = query.role;

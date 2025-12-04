@@ -7,6 +7,7 @@ interface Device {
   friendly_name: string;
   device_type: string;
   device_category?: string;
+  action_type?: string;
 }
 
 interface PuzzleNodeProps {
@@ -78,8 +79,12 @@ export const PuzzleNode = memo(({ id, data, selected }: PuzzleNodeProps) => {
     deleteElements({ nodes: [{ id }] });
   };
 
-  // Filter to only sensor devices
+  // Filter to only input-type devices based on action_type
+  const inputActionTypes = ['digital_switch', 'analog_sensor', 'counter', 'code_reader'];
   const sensorDevices = data.devices?.filter(d =>
+    // Primary filter: use action_type if available
+    (d.action_type && inputActionTypes.includes(d.action_type)) ||
+    // Fallback: use device_category or device_type
     d.device_category === 'sensor' ||
     d.device_type?.toLowerCase().includes('sensor') ||
     d.device_type?.toLowerCase().includes('button') ||

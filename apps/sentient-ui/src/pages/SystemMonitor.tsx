@@ -99,10 +99,14 @@ export function SystemMonitor() {
     },
   });
 
-  // WebSocket connection
+  // WebSocket connection - filter out heartbeat events for activity feed
   useWebSocket({
     url: WS_URL,
     onEvent: (event) => {
+      // Skip heartbeat messages - they're too frequent and not useful in the activity feed
+      if (event.type === 'controller_heartbeat' || event.type === 'heartbeat') {
+        return;
+      }
       setRecentActivity((prev) => [event, ...prev].slice(0, 20));
     },
   });

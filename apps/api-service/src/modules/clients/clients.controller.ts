@@ -4,8 +4,11 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { ListClientsDto } from './dto/list-clients.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../../auth/roles.guard';
 
-@UseGuards(JwtAuthGuard)
+// Only SENTIENT_ADMIN can access clients endpoints
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('SENTIENT_ADMIN')
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}

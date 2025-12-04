@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Building2, Plus, Pencil, Trash2, ChevronDown, ChevronRight, MapPin } from 'lucide-react';
-import { getAuthToken } from '../components/ProtectedRoute';
+import { getAuthToken, isSentientAdmin } from '../components/ProtectedRoute';
 import styles from './Clients.module.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -23,6 +24,7 @@ interface Client {
 }
 
 export function Clients() {
+  const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -30,17 +32,28 @@ export function Clients() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
   const [showVenueForm, setShowVenueForm] = useState<string | null>(null);
-  const [venueFormData, setVenueFormData] = useState({ 
-    name: '', 
-    address: '', 
-    city: '', 
-    state: '', 
-    zipCode: '' 
+  const [venueFormData, setVenueFormData] = useState({
+    name: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: ''
   });
   const [editingVenueId, setEditingVenueId] = useState<string | null>(null);
 
+  // Check if user has access to this page
   useEffect(() => {
-    fetchClients();
+    if (!isSentientAdmin()) {
+      // Redirect non-admins to overview
+      navigate('/overview', { replace: true });
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    // Only fetch if user is admin
+    if (isSentientAdmin()) {
+      fetchClients();
+    }
   }, []);
 
   const fetchClients = async () => {

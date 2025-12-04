@@ -4,13 +4,18 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { ListClientsDto } from './dto/list-clients.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { Prisma } from '@prisma/client';
+import { SENTIENT_CLIENT_NAME } from '../../auth/auth.service';
 
 @Injectable()
 export class ClientsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: ListClientsDto) {
+    // Filter out the internal Sentient client from the list
     return this.prisma.client.findMany({
+      where: {
+        name: { not: SENTIENT_CLIENT_NAME }
+      },
       orderBy: { created_at: 'desc' },
       take: query.take,
       skip: query.skip

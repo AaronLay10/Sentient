@@ -7,6 +7,8 @@ interface Device {
   id: string;
   friendly_name: string;
   device_type: string;
+  action_type?: string;
+  current_state?: unknown;
   actions?: Array<{
     action_id: string;
     friendly_name?: string;
@@ -189,8 +191,8 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
             {data.config?.deviceId && (() => {
               const device = data.devices?.find(d => d.id === data.config.deviceId);
               if (!device) return null;
-              
-              const currentState = (device as any).current_state;
+
+              const currentState = device.current_state;
               
               // Generate friendly label based on device type and state
               let stateLabel = 'UNKNOWN';
@@ -295,18 +297,85 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
               </select>
             </div>
             
-            {/* Conditional Parameter Inputs */}
-            {data.config?.action && (() => {
-              const action = data.config.action.toLowerCase();
-              const needsBrightness = action.includes('brightness');
-              const needsColor = action.includes('color');
-              const needsDuration = action.includes('duration');
-              
+            {/* Action Type-Specific Controls */}
+            {data.config?.deviceId && (() => {
+              const device = data.devices?.find(d => d.id === data.config.deviceId);
+              const actionType = device?.action_type;
+
               return (
                 <>
-                  {needsBrightness && (
+                  {/* RGB LED Controls */}
+                  {actionType === 'rgb_led' && (
+                    <>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Color</div>
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                          {[
+                            { name: 'red', hex: '#ef4444' },
+                            { name: 'orange', hex: '#f97316' },
+                            { name: 'yellow', hex: '#eab308' },
+                            { name: 'green', hex: '#22c55e' },
+                            { name: 'blue', hex: '#3b82f6' },
+                            { name: 'purple', hex: '#a855f7' },
+                            { name: 'pink', hex: '#ec4899' },
+                            { name: 'white', hex: '#f8fafc' },
+                          ].map((color) => (
+                            <div
+                              key={color.name}
+                              className="nopan nodrag"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                data.onConfigChange?.(id, {
+                                  ...data.config,
+                                  payload: { ...data.config.payload, color: color.name }
+                                });
+                              }}
+                              style={{
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '4px',
+                                backgroundColor: color.hex,
+                                border: data.config.payload?.color === color.name ? '2px solid #fff' : '1px solid #333',
+                                cursor: 'pointer',
+                                boxShadow: data.config.payload?.color === color.name ? '0 0 0 2px #8b5cf6' : 'none',
+                              }}
+                              title={color.name}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Brightness</div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input
+                            type="range"
+                            className="nopan nodrag"
+                            min="0"
+                            max="255"
+                            step="1"
+                            value={data.config.payload?.brightness ?? 255}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              data.onConfigChange?.(id, {
+                                ...data.config,
+                                payload: { ...data.config.payload, brightness: parseInt(e.target.value) }
+                              });
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ flex: 1 }}
+                          />
+                          <span style={{ minWidth: '30px', fontSize: '11px', color: '#9ca3af' }}>
+                            {data.config.payload?.brightness ?? 255}
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Analog PWM Dimmer Controls */}
+                  {actionType === 'analog_pwm' && (
                     <div className={styles.field}>
-                      <div className={styles.label}>Brightness (0-255)</div>
+                      <div className={styles.label}>PWM Value (0-255)</div>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <input
                           type="range"
@@ -314,52 +383,158 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
                           min="0"
                           max="255"
                           step="1"
-                          value={data.config.payload?.brightness || 128}
+                          value={data.config.payload?.value ?? 255}
                           onChange={(e) => {
                             e.stopPropagation();
-                            const brightness = parseInt(e.target.value);
                             data.onConfigChange?.(id, {
                               ...data.config,
-                              payload: { ...data.config.payload, brightness }
+                              payload: { ...data.config.payload, value: parseInt(e.target.value) }
                             });
                           }}
                           onClick={(e) => e.stopPropagation()}
                           style={{ flex: 1 }}
                         />
-                        <span style={{ minWidth: '30px', fontSize: '12px' }}>
-                          {data.config.payload?.brightness || 128}
+                        <span style={{ minWidth: '30px', fontSize: '11px', color: '#9ca3af' }}>
+                          {data.config.payload?.value ?? 255}
                         </span>
                       </div>
                     </div>
                   )}
-                  
-                  {needsColor && (
+
+                  {/* Servo Position Controls */}
+                  {actionType === 'position_servo' && (
                     <div className={styles.field}>
-                      <div className={styles.label}>Color</div>
-                      <select
-                        className={`${styles.dropdown} nopan nodrag`}
-                        value={data.config.payload?.color || 'white'}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          data.onConfigChange?.(id, {
-                            ...data.config,
-                            payload: { ...data.config.payload, color: e.target.value }
-                          });
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <option value="yellow">Yellow</option>
-                        <option value="red">Red</option>
-                        <option value="green">Green</option>
-                        <option value="blue">Blue</option>
-                        <option value="white">White</option>
-                        <option value="purple">Purple</option>
-                        <option value="orange">Orange</option>
-                      </select>
+                      <div className={styles.label}>Position (0-180°)</div>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <input
+                          type="range"
+                          className="nopan nodrag"
+                          min="0"
+                          max="180"
+                          step="1"
+                          value={data.config.payload?.position ?? 90}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            data.onConfigChange?.(id, {
+                              ...data.config,
+                              payload: { ...data.config.payload, position: parseInt(e.target.value) }
+                            });
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ flex: 1 }}
+                        />
+                        <span style={{ minWidth: '35px', fontSize: '11px', color: '#9ca3af' }}>
+                          {data.config.payload?.position ?? 90}°
+                        </span>
+                      </div>
                     </div>
                   )}
-                  
-                  {needsDuration && (
+
+                  {/* Stepper Position Controls */}
+                  {actionType === 'position_stepper' && (
+                    <>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Target Position</div>
+                        <input
+                          type="number"
+                          className={`${styles.dropdown} nopan nodrag`}
+                          value={data.config.payload?.position ?? 0}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            data.onConfigChange?.(id, {
+                              ...data.config,
+                              payload: { ...data.config.payload, position: parseInt(e.target.value) || 0 }
+                            });
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          placeholder="Steps or position..."
+                        />
+                      </div>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Speed</div>
+                        <select
+                          className={`${styles.dropdown} nopan nodrag`}
+                          value={data.config.payload?.speed || 'normal'}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            data.onConfigChange?.(id, {
+                              ...data.config,
+                              payload: { ...data.config.payload, speed: e.target.value }
+                            });
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <option value="slow">Slow</option>
+                          <option value="normal">Normal</option>
+                          <option value="fast">Fast</option>
+                        </select>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Motor Control */}
+                  {actionType === 'motor_control' && (
+                    <>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Direction</div>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {['forward', 'reverse', 'stop'].map((dir) => (
+                            <button
+                              key={dir}
+                              className="nopan nodrag"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                data.onConfigChange?.(id, {
+                                  ...data.config,
+                                  payload: { ...data.config.payload, direction: dir }
+                                });
+                              }}
+                              style={{
+                                flex: 1,
+                                padding: '6px 8px',
+                                fontSize: '11px',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                backgroundColor: data.config.payload?.direction === dir ? '#8b5cf6' : '#374151',
+                                color: data.config.payload?.direction === dir ? '#fff' : '#9ca3af',
+                              }}
+                            >
+                              {dir === 'forward' ? '▲' : dir === 'reverse' ? '▼' : '■'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Speed (%)</div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input
+                            type="range"
+                            className="nopan nodrag"
+                            min="0"
+                            max="100"
+                            step="5"
+                            value={data.config.payload?.speed ?? 100}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              data.onConfigChange?.(id, {
+                                ...data.config,
+                                payload: { ...data.config.payload, speed: parseInt(e.target.value) }
+                              });
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ flex: 1 }}
+                          />
+                          <span style={{ minWidth: '35px', fontSize: '11px', color: '#9ca3af' }}>
+                            {data.config.payload?.speed ?? 100}%
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Trigger (One-Shot) Controls */}
+                  {actionType === 'trigger' && (
                     <div className={styles.field}>
                       <div className={styles.label}>Duration (ms)</div>
                       <input
@@ -367,18 +542,82 @@ export const SceneNode = memo(({ id, data, selected }: SceneNodeProps) => {
                         className={`${styles.dropdown} nopan nodrag`}
                         min="0"
                         step="100"
-                        value={data.config.payload?.duration || 1000}
+                        value={data.config.payload?.duration ?? 500}
                         onChange={(e) => {
                           e.stopPropagation();
-                          const duration = parseInt(e.target.value) || 0;
                           data.onConfigChange?.(id, {
                             ...data.config,
-                            payload: { ...data.config.payload, duration }
+                            payload: { ...data.config.payload, duration: parseInt(e.target.value) || 0 }
                           });
                         }}
                         onClick={(e) => e.stopPropagation()}
+                        placeholder="Pulse duration..."
                       />
                     </div>
+                  )}
+
+                  {/* Counter Display (Input) */}
+                  {actionType === 'counter' && (
+                    <div className={styles.field}>
+                      <div className={styles.label}>Counter Threshold</div>
+                      <input
+                        type="number"
+                        className={`${styles.dropdown} nopan nodrag`}
+                        value={data.config.payload?.threshold ?? 0}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          data.onConfigChange?.(id, {
+                            ...data.config,
+                            payload: { ...data.config.payload, threshold: parseInt(e.target.value) || 0 }
+                          });
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Trigger at count..."
+                      />
+                    </div>
+                  )}
+
+                  {/* Analog Sensor Threshold (Input) */}
+                  {actionType === 'analog_sensor' && (
+                    <>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Condition</div>
+                        <select
+                          className={`${styles.dropdown} nopan nodrag`}
+                          value={data.config.payload?.operator || 'gt'}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            data.onConfigChange?.(id, {
+                              ...data.config,
+                              payload: { ...data.config.payload, operator: e.target.value }
+                            });
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <option value="gt">Greater than</option>
+                          <option value="lt">Less than</option>
+                          <option value="eq">Equals</option>
+                          <option value="gte">Greater or equal</option>
+                          <option value="lte">Less or equal</option>
+                        </select>
+                      </div>
+                      <div className={styles.field}>
+                        <div className={styles.label}>Threshold Value</div>
+                        <input
+                          type="number"
+                          className={`${styles.dropdown} nopan nodrag`}
+                          value={data.config.payload?.threshold ?? 512}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            data.onConfigChange?.(id, {
+                              ...data.config,
+                              payload: { ...data.config.payload, threshold: parseInt(e.target.value) || 0 }
+                            });
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </div>
+                    </>
                   )}
                 </>
               );

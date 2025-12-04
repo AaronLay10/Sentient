@@ -34,12 +34,6 @@ const NODE_CATEGORIES = {
   Puzzles: [
     { type: 'puzzle', subtype: 'puzzle-trigger', label: 'Puzzle', description: 'Trigger a puzzle from the room', icon: '🧩', color: '#6366f1' },
   ],
-  Effects: [
-    { type: 'effect', subtype: 'light', label: 'Lighting', description: 'Control lights/LEDs', icon: '💡', color: '#f472b6' },
-    { type: 'effect', subtype: 'servo', label: 'Servo/Motor', description: 'Mechanical movement', icon: '⚙', color: '#f472b6' },
-    { type: 'effect', subtype: 'fog', label: 'Fog Machine', description: 'Atmospheric effect', icon: '☁', color: '#f472b6' },
-    { type: 'effect', subtype: 'maglock', label: 'Mag Lock', description: 'Door/compartment lock', icon: '🔓', color: '#f472b6' },
-  ],
   'Audio/Visual': [
     { type: 'media', subtype: 'video', label: 'Video Playback', description: 'Play video file', icon: '🎬', color: '#22d3ee' },
     { type: 'audio', subtype: 'sfx', label: 'Sound Effect', description: 'Play audio clip', icon: '🔊', color: '#22d3ee' },
@@ -79,24 +73,54 @@ export function NodePalette({ onAddNode, roomId: _roomId }: NodePaletteProps) {
     return grouped;
   }, [devices]);
 
-  // Create device nodes for palette
-  const deviceCategories = useMemo(() => {
-    const categories: Record<string, PaletteNode[]> = {};
+  // Define display order for action types (outputs first, then inputs)
+  const ACTION_TYPE_ORDER = [
+    // Output types
+    'digital_relay',
+    'analog_pwm',
+    'rgb_led',
+    'position_servo',
+    'position_stepper',
+    'motor_control',
+    'trigger',
+    // Input types
+    'digital_switch',
+    'analog_sensor',
+    'counter',
+    'code_reader',
+    'unknown',
+  ];
 
-    Object.entries(devicesByActionType).forEach(([actionType, devicesInType]) => {
+  // Create device nodes for palette with category metadata
+  const deviceCategories = useMemo(() => {
+    const categories: Record<string, { icon: string; color: string; nodes: PaletteNode[] }> = {};
+
+    // Sort action types by defined order
+    const sortedActionTypes = Object.keys(devicesByActionType).sort((a, b) => {
+      const aIndex = ACTION_TYPE_ORDER.indexOf(a);
+      const bIndex = ACTION_TYPE_ORDER.indexOf(b);
+      return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+    });
+
+    sortedActionTypes.forEach((actionType) => {
+      const devicesInType = devicesByActionType[actionType];
       const label = ACTION_TYPE_LABELS[actionType] || actionType;
       const icon = ACTION_TYPE_ICONS[actionType] || '🔧';
       const color = ACTION_TYPE_COLORS[actionType] || '#6b7280';
 
-      categories[label] = devicesInType.map((device) => ({
-        type: 'device',
-        subtype: actionType,
-        label: device.friendly_name,
-        description: `${device.device_type} - ${device.id}`,
+      categories[label] = {
         icon,
         color,
-        deviceId: device.id,
-      }));
+        nodes: devicesInType.map((device) => ({
+          type: 'device',
+          subtype: actionType,
+          label: device.friendly_name,
+          description: `${device.controller_id} · ${device.device_type}`,
+          icon,
+          color,
+          deviceId: device.id,
+        })),
+      };
     });
 
     return categories;
@@ -119,18 +143,21 @@ export function NodePalette({ onAddNode, roomId: _roomId }: NodePaletteProps) {
 
   // Filter device categories by search
   const filteredDeviceCategories = Object.entries(deviceCategories).reduce(
-    (acc, [category, nodes]) => {
-      const filtered = nodes.filter(
+    (acc, [category, categoryData]) => {
+      const filtered = categoryData.nodes.filter(
         (node) =>
           node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
           node.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
       if (filtered.length > 0) {
-        acc[category] = filtered;
+        acc[category] = {
+          ...categoryData,
+          nodes: filtered,
+        };
       }
       return acc;
     },
-    {} as Record<string, PaletteNode[]>
+    {} as Record<string, { icon: string; color: string; nodes: PaletteNode[] }>
   );
 
   return (
@@ -205,11 +232,38 @@ export function NodePalette({ onAddNode, roomId: _roomId }: NodePaletteProps) {
             </div>
           ))
         ) : (
-          // Show devices grouped by action type
-          Object.entries(filteredDeviceCategories).map(([actionTypeLabel, deviceNodes]) => (
-            <div key={actionTypeLabel} className={styles.section}>
-              <div className={styles.sectionTitle}>{actionTypeLabel}</div>
-              {deviceNodes.map((node) => (
+          // Show devices grouped by action type with category icons and colors
+          Object.entries(filteredDeviceCategories).map(([actionTypeLabel, categoryData]) => (
+            <div
+              key={actionTypeLabel}
+              className={styles.section}
+              style={{ borderLeft: `3px solid ${categoryData.color}` }}
+            >
+              <div
+                className={styles.sectionTitle}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '4px',
+                    background: `${categoryData.color}33`,
+                    color: categoryData.color,
+                    fontSize: '12px',
+                  }}
+                >
+                  {categoryData.icon}
+                </span>
+                <span>{actionTypeLabel}</span>
+                <span style={{ color: '#6b7280', fontSize: '11px', marginLeft: 'auto' }}>
+                  ({categoryData.nodes.length})
+                </span>
+              </div>
+              {categoryData.nodes.map((node) => (
                 <div
                   key={node.deviceId}
                   className={styles.node}

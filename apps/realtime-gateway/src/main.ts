@@ -5,6 +5,9 @@ import { RedisSubscriberAdapter } from './redis-adapter';
 import Redis from 'ioredis';
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 
+// Load package.json for version
+const packageJson = require('../package.json');
+
 async function bootstrap() {
   const logger = createLogger({
     service: 'realtime-gateway',
@@ -64,6 +67,14 @@ async function bootstrap() {
       const statusCode = redisConnected ? 200 : 503;
       res.writeHead(statusCode, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(health, null, 2));
+    } else if (req.url === '/health/version' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        service: 'realtime-gateway',
+        version: packageJson.version,
+        node: process.version,
+        uptime: process.uptime(),
+      }));
     } else if (req.url === '/ready' && req.method === 'GET') {
       // Readiness probe - only ready if Redis is connected
       if (redisConnected) {

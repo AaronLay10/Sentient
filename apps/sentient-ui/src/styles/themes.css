@@ -1,0 +1,298 @@
+/*
+ * Sentient UI Theme Pack
+ *
+ * This file defines multiple color themes that can be applied to the UI.
+ * Themes are activated by adding a data-theme attribute to the html element.
+ *
+ * Available themes:
+ * - default (Sentient Eye - Cyan/Orange)
+ * - midnight (Purple/Green)
+ * - crimson (Red/Gold)
+ * - arctic (Blue/White)
+ * - forest (Green/Brown)
+ * - neon (Pink/Yellow)
+ */
+
+/* ============================================
+   DEFAULT THEME - Sentient Eye (Cyan/Orange)
+   ============================================ */
+:root,
+[data-theme="default"] {
+  /* Primary Accent Colors */
+  --accent-primary: #00d9ff;
+  --accent-secondary: #ffaa32;
+
+  /* Theme-specific aliases */
+  --accent-cyan: #00d9ff;
+  --accent-orange: #ffaa32;
+
+  /* Background Colors */
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #0f1419;
+  --bg-tertiary: #151b26;
+  --bg-card: #1a2332;
+  --bg-glass: rgba(26, 35, 50, 0.8);
+
+  /* Text Colors */
+  --text-primary: #e8f0ff;
+  --text-secondary: #a8b8d8;
+  --text-muted: #6677aa;
+
+  /* Border Colors */
+  --border-color: rgba(0, 217, 255, 0.15);
+  --border-glow: rgba(0, 217, 255, 0.4);
+
+  /* Status Colors */
+  --status-success: #00ff88;
+  --status-warning: #ffaa32;
+  --status-error: #ff3355;
+  --status-info: #00d9ff;
+  --status-offline: #666677;
+
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(0, 217, 255, 0.3), 0 0 40px rgba(0, 217, 255, 0.15);
+  --glow-secondary: 0 0 20px rgba(255, 170, 50, 0.3), 0 0 40px rgba(255, 170, 50, 0.15);
+
+  /* Gradient - Used for titles and highlights */
+  --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --gradient-radial-left: radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.03) 0%, transparent 50%);
+  --gradient-radial-right: radial-gradient(circle at 80% 50%, rgba(255, 170, 50, 0.03) 0%, transparent 50%);
+
+  /* Component-specific Colors */
+  --btn-primary-bg: transparent;
+  --btn-primary-border: var(--accent-primary);
+  --btn-primary-text: var(--accent-primary);
+  --btn-primary-hover-bg: var(--accent-primary);
+  --btn-primary-hover-text: var(--bg-primary);
+
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: var(--accent-secondary);
+  --btn-secondary-text: var(--accent-secondary);
+  --btn-secondary-hover-bg: var(--accent-secondary);
+  --btn-secondary-hover-text: var(--bg-primary);
+}
+
+/* ============================================
+   MIDNIGHT THEME - Purple/Green
+   ============================================ */
+[data-theme="midnight"] {
+  /* Primary Accent Colors */
+  --accent-primary: #a855f7;
+  --accent-secondary: #34d399;
+
+  /* Theme-specific aliases */
+  --accent-cyan: #a855f7;
+  --accent-orange: #34d399;
+
+  /* Background Colors */
+  --bg-primary: #0c0a14;
+  --bg-secondary: #12101a;
+  --bg-tertiary: #1a1726;
+  --bg-card: #241f32;
+  --bg-glass: rgba(36, 31, 50, 0.8);
+
+  /* Text Colors */
+  --text-primary: #f0e8ff;
+  --text-secondary: #c8b8e8;
+  --text-muted: #7766aa;
+
+  /* Border Colors */
+  --border-color: rgba(168, 85, 247, 0.15);
+  --border-glow: rgba(168, 85, 247, 0.4);
+
+  /* Status Colors */
+  --status-success: #34d399;
+  --status-warning: #fbbf24;
+  --status-error: #f87171;
+  --status-info: #a855f7;
+  --status-offline: #666677;
+
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(168, 85, 247, 0.15);
+  --glow-secondary: 0 0 20px rgba(52, 211, 153, 0.3), 0 0 40px rgba(52, 211, 153, 0.15);
+
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --gradient-radial-left: radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.03) 0%, transparent 50%);
+  --gradient-radial-right: radial-gradient(circle at 80% 50%, rgba(52, 211, 153, 0.03) 0%, transparent 50%);
+}
+
+/* ============================================
+   CRIMSON THEME - Red/Gold
+   ============================================ */
+[data-theme="crimson"] {
+  /* Primary Accent Colors */
+  --accent-primary: #ef4444;
+  --accent-secondary: #f59e0b;
+
+  /* Theme-specific aliases */
+  --accent-cyan: #ef4444;
+  --accent-orange: #f59e0b;
+
+  /* Background Colors */
+  --bg-primary: #0f0808;
+  --bg-secondary: #1a0e0e;
+  --bg-tertiary: #261414;
+  --bg-card: #321a1a;
+  --bg-glass: rgba(50, 26, 26, 0.8);
+
+  /* Text Colors */
+  --text-primary: #fff0e8;
+  --text-secondary: #e8c8b8;
+  --text-muted: #aa7766;
+
+  /* Border Colors */
+  --border-color: rgba(239, 68, 68, 0.15);
+  --border-glow: rgba(239, 68, 68, 0.4);
+
+  /* Status Colors */
+  --status-success: #22c55e;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
+  --status-info: #3b82f6;
+  --status-offline: #777766;
+
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 40px rgba(239, 68, 68, 0.15);
+  --glow-secondary: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.15);
+
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --gradient-radial-left: radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.03) 0%, transparent 50%);
+  --gradient-radial-right: radial-gradient(circle at 80% 50%, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
+}
+
+/* ============================================
+   ARCTIC THEME - Blue/White
+   ============================================ */
+[data-theme="arctic"] {
+  /* Primary Accent Colors */
+  --accent-primary: #38bdf8;
+  --accent-secondary: #e0f2fe;
+
+  /* Theme-specific aliases */
+  --accent-cyan: #38bdf8;
+  --accent-orange: #e0f2fe;
+
+  /* Background Colors */
+  --bg-primary: #0c1929;
+  --bg-secondary: #0f2035;
+  --bg-tertiary: #142842;
+  --bg-card: #1a3352;
+  --bg-glass: rgba(26, 51, 82, 0.8);
+
+  /* Text Colors */
+  --text-primary: #f0f9ff;
+  --text-secondary: #bae6fd;
+  --text-muted: #7dd3fc;
+
+  /* Border Colors */
+  --border-color: rgba(56, 189, 248, 0.15);
+  --border-glow: rgba(56, 189, 248, 0.4);
+
+  /* Status Colors */
+  --status-success: #22d3ee;
+  --status-warning: #fcd34d;
+  --status-error: #f87171;
+  --status-info: #38bdf8;
+  --status-offline: #64748b;
+
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(56, 189, 248, 0.3), 0 0 40px rgba(56, 189, 248, 0.15);
+  --glow-secondary: 0 0 20px rgba(224, 242, 254, 0.3), 0 0 40px rgba(224, 242, 254, 0.15);
+
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --gradient-radial-left: radial-gradient(circle at 20% 50%, rgba(56, 189, 248, 0.03) 0%, transparent 50%);
+  --gradient-radial-right: radial-gradient(circle at 80% 50%, rgba(224, 242, 254, 0.03) 0%, transparent 50%);
+}
+
+/* ============================================
+   FOREST THEME - Green/Brown
+   ============================================ */
+[data-theme="forest"] {
+  /* Primary Accent Colors */
+  --accent-primary: #22c55e;
+  --accent-secondary: #d97706;
+
+  /* Theme-specific aliases */
+  --accent-cyan: #22c55e;
+  --accent-orange: #d97706;
+
+  /* Background Colors */
+  --bg-primary: #0a120c;
+  --bg-secondary: #0f1a12;
+  --bg-tertiary: #152618;
+  --bg-card: #1a321e;
+  --bg-glass: rgba(26, 50, 30, 0.8);
+
+  /* Text Colors */
+  --text-primary: #ecfdf5;
+  --text-secondary: #bbf7d0;
+  --text-muted: #6ee7a0;
+
+  /* Border Colors */
+  --border-color: rgba(34, 197, 94, 0.15);
+  --border-glow: rgba(34, 197, 94, 0.4);
+
+  /* Status Colors */
+  --status-success: #22c55e;
+  --status-warning: #d97706;
+  --status-error: #dc2626;
+  --status-info: #0ea5e9;
+  --status-offline: #6b7280;
+
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(34, 197, 94, 0.3), 0 0 40px rgba(34, 197, 94, 0.15);
+  --glow-secondary: 0 0 20px rgba(217, 119, 6, 0.3), 0 0 40px rgba(217, 119, 6, 0.15);
+
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --gradient-radial-left: radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 50%);
+  --gradient-radial-right: radial-gradient(circle at 80% 50%, rgba(217, 119, 6, 0.03) 0%, transparent 50%);
+}
+
+/* ============================================
+   NEON THEME - Pink/Yellow
+   ============================================ */
+[data-theme="neon"] {
+  /* Primary Accent Colors */
+  --accent-primary: #ec4899;
+  --accent-secondary: #facc15;
+
+  /* Theme-specific aliases */
+  --accent-cyan: #ec4899;
+  --accent-orange: #facc15;
+
+  /* Background Colors */
+  --bg-primary: #0f0a14;
+  --bg-secondary: #1a101e;
+  --bg-tertiary: #26152a;
+  --bg-card: #321a36;
+  --bg-glass: rgba(50, 26, 54, 0.8);
+
+  /* Text Colors */
+  --text-primary: #fdf4ff;
+  --text-secondary: #f5d0fe;
+  --text-muted: #e879f9;
+
+  /* Border Colors */
+  --border-color: rgba(236, 72, 153, 0.15);
+  --border-glow: rgba(236, 72, 153, 0.4);
+
+  /* Status Colors */
+  --status-success: #4ade80;
+  --status-warning: #facc15;
+  --status-error: #f43f5e;
+  --status-info: #a78bfa;
+  --status-offline: #71717a;
+
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(236, 72, 153, 0.3), 0 0 40px rgba(236, 72, 153, 0.15);
+  --glow-secondary: 0 0 20px rgba(250, 204, 21, 0.3), 0 0 40px rgba(250, 204, 21, 0.15);
+
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --gradient-radial-left: radial-gradient(circle at 20% 50%, rgba(236, 72, 153, 0.03) 0%, transparent 50%);
+  --gradient-radial-right: radial-gradient(circle at 80% 50%, rgba(250, 204, 21, 0.03) 0%, transparent 50%);
+}

@@ -56,10 +56,11 @@ model Room {
 }
 
 enum UserRole {
-  OWNER
-  GM
-  TECH
-  VIEWER
+  SENTIENT_ADMIN  // Sentient staff - can emulate any client
+  OWNER           // Client owner - full access to their client
+  GM              // Game Master - run games
+  TECH            // Technician - manage hardware
+  VIEWER          // Read-only access
 }
 
 model User {
