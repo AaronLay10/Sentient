@@ -27,9 +27,11 @@ export interface SystemHealth {
 interface SentientEyeProps {
   health?: SystemHealth;
   onIssueClick?: (issueId: string) => void;
+  /** Hide the outer tick marks circle for a cleaner look */
+  hideTickMarks?: boolean;
 }
 
-export function SentientEye({ health }: SentientEyeProps) {
+export function SentientEye({ health, hideTickMarks = false }: SentientEyeProps) {
   const effectiveHealth = health?.overall || 'offline';
 
   return (
@@ -37,102 +39,104 @@ export function SentientEye({ health }: SentientEyeProps) {
 
       {/* Eye Visualization */}
       <div className="hud-eye-container">
-        {/* Outer HUD Rings */}
-        <svg className="hud-rings" viewBox="0 0 500 500">
-          <defs>
-            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#00d9ff" stopOpacity="0.8" />
-              <stop offset="50%" stopColor="#00d9ff" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#00d9ff" stopOpacity="0.8" />
-            </linearGradient>
-          </defs>
+        {/* Outer HUD Rings with tick marks - can be hidden with hideTickMarks prop */}
+        {!hideTickMarks && (
+          <svg className="hud-rings" viewBox="0 0 500 500">
+            <defs>
+              <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#00d9ff" stopOpacity="0.8" />
+                <stop offset="50%" stopColor="#00d9ff" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#00d9ff" stopOpacity="0.8" />
+              </linearGradient>
+            </defs>
 
-          {/* Rotating outer ring with segments */}
-          <circle cx="250" cy="250" r="220" fill="none" stroke="rgba(0, 217, 255, 0.2)" strokeWidth="1" />
-          <circle cx="250" cy="250" r="180" fill="none" stroke="rgba(0, 217, 255, 0.15)" strokeWidth="1" />
+            {/* Rotating outer ring with segments */}
+            <circle cx="250" cy="250" r="220" fill="none" stroke="rgba(0, 217, 255, 0.2)" strokeWidth="1" />
+            <circle cx="250" cy="250" r="180" fill="none" stroke="rgba(0, 217, 255, 0.15)" strokeWidth="1" />
 
-          {/* Tick marks */}
-          {Array.from({ length: 60 }).map((_, i) => {
-            const angle = (i * 6 - 90) * (Math.PI / 180);
-            const isLarge = i % 5 === 0;
-            const r1 = isLarge ? 195 : 205;
-            const r2 = 215;
-            return (
-              <line
-                key={i}
-                x1={250 + r1 * Math.cos(angle)}
-                y1={250 + r1 * Math.sin(angle)}
-                x2={250 + r2 * Math.cos(angle)}
-                y2={250 + r2 * Math.sin(angle)}
-                stroke="rgba(0, 217, 255, 0.4)"
-                strokeWidth={isLarge ? "2" : "1"}
-              />
-            );
-          })}
-        </svg>
+            {/* Tick marks */}
+            {Array.from({ length: 60 }).map((_, i) => {
+              const angle = (i * 6 - 90) * (Math.PI / 180);
+              const isLarge = i % 5 === 0;
+              const r1 = isLarge ? 195 : 205;
+              const r2 = 215;
+              return (
+                <line
+                  key={i}
+                  x1={250 + r1 * Math.cos(angle)}
+                  y1={250 + r1 * Math.sin(angle)}
+                  x2={250 + r2 * Math.cos(angle)}
+                  y2={250 + r2 * Math.sin(angle)}
+                  stroke="rgba(0, 217, 255, 0.4)"
+                  strokeWidth={isLarge ? "2" : "1"}
+                />
+              );
+            })}
+          </svg>
+        )}
 
-        {/* Rotating ring around eye - renders BEFORE eye so it appears behind */}
+        {/* Rotating ring around eye - always visible */}
         <svg viewBox="0 0 240 240" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '240px', height: '240px', pointerEvents: 'none', overflow: 'visible' }}>
-          <defs>
-            {/* Outer glow filter for the rotating ring */}
-            <filter id="outerGlow">
-              <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
+            <defs>
+              {/* Outer glow filter for the rotating ring */}
+              <filter id="outerGlow">
+                <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
 
-          {/* 3D shadow/depth layer behind rings */}
-          <circle
-            cx="120"
-            cy="120"
-            r="100"
-            fill="none"
-            stroke="rgba(0, 0, 0, 0.6)"
-            strokeWidth="6"
-            transform="translate(2, 2)"
-          />
-
-          {/* Rotating ring with alternating segments - colors and speed change based on health status */}
-          <g className={`rotating-outer-ring ${effectiveHealth === 'warning' ? 'status-warning' : effectiveHealth === 'critical' ? 'status-critical' : ''}`} style={{ filter: 'url(#outerGlow)' }}>
-            {/* Primary segments - cyan (healthy), orange (warning), or red (critical) */}
+            {/* 3D shadow/depth layer behind rings */}
             <circle
               cx="120"
               cy="120"
               r="100"
               fill="none"
-              stroke={
-                effectiveHealth === 'critical'
-                  ? 'rgba(255, 51, 85, 1.0)'
-                  : effectiveHealth === 'warning'
-                  ? 'rgba(255, 170, 0, 1.0)'
-                  : 'rgba(0, 217, 255, 1.0)'
-              }
+              stroke="rgba(0, 0, 0, 0.6)"
               strokeWidth="6"
-              strokeDasharray="78.5 78.5"
-              strokeDashoffset="0"
+              transform="translate(2, 2)"
             />
-            {/* Secondary segments - orange (healthy), yellow (warning), or dark red (critical) */}
-            <circle
-              cx="120"
-              cy="120"
-              r="100"
-              fill="none"
-              stroke={
-                effectiveHealth === 'critical'
-                  ? 'rgba(200, 30, 60, 1.0)'
-                  : effectiveHealth === 'warning'
-                  ? 'rgba(255, 200, 0, 1.0)'
-                  : 'rgba(255, 170, 50, 1.0)'
-              }
-              strokeWidth="6"
-              strokeDasharray="78.5 78.5"
-              strokeDashoffset="-78.5"
-            />
-          </g>
-        </svg>
+
+            {/* Rotating ring with alternating segments - colors and speed change based on health status */}
+            <g className={`rotating-outer-ring ${effectiveHealth === 'warning' ? 'status-warning' : effectiveHealth === 'critical' ? 'status-critical' : ''}`} style={{ filter: 'url(#outerGlow)' }}>
+              {/* Primary segments - cyan (healthy), orange (warning), or red (critical) */}
+              <circle
+                cx="120"
+                cy="120"
+                r="100"
+                fill="none"
+                stroke={
+                  effectiveHealth === 'critical'
+                    ? 'rgba(255, 51, 85, 1.0)'
+                    : effectiveHealth === 'warning'
+                    ? 'rgba(255, 170, 0, 1.0)'
+                    : 'rgba(0, 217, 255, 1.0)'
+                }
+                strokeWidth="6"
+                strokeDasharray="78.5 78.5"
+                strokeDashoffset="0"
+              />
+              {/* Secondary segments - orange (healthy), yellow (warning), or dark red (critical) */}
+              <circle
+                cx="120"
+                cy="120"
+                r="100"
+                fill="none"
+                stroke={
+                  effectiveHealth === 'critical'
+                    ? 'rgba(200, 30, 60, 1.0)'
+                    : effectiveHealth === 'warning'
+                    ? 'rgba(255, 200, 0, 1.0)'
+                    : 'rgba(255, 170, 50, 1.0)'
+                }
+                strokeWidth="6"
+                strokeDasharray="78.5 78.5"
+                strokeDashoffset="-78.5"
+              />
+            </g>
+          </svg>
 
         {/* Realistic Eye with HUD overlay */}
         <div className="realistic-eye">

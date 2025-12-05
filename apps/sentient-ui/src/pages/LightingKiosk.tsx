@@ -2,23 +2,10 @@ import { useState, useEffect } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { SentientEye } from '../components/SentientEye/SentientEye';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
-// Construct WebSocket URL - handle both relative paths and full URLs
-function getWebSocketUrl(): string {
-  const envUrl = import.meta.env.VITE_WS_URL;
-  if (!envUrl) return 'ws://localhost:3002';
-
-  // If it's a relative path like /ws, construct full URL from current location
-  if (envUrl.startsWith('/')) {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    return `${protocol}//${window.location.host}${envUrl}`;
-  }
-
-  return envUrl;
-}
-
-const WS_URL = getWebSocketUrl();
+// Production URLs for kiosk - always use sentientengine.ai
+// The kiosk runs locally but needs to connect to the production server
+const API_URL = 'https://sentientengine.ai/api';
+const WS_URL = 'wss://sentientengine.ai/ws';
 
 interface LightingDevice {
   id: string;
@@ -152,9 +139,9 @@ export function LightingKiosk() {
 
       {/* Main Content */}
       <main className="kiosk-main">
-        {/* Eye Section - matches sidebar style without HUD decoration */}
+        {/* Eye Section - spinning rings but no outer tick marks */}
         <div className="eye-section">
-          <SentientEye />
+          <SentientEye hideTickMarks />
         </div>
 
         {/* Status Bar */}
