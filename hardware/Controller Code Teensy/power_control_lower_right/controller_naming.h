@@ -21,49 +21,49 @@ namespace naming
     // ========================================================================
 
     // Gear Puzzle Power Rails
-    constexpr const char *DEV_GEAR_24V = "gear_24v";
-    constexpr const char *DEV_GEAR_12V = "gear_12v";
-    constexpr const char *DEV_GEAR_5V = "gear_5v";
+    constexpr const char *GEAR_24V = "gear_24v";
+    constexpr const char *GEAR_12V = "gear_12v";
+    constexpr const char *GEAR_5V = "gear_5v";
 
     // Floor Puzzle Power Rails
-    constexpr const char *DEV_FLOOR_24V = "floor_24v";
-    constexpr const char *DEV_FLOOR_12V = "floor_12v";
-    constexpr const char *DEV_FLOOR_5V = "floor_5v";
+    constexpr const char *FLOOR_24V = "floor_24v";
+    constexpr const char *FLOOR_12V = "floor_12v";
+    constexpr const char *FLOOR_5V = "floor_5v";
 
     // Riddle RPi Power Rails
-    constexpr const char *DEV_RIDDLE_RPI_5V = "riddle_rpi_5v";
-    constexpr const char *DEV_RIDDLE_RPI_12V = "riddle_rpi_12v";
-    constexpr const char *DEV_RIDDLE_5V = "riddle_5v";
+    constexpr const char *RIDDLE_RPI_5V = "riddle_rpi_5v";
+    constexpr const char *RIDDLE_RPI_12V = "riddle_rpi_12v";
+    constexpr const char *RIDDLE_5V = "riddle_5v";
 
     // Boiler Room Subpanel Power Rails
-    constexpr const char *DEV_BOILER_ROOM_SUBPANEL_24V = "boiler_room_subpanel_24v";
-    constexpr const char *DEV_BOILER_ROOM_SUBPANEL_12V = "boiler_room_subpanel_12v";
-    constexpr const char *DEV_BOILER_ROOM_SUBPANEL_5V = "boiler_room_subpanel_5v";
+    constexpr const char *BOILER_ROOM_SUBPANEL_24V = "boiler_room_subpanel_24v";
+    constexpr const char *BOILER_ROOM_SUBPANEL_12V = "boiler_room_subpanel_12v";
+    constexpr const char *BOILER_ROOM_SUBPANEL_5V = "boiler_room_subpanel_5v";
 
     // Lab Room Subpanel Power Rails
-    constexpr const char *DEV_LAB_ROOM_SUBPANEL_24V = "lab_room_subpanel_24v";
-    constexpr const char *DEV_LAB_ROOM_SUBPANEL_12V = "lab_room_subpanel_12v";
-    constexpr const char *DEV_LAB_ROOM_SUBPANEL_5V = "lab_room_subpanel_5v";
+    constexpr const char *LAB_ROOM_SUBPANEL_24V = "lab_room_subpanel_24v";
+    constexpr const char *LAB_ROOM_SUBPANEL_12V = "lab_room_subpanel_12v";
+    constexpr const char *LAB_ROOM_SUBPANEL_5V = "lab_room_subpanel_5v";
 
     // Study Room Subpanel Power Rails
-    constexpr const char *DEV_STUDY_ROOM_SUBPANEL_24V = "study_room_subpanel_24v";
-    constexpr const char *DEV_STUDY_ROOM_SUBPANEL_12V = "study_room_subpanel_12v";
-    constexpr const char *DEV_STUDY_ROOM_SUBPANEL_5V = "study_room_subpanel_5v";
+    constexpr const char *STUDY_ROOM_SUBPANEL_24V = "study_room_subpanel_24v";
+    constexpr const char *STUDY_ROOM_SUBPANEL_12V = "study_room_subpanel_12v";
+    constexpr const char *STUDY_ROOM_SUBPANEL_5V = "study_room_subpanel_5v";
 
     // Gun Drawers Power Rails
-    constexpr const char *DEV_GUN_DRAWERS_24V = "gun_drawers_24v";
-    constexpr const char *DEV_GUN_DRAWERS_12V = "gun_drawers_12v";
-    constexpr const char *DEV_GUN_DRAWERS_5V = "gun_drawers_5v";
+    constexpr const char *GUN_DRAWERS_24V = "gun_drawers_24v";
+    constexpr const char *GUN_DRAWERS_12V = "gun_drawers_12v";
+    constexpr const char *GUN_DRAWERS_5V = "gun_drawers_5v";
 
     // Keys Puzzle Power
-    constexpr const char *DEV_KEYS_5V = "keys_5v";
+    constexpr const char *KEYS_5V = "keys_5v";
 
     // Reserved/Empty Relays
-    constexpr const char *DEV_EMPTY_35 = "empty_35";
-    constexpr const char *DEV_EMPTY_34 = "empty_34";
+    constexpr const char *EMPTY_35 = "empty_35";
+    constexpr const char *EMPTY_34 = "empty_34";
 
     // Controller virtual device
-    constexpr const char *DEV_CONTROLLER = "controller";
+    constexpr const char *CONTROLLER = "controller";
 
     // ========================================================================
     // FRIENDLY NAMES (UI-only, never in MQTT topics)

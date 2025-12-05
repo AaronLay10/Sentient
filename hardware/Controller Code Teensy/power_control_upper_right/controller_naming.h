@@ -21,51 +21,51 @@ namespace naming
     // ========================================================================
 
     // Main Lighting Power Rails
-    constexpr const char *DEV_MAIN_LIGHTING_24V = "main_lighting_24v";
-    constexpr const char *DEV_MAIN_LIGHTING_12V = "main_lighting_12v";
-    constexpr const char *DEV_MAIN_LIGHTING_5V = "main_lighting_5v";
+    constexpr const char *MAIN_LIGHTING_24V = "main_lighting_24v";
+    constexpr const char *MAIN_LIGHTING_12V = "main_lighting_12v";
+    constexpr const char *MAIN_LIGHTING_5V = "main_lighting_5v";
 
     // Gauge Cluster Power Rails
-    constexpr const char *DEV_GAUGES_12V_A = "gauges_12v_a";
-    constexpr const char *DEV_GAUGES_12V_B = "gauges_12v_b";
-    constexpr const char *DEV_GAUGES_5V = "gauges_5v";
+    constexpr const char *GAUGES_12V_A = "gauges_12v_a";
+    constexpr const char *GAUGES_12V_B = "gauges_12v_b";
+    constexpr const char *GAUGES_5V = "gauges_5v";
 
     // Lever Boiler Power Rails
-    constexpr const char *DEV_LEVER_BOILER_5V = "lever_boiler_5v";
-    constexpr const char *DEV_LEVER_BOILER_12V = "lever_boiler_12v";
+    constexpr const char *LEVER_BOILER_5V = "lever_boiler_5v";
+    constexpr const char *LEVER_BOILER_12V = "lever_boiler_12v";
 
     // Pilot Light Power
-    constexpr const char *DEV_PILOT_LIGHT_5V = "pilot_light_5v";
+    constexpr const char *PILOT_LIGHT_5V = "pilot_light_5v";
 
     // Kraken Controls Power
-    constexpr const char *DEV_KRAKEN_CONTROLS_5V = "kraken_controls_5v";
+    constexpr const char *KRAKEN_CONTROLS_5V = "kraken_controls_5v";
 
     // Fuse Puzzle Power Rails
-    constexpr const char *DEV_FUSE_12V = "fuse_12v";
-    constexpr const char *DEV_FUSE_5V = "fuse_5v";
+    constexpr const char *FUSE_12V = "fuse_12v";
+    constexpr const char *FUSE_5V = "fuse_5v";
 
     // Syringe Puzzle Power Rails
-    constexpr const char *DEV_SYRINGE_24V = "syringe_24v";
-    constexpr const char *DEV_SYRINGE_12V = "syringe_12v";
-    constexpr const char *DEV_SYRINGE_5V = "syringe_5v";
+    constexpr const char *SYRINGE_24V = "syringe_24v";
+    constexpr const char *SYRINGE_12V = "syringe_12v";
+    constexpr const char *SYRINGE_5V = "syringe_5v";
 
     // Chemical Puzzle Power Rails
-    constexpr const char *DEV_CHEMICAL_24V = "chemical_24v";
-    constexpr const char *DEV_CHEMICAL_12V = "chemical_12v";
-    constexpr const char *DEV_CHEMICAL_5V = "chemical_5v";
+    constexpr const char *CHEMICAL_24V = "chemical_24v";
+    constexpr const char *CHEMICAL_12V = "chemical_12v";
+    constexpr const char *CHEMICAL_5V = "chemical_5v";
 
     // Special Effects Power
-    constexpr const char *DEV_CRAWL_SPACE_BLACKLIGHT = "crawl_space_blacklight";
-    constexpr const char *DEV_FLOOR_AUDIO_AMP = "floor_audio_amp";
-    constexpr const char *DEV_KRAKEN_RADAR_AMP = "kraken_radar_amp";
+    constexpr const char *CRAWL_SPACE_BLACKLIGHT = "crawl_space_blacklight";
+    constexpr const char *FLOOR_AUDIO_AMP = "floor_audio_amp";
+    constexpr const char *KRAKEN_RADAR_AMP = "kraken_radar_amp";
 
     // Vault Power Rails
-    constexpr const char *DEV_VAULT_24V = "vault_24v";
-    constexpr const char *DEV_VAULT_12V = "vault_12v";
-    constexpr const char *DEV_VAULT_5V = "vault_5v";
+    constexpr const char *VAULT_24V = "vault_24v";
+    constexpr const char *VAULT_12V = "vault_12v";
+    constexpr const char *VAULT_5V = "vault_5v";
 
     // Controller virtual device
-    constexpr const char *DEV_CONTROLLER = "controller";
+    constexpr const char *CONTROLLER = "controller";
 
     // ========================================================================
     // FRIENDLY NAMES (UI-only, never in MQTT topics)

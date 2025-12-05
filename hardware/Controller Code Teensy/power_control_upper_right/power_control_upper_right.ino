@@ -151,31 +151,31 @@ const char *controller_commands[] = {
     naming::CMD_REQUEST_STATUS};
 
 // Create device definitions for all 24 relays (with action_type for UI categorization)
-SentientDeviceDef dev_main_lighting_24v(naming::DEV_MAIN_LIGHTING_24V, naming::FRIENDLY_MAIN_LIGHTING_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_main_lighting_12v(naming::DEV_MAIN_LIGHTING_12V, naming::FRIENDLY_MAIN_LIGHTING_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_main_lighting_5v(naming::DEV_MAIN_LIGHTING_5V, naming::FRIENDLY_MAIN_LIGHTING_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gauges_12v_a(naming::DEV_GAUGES_12V_A, naming::FRIENDLY_GAUGES_12V_A, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gauges_12v_b(naming::DEV_GAUGES_12V_B, naming::FRIENDLY_GAUGES_12V_B, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gauges_5v(naming::DEV_GAUGES_5V, naming::FRIENDLY_GAUGES_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_lever_boiler_5v(naming::DEV_LEVER_BOILER_5V, naming::FRIENDLY_LEVER_BOILER_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_lever_boiler_12v(naming::DEV_LEVER_BOILER_12V, naming::FRIENDLY_LEVER_BOILER_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_pilot_light_5v(naming::DEV_PILOT_LIGHT_5V, naming::FRIENDLY_PILOT_LIGHT_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_kraken_controls_5v(naming::DEV_KRAKEN_CONTROLS_5V, naming::FRIENDLY_KRAKEN_CONTROLS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_fuse_12v(naming::DEV_FUSE_12V, naming::FRIENDLY_FUSE_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_fuse_5v(naming::DEV_FUSE_5V, naming::FRIENDLY_FUSE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_syringe_24v(naming::DEV_SYRINGE_24V, naming::FRIENDLY_SYRINGE_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_syringe_12v(naming::DEV_SYRINGE_12V, naming::FRIENDLY_SYRINGE_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_syringe_5v(naming::DEV_SYRINGE_5V, naming::FRIENDLY_SYRINGE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_chemical_24v(naming::DEV_CHEMICAL_24V, naming::FRIENDLY_CHEMICAL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_chemical_12v(naming::DEV_CHEMICAL_12V, naming::FRIENDLY_CHEMICAL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_chemical_5v(naming::DEV_CHEMICAL_5V, naming::FRIENDLY_CHEMICAL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_crawl_space_blacklight(naming::DEV_CRAWL_SPACE_BLACKLIGHT, naming::FRIENDLY_CRAWL_SPACE_BLACKLIGHT, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_floor_audio_amp(naming::DEV_FLOOR_AUDIO_AMP, naming::FRIENDLY_FLOOR_AUDIO_AMP, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_kraken_radar_amp(naming::DEV_KRAKEN_RADAR_AMP, naming::FRIENDLY_KRAKEN_RADAR_AMP, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_vault_24v(naming::DEV_VAULT_24V, naming::FRIENDLY_VAULT_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_vault_12v(naming::DEV_VAULT_12V, naming::FRIENDLY_VAULT_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_vault_5v(naming::DEV_VAULT_5V, naming::FRIENDLY_VAULT_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 5);
+SentientDeviceDef dev_main_lighting_24v(naming::MAIN_LIGHTING_24V, naming::FRIENDLY_MAIN_LIGHTING_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_main_lighting_12v(naming::MAIN_LIGHTING_12V, naming::FRIENDLY_MAIN_LIGHTING_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_main_lighting_5v(naming::MAIN_LIGHTING_5V, naming::FRIENDLY_MAIN_LIGHTING_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gauges_12v_a(naming::GAUGES_12V_A, naming::FRIENDLY_GAUGES_12V_A, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gauges_12v_b(naming::GAUGES_12V_B, naming::FRIENDLY_GAUGES_12V_B, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gauges_5v(naming::GAUGES_5V, naming::FRIENDLY_GAUGES_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lever_boiler_5v(naming::LEVER_BOILER_5V, naming::FRIENDLY_LEVER_BOILER_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lever_boiler_12v(naming::LEVER_BOILER_12V, naming::FRIENDLY_LEVER_BOILER_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_pilot_light_5v(naming::PILOT_LIGHT_5V, naming::FRIENDLY_PILOT_LIGHT_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_kraken_controls_5v(naming::KRAKEN_CONTROLS_5V, naming::FRIENDLY_KRAKEN_CONTROLS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_fuse_12v(naming::FUSE_12V, naming::FRIENDLY_FUSE_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_fuse_5v(naming::FUSE_5V, naming::FRIENDLY_FUSE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_syringe_24v(naming::SYRINGE_24V, naming::FRIENDLY_SYRINGE_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_syringe_12v(naming::SYRINGE_12V, naming::FRIENDLY_SYRINGE_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_syringe_5v(naming::SYRINGE_5V, naming::FRIENDLY_SYRINGE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_chemical_24v(naming::CHEMICAL_24V, naming::FRIENDLY_CHEMICAL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_chemical_12v(naming::CHEMICAL_12V, naming::FRIENDLY_CHEMICAL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_chemical_5v(naming::CHEMICAL_5V, naming::FRIENDLY_CHEMICAL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_crawl_space_blacklight(naming::CRAWL_SPACE_BLACKLIGHT, naming::FRIENDLY_CRAWL_SPACE_BLACKLIGHT, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_audio_amp(naming::FLOOR_AUDIO_AMP, naming::FRIENDLY_FLOOR_AUDIO_AMP, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_kraken_radar_amp(naming::KRAKEN_RADAR_AMP, naming::FRIENDLY_KRAKEN_RADAR_AMP, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_vault_24v(naming::VAULT_24V, naming::FRIENDLY_VAULT_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_vault_12v(naming::VAULT_12V, naming::FRIENDLY_VAULT_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_vault_5v(naming::VAULT_5V, naming::FRIENDLY_VAULT_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_controller(naming::CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 5);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;
@@ -403,175 +403,175 @@ void setup()
                     Serial.println(command);
                     
                     // Route to device-specific handlers
-                    if (device == naming::DEV_MAIN_LIGHTING_24V) {
+                    if (device == naming::MAIN_LIGHTING_24V) {
                         if (command == "power_on") {
-                            set_relay_state(main_lighting_24v_pin, true, main_lighting_24v_state, "Main Lighting 24V", naming::DEV_MAIN_LIGHTING_24V, "power_on");
+                            set_relay_state(main_lighting_24v_pin, true, main_lighting_24v_state, "Main Lighting 24V", naming::MAIN_LIGHTING_24V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(main_lighting_24v_pin, false, main_lighting_24v_state, "Main Lighting 24V", naming::DEV_MAIN_LIGHTING_24V, "power_off");
+                            set_relay_state(main_lighting_24v_pin, false, main_lighting_24v_state, "Main Lighting 24V", naming::MAIN_LIGHTING_24V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_MAIN_LIGHTING_12V) {
+                    else if (device == naming::MAIN_LIGHTING_12V) {
                         if (command == "power_on") {
-                            set_relay_state(main_lighting_12v_pin, true, main_lighting_12v_state, "Main Lighting 12V", naming::DEV_MAIN_LIGHTING_12V, "power_on");
+                            set_relay_state(main_lighting_12v_pin, true, main_lighting_12v_state, "Main Lighting 12V", naming::MAIN_LIGHTING_12V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(main_lighting_12v_pin, false, main_lighting_12v_state, "Main Lighting 12V", naming::DEV_MAIN_LIGHTING_12V, "power_off");
+                            set_relay_state(main_lighting_12v_pin, false, main_lighting_12v_state, "Main Lighting 12V", naming::MAIN_LIGHTING_12V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_MAIN_LIGHTING_5V) {
+                    else if (device == naming::MAIN_LIGHTING_5V) {
                         if (command == "power_on") {
-                            set_relay_state(main_lighting_5v_pin, true, main_lighting_5v_state, "Main Lighting 5V", naming::DEV_MAIN_LIGHTING_5V, "power_on");
+                            set_relay_state(main_lighting_5v_pin, true, main_lighting_5v_state, "Main Lighting 5V", naming::MAIN_LIGHTING_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(main_lighting_5v_pin, false, main_lighting_5v_state, "Main Lighting 5V", naming::DEV_MAIN_LIGHTING_5V, "power_off");
+                            set_relay_state(main_lighting_5v_pin, false, main_lighting_5v_state, "Main Lighting 5V", naming::MAIN_LIGHTING_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_GAUGES_12V_A) {
+                    else if (device == naming::GAUGES_12V_A) {
                         if (command == "power_on") {
-                            set_relay_state(gauges_12v_a_pin, true, gauges_12v_a_state, "Gauges 12V A", naming::DEV_GAUGES_12V_A, "power_on");
+                            set_relay_state(gauges_12v_a_pin, true, gauges_12v_a_state, "Gauges 12V A", naming::GAUGES_12V_A, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(gauges_12v_a_pin, false, gauges_12v_a_state, "Gauges 12V A", naming::DEV_GAUGES_12V_A, "power_off");
+                            set_relay_state(gauges_12v_a_pin, false, gauges_12v_a_state, "Gauges 12V A", naming::GAUGES_12V_A, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_GAUGES_12V_B) {
+                    else if (device == naming::GAUGES_12V_B) {
                         if (command == "power_on") {
-                            set_relay_state(gauges_12v_b_pin, true, gauges_12v_b_state, "Gauges 12V B", naming::DEV_GAUGES_12V_B, "power_on");
+                            set_relay_state(gauges_12v_b_pin, true, gauges_12v_b_state, "Gauges 12V B", naming::GAUGES_12V_B, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(gauges_12v_b_pin, false, gauges_12v_b_state, "Gauges 12V B", naming::DEV_GAUGES_12V_B, "power_off");
+                            set_relay_state(gauges_12v_b_pin, false, gauges_12v_b_state, "Gauges 12V B", naming::GAUGES_12V_B, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_GAUGES_5V) {
+                    else if (device == naming::GAUGES_5V) {
                         if (command == "power_on") {
-                            set_relay_state(gauges_5v_pin, true, gauges_5v_state, "Gauges 5V", naming::DEV_GAUGES_5V, "power_on");
+                            set_relay_state(gauges_5v_pin, true, gauges_5v_state, "Gauges 5V", naming::GAUGES_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(gauges_5v_pin, false, gauges_5v_state, "Gauges 5V", naming::DEV_GAUGES_5V, "power_off");
+                            set_relay_state(gauges_5v_pin, false, gauges_5v_state, "Gauges 5V", naming::GAUGES_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_LEVER_BOILER_5V) {
+                    else if (device == naming::LEVER_BOILER_5V) {
                         if (command == "power_on") {
-                            set_relay_state(lever_boiler_5v_pin, true, lever_boiler_5v_state, "Lever Boiler 5V", naming::DEV_LEVER_BOILER_5V, "power_on");
+                            set_relay_state(lever_boiler_5v_pin, true, lever_boiler_5v_state, "Lever Boiler 5V", naming::LEVER_BOILER_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(lever_boiler_5v_pin, false, lever_boiler_5v_state, "Lever Boiler 5V", naming::DEV_LEVER_BOILER_5V, "power_off");
+                            set_relay_state(lever_boiler_5v_pin, false, lever_boiler_5v_state, "Lever Boiler 5V", naming::LEVER_BOILER_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_LEVER_BOILER_12V) {
+                    else if (device == naming::LEVER_BOILER_12V) {
                         if (command == "power_on") {
-                            set_relay_state(lever_boiler_12v_pin, true, lever_boiler_12v_state, "Lever Boiler 12V", naming::DEV_LEVER_BOILER_12V, "power_on");
+                            set_relay_state(lever_boiler_12v_pin, true, lever_boiler_12v_state, "Lever Boiler 12V", naming::LEVER_BOILER_12V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(lever_boiler_12v_pin, false, lever_boiler_12v_state, "Lever Boiler 12V", naming::DEV_LEVER_BOILER_12V, "power_off");
+                            set_relay_state(lever_boiler_12v_pin, false, lever_boiler_12v_state, "Lever Boiler 12V", naming::LEVER_BOILER_12V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_PILOT_LIGHT_5V) {
+                    else if (device == naming::PILOT_LIGHT_5V) {
                         if (command == "power_on") {
-                            set_relay_state(pilot_light_5v_pin, true, pilot_light_5v_state, "Pilot Light 5V", naming::DEV_PILOT_LIGHT_5V, "power_on");
+                            set_relay_state(pilot_light_5v_pin, true, pilot_light_5v_state, "Pilot Light 5V", naming::PILOT_LIGHT_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(pilot_light_5v_pin, false, pilot_light_5v_state, "Pilot Light 5V", naming::DEV_PILOT_LIGHT_5V, "power_off");
+                            set_relay_state(pilot_light_5v_pin, false, pilot_light_5v_state, "Pilot Light 5V", naming::PILOT_LIGHT_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_KRAKEN_CONTROLS_5V) {
+                    else if (device == naming::KRAKEN_CONTROLS_5V) {
                         if (command == "power_on") {
-                            set_relay_state(kraken_controls_5v_pin, true, kraken_controls_5v_state, "Kraken Controls 5V", naming::DEV_KRAKEN_CONTROLS_5V, "power_on");
+                            set_relay_state(kraken_controls_5v_pin, true, kraken_controls_5v_state, "Kraken Controls 5V", naming::KRAKEN_CONTROLS_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(kraken_controls_5v_pin, false, kraken_controls_5v_state, "Kraken Controls 5V", naming::DEV_KRAKEN_CONTROLS_5V, "power_off");
+                            set_relay_state(kraken_controls_5v_pin, false, kraken_controls_5v_state, "Kraken Controls 5V", naming::KRAKEN_CONTROLS_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_FUSE_12V) {
+                    else if (device == naming::FUSE_12V) {
                         if (command == "power_on") {
-                            set_relay_state(fuse_12v_pin, true, fuse_12v_state, "Fuse 12V", naming::DEV_FUSE_12V, "power_on");
+                            set_relay_state(fuse_12v_pin, true, fuse_12v_state, "Fuse 12V", naming::FUSE_12V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(fuse_12v_pin, false, fuse_12v_state, "Fuse 12V", naming::DEV_FUSE_12V, "power_off");
+                            set_relay_state(fuse_12v_pin, false, fuse_12v_state, "Fuse 12V", naming::FUSE_12V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_FUSE_5V) {
+                    else if (device == naming::FUSE_5V) {
                         if (command == "power_on") {
-                            set_relay_state(fuse_5v_pin, true, fuse_5v_state, "Fuse 5V", naming::DEV_FUSE_5V, "power_on");
+                            set_relay_state(fuse_5v_pin, true, fuse_5v_state, "Fuse 5V", naming::FUSE_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(fuse_5v_pin, false, fuse_5v_state, "Fuse 5V", naming::DEV_FUSE_5V, "power_off");
+                            set_relay_state(fuse_5v_pin, false, fuse_5v_state, "Fuse 5V", naming::FUSE_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_SYRINGE_24V) {
+                    else if (device == naming::SYRINGE_24V) {
                         if (command == "power_on") {
-                            set_relay_state(syringe_24v_pin, true, syringe_24v_state, "Syringe 24V", naming::DEV_SYRINGE_24V, "power_on");
+                            set_relay_state(syringe_24v_pin, true, syringe_24v_state, "Syringe 24V", naming::SYRINGE_24V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(syringe_24v_pin, false, syringe_24v_state, "Syringe 24V", naming::DEV_SYRINGE_24V, "power_off");
+                            set_relay_state(syringe_24v_pin, false, syringe_24v_state, "Syringe 24V", naming::SYRINGE_24V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_SYRINGE_12V) {
+                    else if (device == naming::SYRINGE_12V) {
                         if (command == "power_on") {
-                            set_relay_state(syringe_12v_pin, true, syringe_12v_state, "Syringe 12V", naming::DEV_SYRINGE_12V, "power_on");
+                            set_relay_state(syringe_12v_pin, true, syringe_12v_state, "Syringe 12V", naming::SYRINGE_12V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(syringe_12v_pin, false, syringe_12v_state, "Syringe 12V", naming::DEV_SYRINGE_12V, "power_off");
+                            set_relay_state(syringe_12v_pin, false, syringe_12v_state, "Syringe 12V", naming::SYRINGE_12V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_SYRINGE_5V) {
+                    else if (device == naming::SYRINGE_5V) {
                         if (command == "power_on") {
-                            set_relay_state(syringe_5v_pin, true, syringe_5v_state, "Syringe 5V", naming::DEV_SYRINGE_5V, "power_on");
+                            set_relay_state(syringe_5v_pin, true, syringe_5v_state, "Syringe 5V", naming::SYRINGE_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(syringe_5v_pin, false, syringe_5v_state, "Syringe 5V", naming::DEV_SYRINGE_5V, "power_off");
+                            set_relay_state(syringe_5v_pin, false, syringe_5v_state, "Syringe 5V", naming::SYRINGE_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_CHEMICAL_24V) {
+                    else if (device == naming::CHEMICAL_24V) {
                         if (command == "power_on") {
-                            set_relay_state(chemical_24v_pin, true, chemical_24v_state, "Chemical 24V", naming::DEV_CHEMICAL_24V, "power_on");
+                            set_relay_state(chemical_24v_pin, true, chemical_24v_state, "Chemical 24V", naming::CHEMICAL_24V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(chemical_24v_pin, false, chemical_24v_state, "Chemical 24V", naming::DEV_CHEMICAL_24V, "power_off");
+                            set_relay_state(chemical_24v_pin, false, chemical_24v_state, "Chemical 24V", naming::CHEMICAL_24V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_CHEMICAL_12V) {
+                    else if (device == naming::CHEMICAL_12V) {
                         if (command == "power_on") {
-                            set_relay_state(chemical_12v_pin, true, chemical_12v_state, "Chemical 12V", naming::DEV_CHEMICAL_12V, "power_on");
+                            set_relay_state(chemical_12v_pin, true, chemical_12v_state, "Chemical 12V", naming::CHEMICAL_12V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(chemical_12v_pin, false, chemical_12v_state, "Chemical 12V", naming::DEV_CHEMICAL_12V, "power_off");
+                            set_relay_state(chemical_12v_pin, false, chemical_12v_state, "Chemical 12V", naming::CHEMICAL_12V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_CHEMICAL_5V) {
+                    else if (device == naming::CHEMICAL_5V) {
                         if (command == "power_on") {
-                            set_relay_state(chemical_5v_pin, true, chemical_5v_state, "Chemical 5V", naming::DEV_CHEMICAL_5V, "power_on");
+                            set_relay_state(chemical_5v_pin, true, chemical_5v_state, "Chemical 5V", naming::CHEMICAL_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(chemical_5v_pin, false, chemical_5v_state, "Chemical 5V", naming::DEV_CHEMICAL_5V, "power_off");
+                            set_relay_state(chemical_5v_pin, false, chemical_5v_state, "Chemical 5V", naming::CHEMICAL_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_CRAWL_SPACE_BLACKLIGHT) {
+                    else if (device == naming::CRAWL_SPACE_BLACKLIGHT) {
                         if (command == "power_on") {
-                            set_relay_state(crawl_space_blacklight_pin, true, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::DEV_CRAWL_SPACE_BLACKLIGHT, "power_on");
+                            set_relay_state(crawl_space_blacklight_pin, true, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::CRAWL_SPACE_BLACKLIGHT, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(crawl_space_blacklight_pin, false, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::DEV_CRAWL_SPACE_BLACKLIGHT, "power_off");
+                            set_relay_state(crawl_space_blacklight_pin, false, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::CRAWL_SPACE_BLACKLIGHT, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_FLOOR_AUDIO_AMP) {
+                    else if (device == naming::FLOOR_AUDIO_AMP) {
                         if (command == "power_on") {
-                            set_relay_state(floor_audio_amp_pin, true, floor_audio_amp_state, "Floor Audio Amp", naming::DEV_FLOOR_AUDIO_AMP, "power_on");
+                            set_relay_state(floor_audio_amp_pin, true, floor_audio_amp_state, "Floor Audio Amp", naming::FLOOR_AUDIO_AMP, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(floor_audio_amp_pin, false, floor_audio_amp_state, "Floor Audio Amp", naming::DEV_FLOOR_AUDIO_AMP, "power_off");
+                            set_relay_state(floor_audio_amp_pin, false, floor_audio_amp_state, "Floor Audio Amp", naming::FLOOR_AUDIO_AMP, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_KRAKEN_RADAR_AMP) {
+                    else if (device == naming::KRAKEN_RADAR_AMP) {
                         if (command == "power_on") {
-                            set_relay_state(kraken_radar_amp_pin, true, kraken_radar_amp_state, "Kraken Radar Amp", naming::DEV_KRAKEN_RADAR_AMP, "power_on");
+                            set_relay_state(kraken_radar_amp_pin, true, kraken_radar_amp_state, "Kraken Radar Amp", naming::KRAKEN_RADAR_AMP, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(kraken_radar_amp_pin, false, kraken_radar_amp_state, "Kraken Radar Amp", naming::DEV_KRAKEN_RADAR_AMP, "power_off");
+                            set_relay_state(kraken_radar_amp_pin, false, kraken_radar_amp_state, "Kraken Radar Amp", naming::KRAKEN_RADAR_AMP, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_VAULT_24V) {
+                    else if (device == naming::VAULT_24V) {
                         if (command == "power_on") {
-                            set_relay_state(vault_24v_pin, true, vault_24v_state, "Vault 24V", naming::DEV_VAULT_24V, "power_on");
+                            set_relay_state(vault_24v_pin, true, vault_24v_state, "Vault 24V", naming::VAULT_24V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(vault_24v_pin, false, vault_24v_state, "Vault 24V", naming::DEV_VAULT_24V, "power_off");
+                            set_relay_state(vault_24v_pin, false, vault_24v_state, "Vault 24V", naming::VAULT_24V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_VAULT_12V) {
+                    else if (device == naming::VAULT_12V) {
                         if (command == "power_on") {
-                            set_relay_state(vault_12v_pin, true, vault_12v_state, "Vault 12V", naming::DEV_VAULT_12V, "power_on");
+                            set_relay_state(vault_12v_pin, true, vault_12v_state, "Vault 12V", naming::VAULT_12V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(vault_12v_pin, false, vault_12v_state, "Vault 12V", naming::DEV_VAULT_12V, "power_off");
+                            set_relay_state(vault_12v_pin, false, vault_12v_state, "Vault 12V", naming::VAULT_12V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_VAULT_5V) {
+                    else if (device == naming::VAULT_5V) {
                         if (command == "power_on") {
-                            set_relay_state(vault_5v_pin, true, vault_5v_state, "Vault 5V", naming::DEV_VAULT_5V, "power_on");
+                            set_relay_state(vault_5v_pin, true, vault_5v_state, "Vault 5V", naming::VAULT_5V, "power_on");
                         } else if (command == "power_off") {
-                            set_relay_state(vault_5v_pin, false, vault_5v_state, "Vault 5V", naming::DEV_VAULT_5V, "power_off");
+                            set_relay_state(vault_5v_pin, false, vault_5v_state, "Vault 5V", naming::VAULT_5V, "power_off");
                         }
                     }
-                    else if (device == naming::DEV_CONTROLLER) {
+                    else if (device == naming::CONTROLLER) {
                         // Controller-level commands handled separately
                         if (command == naming::CMD_ALL_ON) {
                             all_relays_on();
@@ -777,60 +777,60 @@ void set_relay_state(int pin, bool state, bool &state_var, const char *device_na
 
 void all_relays_on()
 {
-    set_relay_state(main_lighting_24v_pin, true, main_lighting_24v_state, "Main Lighting 24V", naming::DEV_MAIN_LIGHTING_24V, nullptr);
-    set_relay_state(main_lighting_12v_pin, true, main_lighting_12v_state, "Main Lighting 12V", naming::DEV_MAIN_LIGHTING_12V, nullptr);
-    set_relay_state(main_lighting_5v_pin, true, main_lighting_5v_state, "Main Lighting 5V", naming::DEV_MAIN_LIGHTING_5V, nullptr);
-    set_relay_state(gauges_12v_a_pin, true, gauges_12v_a_state, "Gauges 12V A", naming::DEV_GAUGES_12V_A, nullptr);
-    set_relay_state(gauges_12v_b_pin, true, gauges_12v_b_state, "Gauges 12V B", naming::DEV_GAUGES_12V_B, nullptr);
-    set_relay_state(gauges_5v_pin, true, gauges_5v_state, "Gauges 5V", naming::DEV_GAUGES_5V, nullptr);
-    set_relay_state(lever_boiler_5v_pin, true, lever_boiler_5v_state, "Lever Boiler 5V", naming::DEV_LEVER_BOILER_5V, nullptr);
-    set_relay_state(lever_boiler_12v_pin, true, lever_boiler_12v_state, "Lever Boiler 12V", naming::DEV_LEVER_BOILER_12V, nullptr);
-    set_relay_state(pilot_light_5v_pin, true, pilot_light_5v_state, "Pilot Light 5V", naming::DEV_PILOT_LIGHT_5V, nullptr);
-    set_relay_state(kraken_controls_5v_pin, true, kraken_controls_5v_state, "Kraken Controls 5V", naming::DEV_KRAKEN_CONTROLS_5V, nullptr);
-    set_relay_state(fuse_12v_pin, true, fuse_12v_state, "Fuse 12V", naming::DEV_FUSE_12V, nullptr);
-    set_relay_state(fuse_5v_pin, true, fuse_5v_state, "Fuse 5V", naming::DEV_FUSE_5V, nullptr);
-    set_relay_state(syringe_24v_pin, true, syringe_24v_state, "Syringe 24V", naming::DEV_SYRINGE_24V, nullptr);
-    set_relay_state(syringe_12v_pin, true, syringe_12v_state, "Syringe 12V", naming::DEV_SYRINGE_12V, nullptr);
-    set_relay_state(syringe_5v_pin, true, syringe_5v_state, "Syringe 5V", naming::DEV_SYRINGE_5V, nullptr);
-    set_relay_state(chemical_24v_pin, true, chemical_24v_state, "Chemical 24V", naming::DEV_CHEMICAL_24V, nullptr);
-    set_relay_state(chemical_12v_pin, true, chemical_12v_state, "Chemical 12V", naming::DEV_CHEMICAL_12V, nullptr);
-    set_relay_state(chemical_5v_pin, true, chemical_5v_state, "Chemical 5V", naming::DEV_CHEMICAL_5V, nullptr);
-    set_relay_state(crawl_space_blacklight_pin, true, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::DEV_CRAWL_SPACE_BLACKLIGHT, nullptr);
-    set_relay_state(floor_audio_amp_pin, true, floor_audio_amp_state, "Floor Audio Amp", naming::DEV_FLOOR_AUDIO_AMP, nullptr);
-    set_relay_state(kraken_radar_amp_pin, true, kraken_radar_amp_state, "Kraken Radar Amp", naming::DEV_KRAKEN_RADAR_AMP, nullptr);
-    set_relay_state(vault_24v_pin, true, vault_24v_state, "Vault 24V", naming::DEV_VAULT_24V, nullptr);
-    set_relay_state(vault_12v_pin, true, vault_12v_state, "Vault 12V", naming::DEV_VAULT_12V, nullptr);
-    set_relay_state(vault_5v_pin, true, vault_5v_state, "Vault 5V", naming::DEV_VAULT_5V, nullptr);
+    set_relay_state(main_lighting_24v_pin, true, main_lighting_24v_state, "Main Lighting 24V", naming::MAIN_LIGHTING_24V, nullptr);
+    set_relay_state(main_lighting_12v_pin, true, main_lighting_12v_state, "Main Lighting 12V", naming::MAIN_LIGHTING_12V, nullptr);
+    set_relay_state(main_lighting_5v_pin, true, main_lighting_5v_state, "Main Lighting 5V", naming::MAIN_LIGHTING_5V, nullptr);
+    set_relay_state(gauges_12v_a_pin, true, gauges_12v_a_state, "Gauges 12V A", naming::GAUGES_12V_A, nullptr);
+    set_relay_state(gauges_12v_b_pin, true, gauges_12v_b_state, "Gauges 12V B", naming::GAUGES_12V_B, nullptr);
+    set_relay_state(gauges_5v_pin, true, gauges_5v_state, "Gauges 5V", naming::GAUGES_5V, nullptr);
+    set_relay_state(lever_boiler_5v_pin, true, lever_boiler_5v_state, "Lever Boiler 5V", naming::LEVER_BOILER_5V, nullptr);
+    set_relay_state(lever_boiler_12v_pin, true, lever_boiler_12v_state, "Lever Boiler 12V", naming::LEVER_BOILER_12V, nullptr);
+    set_relay_state(pilot_light_5v_pin, true, pilot_light_5v_state, "Pilot Light 5V", naming::PILOT_LIGHT_5V, nullptr);
+    set_relay_state(kraken_controls_5v_pin, true, kraken_controls_5v_state, "Kraken Controls 5V", naming::KRAKEN_CONTROLS_5V, nullptr);
+    set_relay_state(fuse_12v_pin, true, fuse_12v_state, "Fuse 12V", naming::FUSE_12V, nullptr);
+    set_relay_state(fuse_5v_pin, true, fuse_5v_state, "Fuse 5V", naming::FUSE_5V, nullptr);
+    set_relay_state(syringe_24v_pin, true, syringe_24v_state, "Syringe 24V", naming::SYRINGE_24V, nullptr);
+    set_relay_state(syringe_12v_pin, true, syringe_12v_state, "Syringe 12V", naming::SYRINGE_12V, nullptr);
+    set_relay_state(syringe_5v_pin, true, syringe_5v_state, "Syringe 5V", naming::SYRINGE_5V, nullptr);
+    set_relay_state(chemical_24v_pin, true, chemical_24v_state, "Chemical 24V", naming::CHEMICAL_24V, nullptr);
+    set_relay_state(chemical_12v_pin, true, chemical_12v_state, "Chemical 12V", naming::CHEMICAL_12V, nullptr);
+    set_relay_state(chemical_5v_pin, true, chemical_5v_state, "Chemical 5V", naming::CHEMICAL_5V, nullptr);
+    set_relay_state(crawl_space_blacklight_pin, true, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::CRAWL_SPACE_BLACKLIGHT, nullptr);
+    set_relay_state(floor_audio_amp_pin, true, floor_audio_amp_state, "Floor Audio Amp", naming::FLOOR_AUDIO_AMP, nullptr);
+    set_relay_state(kraken_radar_amp_pin, true, kraken_radar_amp_state, "Kraken Radar Amp", naming::KRAKEN_RADAR_AMP, nullptr);
+    set_relay_state(vault_24v_pin, true, vault_24v_state, "Vault 24V", naming::VAULT_24V, nullptr);
+    set_relay_state(vault_12v_pin, true, vault_12v_state, "Vault 12V", naming::VAULT_12V, nullptr);
+    set_relay_state(vault_5v_pin, true, vault_5v_state, "Vault 5V", naming::VAULT_5V, nullptr);
 
     Serial.println(F("[PowerCtrl] All relays powered ON"));
 }
 
 void all_relays_off()
 {
-    set_relay_state(main_lighting_24v_pin, false, main_lighting_24v_state, "Main Lighting 24V", naming::DEV_MAIN_LIGHTING_24V, nullptr);
-    set_relay_state(main_lighting_12v_pin, false, main_lighting_12v_state, "Main Lighting 12V", naming::DEV_MAIN_LIGHTING_12V, nullptr);
-    set_relay_state(main_lighting_5v_pin, false, main_lighting_5v_state, "Main Lighting 5V", naming::DEV_MAIN_LIGHTING_5V, nullptr);
-    set_relay_state(gauges_12v_a_pin, false, gauges_12v_a_state, "Gauges 12V A", naming::DEV_GAUGES_12V_A, nullptr);
-    set_relay_state(gauges_12v_b_pin, false, gauges_12v_b_state, "Gauges 12V B", naming::DEV_GAUGES_12V_B, nullptr);
-    set_relay_state(gauges_5v_pin, false, gauges_5v_state, "Gauges 5V", naming::DEV_GAUGES_5V, nullptr);
-    set_relay_state(lever_boiler_5v_pin, false, lever_boiler_5v_state, "Lever Boiler 5V", naming::DEV_LEVER_BOILER_5V, nullptr);
-    set_relay_state(lever_boiler_12v_pin, false, lever_boiler_12v_state, "Lever Boiler 12V", naming::DEV_LEVER_BOILER_12V, nullptr);
-    set_relay_state(pilot_light_5v_pin, false, pilot_light_5v_state, "Pilot Light 5V", naming::DEV_PILOT_LIGHT_5V, nullptr);
-    set_relay_state(kraken_controls_5v_pin, false, kraken_controls_5v_state, "Kraken Controls 5V", naming::DEV_KRAKEN_CONTROLS_5V, nullptr);
-    set_relay_state(fuse_12v_pin, false, fuse_12v_state, "Fuse 12V", naming::DEV_FUSE_12V, nullptr);
-    set_relay_state(fuse_5v_pin, false, fuse_5v_state, "Fuse 5V", naming::DEV_FUSE_5V, nullptr);
-    set_relay_state(syringe_24v_pin, false, syringe_24v_state, "Syringe 24V", naming::DEV_SYRINGE_24V, nullptr);
-    set_relay_state(syringe_12v_pin, false, syringe_12v_state, "Syringe 12V", naming::DEV_SYRINGE_12V, nullptr);
-    set_relay_state(syringe_5v_pin, false, syringe_5v_state, "Syringe 5V", naming::DEV_SYRINGE_5V, nullptr);
-    set_relay_state(chemical_24v_pin, false, chemical_24v_state, "Chemical 24V", naming::DEV_CHEMICAL_24V, nullptr);
-    set_relay_state(chemical_12v_pin, false, chemical_12v_state, "Chemical 12V", naming::DEV_CHEMICAL_12V, nullptr);
-    set_relay_state(chemical_5v_pin, false, chemical_5v_state, "Chemical 5V", naming::DEV_CHEMICAL_5V, nullptr);
-    set_relay_state(crawl_space_blacklight_pin, false, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::DEV_CRAWL_SPACE_BLACKLIGHT, nullptr);
-    set_relay_state(floor_audio_amp_pin, false, floor_audio_amp_state, "Floor Audio Amp", naming::DEV_FLOOR_AUDIO_AMP, nullptr);
-    set_relay_state(kraken_radar_amp_pin, false, kraken_radar_amp_state, "Kraken Radar Amp", naming::DEV_KRAKEN_RADAR_AMP, nullptr);
-    set_relay_state(vault_24v_pin, false, vault_24v_state, "Vault 24V", naming::DEV_VAULT_24V, nullptr);
-    set_relay_state(vault_12v_pin, false, vault_12v_state, "Vault 12V", naming::DEV_VAULT_12V, nullptr);
-    set_relay_state(vault_5v_pin, false, vault_5v_state, "Vault 5V", naming::DEV_VAULT_5V, nullptr);
+    set_relay_state(main_lighting_24v_pin, false, main_lighting_24v_state, "Main Lighting 24V", naming::MAIN_LIGHTING_24V, nullptr);
+    set_relay_state(main_lighting_12v_pin, false, main_lighting_12v_state, "Main Lighting 12V", naming::MAIN_LIGHTING_12V, nullptr);
+    set_relay_state(main_lighting_5v_pin, false, main_lighting_5v_state, "Main Lighting 5V", naming::MAIN_LIGHTING_5V, nullptr);
+    set_relay_state(gauges_12v_a_pin, false, gauges_12v_a_state, "Gauges 12V A", naming::GAUGES_12V_A, nullptr);
+    set_relay_state(gauges_12v_b_pin, false, gauges_12v_b_state, "Gauges 12V B", naming::GAUGES_12V_B, nullptr);
+    set_relay_state(gauges_5v_pin, false, gauges_5v_state, "Gauges 5V", naming::GAUGES_5V, nullptr);
+    set_relay_state(lever_boiler_5v_pin, false, lever_boiler_5v_state, "Lever Boiler 5V", naming::LEVER_BOILER_5V, nullptr);
+    set_relay_state(lever_boiler_12v_pin, false, lever_boiler_12v_state, "Lever Boiler 12V", naming::LEVER_BOILER_12V, nullptr);
+    set_relay_state(pilot_light_5v_pin, false, pilot_light_5v_state, "Pilot Light 5V", naming::PILOT_LIGHT_5V, nullptr);
+    set_relay_state(kraken_controls_5v_pin, false, kraken_controls_5v_state, "Kraken Controls 5V", naming::KRAKEN_CONTROLS_5V, nullptr);
+    set_relay_state(fuse_12v_pin, false, fuse_12v_state, "Fuse 12V", naming::FUSE_12V, nullptr);
+    set_relay_state(fuse_5v_pin, false, fuse_5v_state, "Fuse 5V", naming::FUSE_5V, nullptr);
+    set_relay_state(syringe_24v_pin, false, syringe_24v_state, "Syringe 24V", naming::SYRINGE_24V, nullptr);
+    set_relay_state(syringe_12v_pin, false, syringe_12v_state, "Syringe 12V", naming::SYRINGE_12V, nullptr);
+    set_relay_state(syringe_5v_pin, false, syringe_5v_state, "Syringe 5V", naming::SYRINGE_5V, nullptr);
+    set_relay_state(chemical_24v_pin, false, chemical_24v_state, "Chemical 24V", naming::CHEMICAL_24V, nullptr);
+    set_relay_state(chemical_12v_pin, false, chemical_12v_state, "Chemical 12V", naming::CHEMICAL_12V, nullptr);
+    set_relay_state(chemical_5v_pin, false, chemical_5v_state, "Chemical 5V", naming::CHEMICAL_5V, nullptr);
+    set_relay_state(crawl_space_blacklight_pin, false, crawl_space_blacklight_state, "Crawl Space Blacklight", naming::CRAWL_SPACE_BLACKLIGHT, nullptr);
+    set_relay_state(floor_audio_amp_pin, false, floor_audio_amp_state, "Floor Audio Amp", naming::FLOOR_AUDIO_AMP, nullptr);
+    set_relay_state(kraken_radar_amp_pin, false, kraken_radar_amp_state, "Kraken Radar Amp", naming::KRAKEN_RADAR_AMP, nullptr);
+    set_relay_state(vault_24v_pin, false, vault_24v_state, "Vault 24V", naming::VAULT_24V, nullptr);
+    set_relay_state(vault_12v_pin, false, vault_12v_state, "Vault 12V", naming::VAULT_12V, nullptr);
+    set_relay_state(vault_5v_pin, false, vault_5v_state, "Vault 5V", naming::VAULT_5V, nullptr);
 
     Serial.println(F("[PowerCtrl] All relays powered OFF"));
 }
@@ -894,30 +894,30 @@ void emergency_power_off()
     // Publish individual relay OFF states for real-time UI updates
     if (mqtt.isConnected())
     {
-        publish_relay_state(naming::DEV_MAIN_LIGHTING_24V, false);
-        publish_relay_state(naming::DEV_MAIN_LIGHTING_12V, false);
-        publish_relay_state(naming::DEV_MAIN_LIGHTING_5V, false);
-        publish_relay_state(naming::DEV_GAUGES_12V_A, false);
-        publish_relay_state(naming::DEV_GAUGES_12V_B, false);
-        publish_relay_state(naming::DEV_GAUGES_5V, false);
-        publish_relay_state(naming::DEV_LEVER_BOILER_5V, false);
-        publish_relay_state(naming::DEV_LEVER_BOILER_12V, false);
-        publish_relay_state(naming::DEV_PILOT_LIGHT_5V, false);
-        publish_relay_state(naming::DEV_KRAKEN_CONTROLS_5V, false);
-        publish_relay_state(naming::DEV_FUSE_12V, false);
-        publish_relay_state(naming::DEV_FUSE_5V, false);
-        publish_relay_state(naming::DEV_SYRINGE_24V, false);
-        publish_relay_state(naming::DEV_SYRINGE_12V, false);
-        publish_relay_state(naming::DEV_SYRINGE_5V, false);
-        publish_relay_state(naming::DEV_CHEMICAL_24V, false);
-        publish_relay_state(naming::DEV_CHEMICAL_12V, false);
-        publish_relay_state(naming::DEV_CHEMICAL_5V, false);
-        publish_relay_state(naming::DEV_CRAWL_SPACE_BLACKLIGHT, false);
-        publish_relay_state(naming::DEV_FLOOR_AUDIO_AMP, false);
-        publish_relay_state(naming::DEV_KRAKEN_RADAR_AMP, false);
-        publish_relay_state(naming::DEV_VAULT_24V, false);
-        publish_relay_state(naming::DEV_VAULT_12V, false);
-        publish_relay_state(naming::DEV_VAULT_5V, false);
+        publish_relay_state(naming::MAIN_LIGHTING_24V, false);
+        publish_relay_state(naming::MAIN_LIGHTING_12V, false);
+        publish_relay_state(naming::MAIN_LIGHTING_5V, false);
+        publish_relay_state(naming::GAUGES_12V_A, false);
+        publish_relay_state(naming::GAUGES_12V_B, false);
+        publish_relay_state(naming::GAUGES_5V, false);
+        publish_relay_state(naming::LEVER_BOILER_5V, false);
+        publish_relay_state(naming::LEVER_BOILER_12V, false);
+        publish_relay_state(naming::PILOT_LIGHT_5V, false);
+        publish_relay_state(naming::KRAKEN_CONTROLS_5V, false);
+        publish_relay_state(naming::FUSE_12V, false);
+        publish_relay_state(naming::FUSE_5V, false);
+        publish_relay_state(naming::SYRINGE_24V, false);
+        publish_relay_state(naming::SYRINGE_12V, false);
+        publish_relay_state(naming::SYRINGE_5V, false);
+        publish_relay_state(naming::CHEMICAL_24V, false);
+        publish_relay_state(naming::CHEMICAL_12V, false);
+        publish_relay_state(naming::CHEMICAL_5V, false);
+        publish_relay_state(naming::CRAWL_SPACE_BLACKLIGHT, false);
+        publish_relay_state(naming::FLOOR_AUDIO_AMP, false);
+        publish_relay_state(naming::KRAKEN_RADAR_AMP, false);
+        publish_relay_state(naming::VAULT_24V, false);
+        publish_relay_state(naming::VAULT_12V, false);
+        publish_relay_state(naming::VAULT_5V, false);
     }
 
     // Publish emergency event
@@ -1019,76 +1019,76 @@ void report_actual_relay_states()
 
     // Read and report all 24 relays
     main_lighting_24v_state = digitalRead(main_lighting_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_MAIN_LIGHTING_24V, main_lighting_24v_state);
+    publish_relay_state(naming::MAIN_LIGHTING_24V, main_lighting_24v_state);
 
     main_lighting_12v_state = digitalRead(main_lighting_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_MAIN_LIGHTING_12V, main_lighting_12v_state);
+    publish_relay_state(naming::MAIN_LIGHTING_12V, main_lighting_12v_state);
 
     main_lighting_5v_state = digitalRead(main_lighting_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_MAIN_LIGHTING_5V, main_lighting_5v_state);
+    publish_relay_state(naming::MAIN_LIGHTING_5V, main_lighting_5v_state);
 
     gauges_12v_a_state = digitalRead(gauges_12v_a_pin) == HIGH;
-    publish_relay_state(naming::DEV_GAUGES_12V_A, gauges_12v_a_state);
+    publish_relay_state(naming::GAUGES_12V_A, gauges_12v_a_state);
 
     gauges_12v_b_state = digitalRead(gauges_12v_b_pin) == HIGH;
-    publish_relay_state(naming::DEV_GAUGES_12V_B, gauges_12v_b_state);
+    publish_relay_state(naming::GAUGES_12V_B, gauges_12v_b_state);
 
     gauges_5v_state = digitalRead(gauges_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_GAUGES_5V, gauges_5v_state);
+    publish_relay_state(naming::GAUGES_5V, gauges_5v_state);
 
     lever_boiler_5v_state = digitalRead(lever_boiler_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_LEVER_BOILER_5V, lever_boiler_5v_state);
+    publish_relay_state(naming::LEVER_BOILER_5V, lever_boiler_5v_state);
 
     lever_boiler_12v_state = digitalRead(lever_boiler_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_LEVER_BOILER_12V, lever_boiler_12v_state);
+    publish_relay_state(naming::LEVER_BOILER_12V, lever_boiler_12v_state);
 
     pilot_light_5v_state = digitalRead(pilot_light_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_PILOT_LIGHT_5V, pilot_light_5v_state);
+    publish_relay_state(naming::PILOT_LIGHT_5V, pilot_light_5v_state);
 
     kraken_controls_5v_state = digitalRead(kraken_controls_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_KRAKEN_CONTROLS_5V, kraken_controls_5v_state);
+    publish_relay_state(naming::KRAKEN_CONTROLS_5V, kraken_controls_5v_state);
 
     fuse_12v_state = digitalRead(fuse_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_FUSE_12V, fuse_12v_state);
+    publish_relay_state(naming::FUSE_12V, fuse_12v_state);
 
     fuse_5v_state = digitalRead(fuse_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_FUSE_5V, fuse_5v_state);
+    publish_relay_state(naming::FUSE_5V, fuse_5v_state);
 
     syringe_24v_state = digitalRead(syringe_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_SYRINGE_24V, syringe_24v_state);
+    publish_relay_state(naming::SYRINGE_24V, syringe_24v_state);
 
     syringe_12v_state = digitalRead(syringe_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_SYRINGE_12V, syringe_12v_state);
+    publish_relay_state(naming::SYRINGE_12V, syringe_12v_state);
 
     syringe_5v_state = digitalRead(syringe_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_SYRINGE_5V, syringe_5v_state);
+    publish_relay_state(naming::SYRINGE_5V, syringe_5v_state);
 
     chemical_24v_state = digitalRead(chemical_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_CHEMICAL_24V, chemical_24v_state);
+    publish_relay_state(naming::CHEMICAL_24V, chemical_24v_state);
 
     chemical_12v_state = digitalRead(chemical_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_CHEMICAL_12V, chemical_12v_state);
+    publish_relay_state(naming::CHEMICAL_12V, chemical_12v_state);
 
     chemical_5v_state = digitalRead(chemical_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_CHEMICAL_5V, chemical_5v_state);
+    publish_relay_state(naming::CHEMICAL_5V, chemical_5v_state);
 
     crawl_space_blacklight_state = digitalRead(crawl_space_blacklight_pin) == HIGH;
-    publish_relay_state(naming::DEV_CRAWL_SPACE_BLACKLIGHT, crawl_space_blacklight_state);
+    publish_relay_state(naming::CRAWL_SPACE_BLACKLIGHT, crawl_space_blacklight_state);
 
     floor_audio_amp_state = digitalRead(floor_audio_amp_pin) == HIGH;
-    publish_relay_state(naming::DEV_FLOOR_AUDIO_AMP, floor_audio_amp_state);
+    publish_relay_state(naming::FLOOR_AUDIO_AMP, floor_audio_amp_state);
 
     kraken_radar_amp_state = digitalRead(kraken_radar_amp_pin) == HIGH;
-    publish_relay_state(naming::DEV_KRAKEN_RADAR_AMP, kraken_radar_amp_state);
+    publish_relay_state(naming::KRAKEN_RADAR_AMP, kraken_radar_amp_state);
 
     vault_24v_state = digitalRead(vault_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_VAULT_24V, vault_24v_state);
+    publish_relay_state(naming::VAULT_24V, vault_24v_state);
 
     vault_12v_state = digitalRead(vault_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_VAULT_12V, vault_12v_state);
+    publish_relay_state(naming::VAULT_12V, vault_12v_state);
 
     vault_5v_state = digitalRead(vault_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_VAULT_5V, vault_5v_state);
+    publish_relay_state(naming::VAULT_5V, vault_5v_state);
 
     Serial.println(F("[PowerCtrl] === All 24 Relay States Reported ==="));
 

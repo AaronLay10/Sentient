@@ -3,7 +3,7 @@
 
 namespace firmware
 {
-    constexpr const char *VERSION = "2.3.5";
+    constexpr const char *VERSION = "2.3.11";
     constexpr const char *BUILD_DATE = "2025-10-30";
     // UNIQUE_ID must equal controller_id and be globally unique per controller
     constexpr const char *UNIQUE_ID = "power_control_upper_right";

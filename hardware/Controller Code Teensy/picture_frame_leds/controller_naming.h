@@ -1,0 +1,50 @@
+#ifndef CONTROLLER_NAMING_H
+#define CONTROLLER_NAMING_H
+
+// Picture Frame LEDs Controller v2 — Canonical naming
+#include "FirmwareMetadata.h"
+
+namespace naming
+{
+    constexpr const char *CLIENT_ID = "paragon";
+    constexpr const char *ROOM_ID = "clockwork";
+    constexpr const char *CONTROLLER_ID = firmware::UNIQUE_ID; // "picture_frame_leds"
+    constexpr const char *CONTROLLER_FRIENDLY_NAME = "Picture Frame LEDs Controller";
+
+    // TV LED devices (each TV has 8 strips)
+    constexpr const char *TV_VINCENT = "tv_vincent";
+    constexpr const char *TV_EDITH = "tv_edith";
+    constexpr const char *TV_MAKS = "tv_maks";
+    constexpr const char *TV_OLIVER = "tv_oliver";
+    constexpr const char *ALL_TVS = "all_tvs";
+
+    // Commands
+    constexpr const char *CMD_POWER_ON = "power_on";
+    constexpr const char *CMD_POWER_OFF = "power_off";
+    constexpr const char *CMD_SET_COLOR = "set_color";
+    constexpr const char *CMD_SET_BRIGHTNESS = "set_brightness";
+    constexpr const char *CMD_FLICKER = "flicker";
+
+    // Categories (fixed, lowercase)
+    constexpr const char *CAT_COMMANDS = "commands";
+    constexpr const char *CAT_SENSORS = "sensors";
+    constexpr const char *CAT_STATUS = "status";
+    constexpr const char *CAT_EVENTS = "events";
+    constexpr const char *CAT_ACKNOWLEDGEMENT = "acknowledgement";
+    constexpr const char *ITEM_HEARTBEAT = "heartbeat";
+    constexpr const char *ITEM_HARDWARE = "hardware";
+    constexpr const char *ITEM_COMMAND_ACK = "command_ack";
+
+    // ========================================================================
+    // ACTION TYPES (defines how devices interact - for UI categorization)
+    // ========================================================================
+    // Action type values:
+    //   INPUT:  digital_switch, analog_sensor, counter, code_reader
+    //   OUTPUT: digital_relay, analog_pwm, rgb_led, position_servo, position_stepper, motor_control, trigger
+
+    // LED strips (RGB LED output)
+    constexpr const char *ACTION_TYPE_RGB = "rgb_led";
+
+}
+
+#endif // CONTROLLER_NAMING_H

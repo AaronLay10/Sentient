@@ -28,7 +28,7 @@ fi
 # Check if input file provided
 if [ $# -eq 0 ]; then
     echo "Usage: $0 <path_to_ino_file>"
-    echo "Example: $0 'Controller Code Teensy/main_lighting_v2/main_lighting_v2.ino'"
+    echo "Example: $0 'Controller Code Teensy/main_lighting/main_lighting.ino'"
     exit 1
 fi
 
@@ -134,6 +134,13 @@ if [ $? -eq 0 ]; then
     echo ""
     HEX_FILE="${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.hex"
     if [ -f "${HEX_FILE}" ]; then
+        # Clean up non-.hex files (keep only .hex)
+        echo -e "${YELLOW}Cleaning up non-.hex files...${NC}"
+        rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.eep"
+        rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.elf"
+        rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.lst"
+        rm -f "${OUTPUT_DIR}/${CONTROLLER_NAME}.ino.sym"
+
         HEX_SIZE=$(du -h "${HEX_FILE}" | cut -f1)
         echo -e "${GREEN}✓ SUCCESS${NC} - HEX: ${HEX_SIZE}"
         echo -e "${BLUE}File:${NC} ${HEX_FILE}"

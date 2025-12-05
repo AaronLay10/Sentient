@@ -21,14 +21,14 @@ namespace naming
     // ========================================================================
 
     // Lever Riddle Cube Power Rails
-    constexpr const char *DEV_LEVER_RIDDLE_CUBE_24V = "lever_riddle_cube_24v";
-    constexpr const char *DEV_LEVER_RIDDLE_CUBE_12V = "lever_riddle_cube_12v";
-    constexpr const char *DEV_LEVER_RIDDLE_CUBE_5V = "lever_riddle_cube_5v";
+    constexpr const char *LEVER_RIDDLE_CUBE_24V = "lever_riddle_cube_24v";
+    constexpr const char *LEVER_RIDDLE_CUBE_12V = "lever_riddle_cube_12v";
+    constexpr const char *LEVER_RIDDLE_CUBE_5V = "lever_riddle_cube_5v";
 
     // Clock Puzzle Power Rails
-    constexpr const char *DEV_CLOCK_24V = "clock_24v";
-    constexpr const char *DEV_CLOCK_12V = "clock_12v";
-    constexpr const char *DEV_CLOCK_5V = "clock_5v";
+    constexpr const char *CLOCK_24V = "clock_24v";
+    constexpr const char *CLOCK_12V = "clock_12v";
+    constexpr const char *CLOCK_5V = "clock_5v";
 
     // ========================================================================
     // FRIENDLY NAMES (UI-only, never in MQTT topics)
@@ -43,6 +43,9 @@ namespace naming
     constexpr const char *FRIENDLY_CLOCK_24V = "Clock Puzzle 24V";
     constexpr const char *FRIENDLY_CLOCK_12V = "Clock Puzzle 12V";
     constexpr const char *FRIENDLY_CLOCK_5V = "Clock Puzzle 5V";
+
+    // Controller virtual device
+    constexpr const char *CONTROLLER = "controller";
 
     // Controller
     constexpr const char *FRIENDLY_CONTROLLER = "Power Control - Lower Left";

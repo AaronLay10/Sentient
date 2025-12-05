@@ -3,8 +3,48 @@
  * Helps Teensy controllers generate self-documenting capability manifests
  *
  * Author: Sentient Development Team
- * Version: 1.0.0
+ * Version: 1.1.0
  * License: MIT
+ *
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * W5500 ETHERNET TX BUFFER LIMITATION - CRITICAL DOCUMENTATION
+ * ═══════════════════════════════════════════════════════════════════════════════
+ *
+ * The W5500 Ethernet chip (used by Teensy 4.1's built-in Ethernet) has a hardware
+ * limitation: its TX buffer is approximately 2KB per socket. When attempting to
+ * publish MQTT messages larger than ~2000 bytes, the PubSubClient library's
+ * publish() call will HANG indefinitely as the W5500 cannot buffer the entire
+ * payload for transmission.
+ *
+ * SYMPTOMS OF THIS ISSUE:
+ * - Controller connects to MQTT broker successfully
+ * - Serial output shows "Publishing to sentient/system/register/controller..."
+ * - Controller hangs indefinitely (no timeout, no error, just frozen)
+ * - Power controllers with 20+ devices are especially affected (~4000+ byte payloads)
+ *
+ * SOLUTION IMPLEMENTED:
+ * The publish_registration() method now detects when payloads exceed 2000 bytes
+ * and automatically switches to a "minimal registration" strategy:
+ *
+ * 1. If payload > 2000 bytes:
+ *    - Send minimal controller metadata (~300 bytes) without embedded device manifest
+ *    - Each device is then registered individually (~200-400 bytes each)
+ *    - The backend receives device_count to know how many devices to expect
+ *
+ * 2. If payload <= 2000 bytes:
+ *    - Send full registration with embedded capability_manifest (original behavior)
+ *    - More efficient for controllers with fewer devices
+ *
+ * This approach ensures ALL controllers can register successfully regardless of
+ * how many devices they manage.
+ *
+ * AFFECTED CONTROLLERS:
+ * - power_control_upper_right: 21 devices (~4158 bytes) - uses minimal registration
+ * - power_control_lower_left: 20+ devices - uses minimal registration
+ * - power_control_lower_right: 20+ devices - uses minimal registration
+ * - Most other controllers: <15 devices - use full registration
+ *
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 #ifndef SENTIENT_CAPABILITY_MANIFEST_H
@@ -105,10 +145,19 @@ public:
   }
 
   /**
-   * Publish registration to Sentient system in SMALL CHUNKS
-   * to avoid W5500 Ethernet TX buffer overflow (2KB hardware limit)
+   * Publish registration to Sentient system
    *
-   * Sends controller info + each device separately
+   * IMPORTANT: This method handles the W5500 Ethernet TX buffer limitation.
+   * See file header documentation for full details.
+   *
+   * Registration Strategy:
+   * - Payloads > 2000 bytes: Minimal controller registration + individual device registration
+   * - Payloads <= 2000 bytes: Full registration with embedded capability_manifest
+   *
+   * @param mqtt_client   Reference to connected PubSubClient
+   * @param room_id_uuid  Room UUID for database association
+   * @param mqtt_device_id Hardware type identifier (default: "Teensy 4.1")
+   * @return true if all registrations succeeded, false on any failure
    */
   bool publish_registration(PubSubClient &mqtt_client, const char *room_id_uuid, const char *mqtt_device_id = "Teensy 4.1")
   {
@@ -123,9 +172,9 @@ public:
     Serial.print(F("[CapabilityManifest] Devices to register: "));
     Serial.println(devices.size());
 
-    // STEP 1: Publish controller metadata (small, ~800 bytes)
+    // STEP 1: Publish controller metadata (can be large with many devices)
     {
-      StaticJsonDocument<2048> controller_doc;
+      StaticJsonDocument<8192> controller_doc;
       controller_doc["controller_id"] = controller_id;
       controller_doc["room_id"] = room_id_uuid;
       controller_doc["friendly_name"] = friendly_name;
@@ -172,14 +221,61 @@ public:
       Serial.print(F("[CapabilityManifest] Controller payload: "));
       Serial.print(payload.length());
       Serial.println(F(" bytes"));
+      Serial.flush();
 
-      if (!mqtt_client.publish("sentient/system/register/controller", payload.c_str()))
+      // Check if payload exceeds safe limit (W5500 has ~2KB TX buffer)
+      if (payload.length() > 2000)
       {
-        Serial.println(F("[CapabilityManifest] Controller registration failed!"));
-        return false;
+        Serial.println(F("[CapabilityManifest] Payload too large, sending minimal registration..."));
+        Serial.flush();
+
+        // Send minimal controller registration without embedded manifest
+        StaticJsonDocument<1024> minimal_doc;
+        minimal_doc["controller_id"] = controller_id;
+        minimal_doc["room_id"] = room_id_uuid;
+        minimal_doc["friendly_name"] = friendly_name;
+        minimal_doc["hardware_type"] = "Teensy 4.1";
+        minimal_doc["firmware_version"] = firmware_version;
+        minimal_doc["device_count"] = devices.size();
+        minimal_doc["mqtt_namespace"] = "paragon";
+        minimal_doc["mqtt_room_id"] = controller_info["room_id"] | "";
+        minimal_doc["mqtt_controller_id"] = controller_info["controller_id"] | "";
+
+        String minimal_payload;
+        serializeJson(minimal_doc, minimal_payload);
+
+        Serial.print(F("[CapabilityManifest] Minimal payload: "));
+        Serial.print(minimal_payload.length());
+        Serial.println(F(" bytes"));
+        Serial.flush();
+
+        if (!mqtt_client.publish("sentient/system/register/controller", minimal_payload.c_str()))
+        {
+          Serial.println(F("[CapabilityManifest] Minimal controller registration failed!"));
+          return false;
+        }
+        Serial.println(F("[CapabilityManifest] Minimal controller registered"));
+        delay(100);
       }
-      Serial.println(F("[CapabilityManifest] Controller registered"));
-      delay(100); // Give broker time to process
+      else
+      {
+        Serial.println(F("[CapabilityManifest] Publishing to sentient/system/register/controller..."));
+        Serial.flush();
+
+        bool publish_result = mqtt_client.publish("sentient/system/register/controller", payload.c_str());
+
+        Serial.print(F("[CapabilityManifest] Publish result: "));
+        Serial.println(publish_result ? "SUCCESS" : "FAILED");
+        Serial.flush();
+
+        if (!publish_result)
+        {
+          Serial.println(F("[CapabilityManifest] Controller registration failed!"));
+          return false;
+        }
+        Serial.println(F("[CapabilityManifest] Controller registered"));
+        delay(100);
+      }
     }
 
     // STEP 2: Publish each device individually (small, ~200-400 bytes each)

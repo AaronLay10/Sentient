@@ -148,31 +148,31 @@ const char *controller_commands[] = {
     naming::CMD_REQUEST_STATUS};
 
 // Create device definitions for all 24 relays
-SentientDeviceDef dev_gear_24v(naming::DEV_GEAR_24V, naming::FRIENDLY_GEAR_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gear_12v(naming::DEV_GEAR_12V, naming::FRIENDLY_GEAR_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gear_5v(naming::DEV_GEAR_5V, naming::FRIENDLY_GEAR_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_floor_24v(naming::DEV_FLOOR_24V, naming::FRIENDLY_FLOOR_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_floor_12v(naming::DEV_FLOOR_12V, naming::FRIENDLY_FLOOR_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_floor_5v(naming::DEV_FLOOR_5V, naming::FRIENDLY_FLOOR_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_riddle_rpi_5v(naming::DEV_RIDDLE_RPI_5V, naming::FRIENDLY_RIDDLE_RPI_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_riddle_rpi_12v(naming::DEV_RIDDLE_RPI_12V, naming::FRIENDLY_RIDDLE_RPI_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_riddle_5v(naming::DEV_RIDDLE_5V, naming::FRIENDLY_RIDDLE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_boiler_room_subpanel_24v(naming::DEV_BOILER_ROOM_SUBPANEL_24V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_boiler_room_subpanel_12v(naming::DEV_BOILER_ROOM_SUBPANEL_12V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_boiler_room_subpanel_5v(naming::DEV_BOILER_ROOM_SUBPANEL_5V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_lab_room_subpanel_24v(naming::DEV_LAB_ROOM_SUBPANEL_24V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_lab_room_subpanel_12v(naming::DEV_LAB_ROOM_SUBPANEL_12V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_lab_room_subpanel_5v(naming::DEV_LAB_ROOM_SUBPANEL_5V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_study_room_subpanel_24v(naming::DEV_STUDY_ROOM_SUBPANEL_24V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_study_room_subpanel_12v(naming::DEV_STUDY_ROOM_SUBPANEL_12V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_study_room_subpanel_5v(naming::DEV_STUDY_ROOM_SUBPANEL_5V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gun_drawers_24v(naming::DEV_GUN_DRAWERS_24V, naming::FRIENDLY_GUN_DRAWERS_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gun_drawers_12v(naming::DEV_GUN_DRAWERS_12V, naming::FRIENDLY_GUN_DRAWERS_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_gun_drawers_5v(naming::DEV_GUN_DRAWERS_5V, naming::FRIENDLY_GUN_DRAWERS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_keys_5v(naming::DEV_KEYS_5V, naming::FRIENDLY_KEYS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_empty_35(naming::DEV_EMPTY_35, naming::FRIENDLY_EMPTY_35, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_empty_34(naming::DEV_EMPTY_34, naming::FRIENDLY_EMPTY_34, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
-SentientDeviceDef dev_controller(naming::DEV_CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 5);
+SentientDeviceDef dev_gear_24v(naming::GEAR_24V, naming::FRIENDLY_GEAR_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gear_12v(naming::GEAR_12V, naming::FRIENDLY_GEAR_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gear_5v(naming::GEAR_5V, naming::FRIENDLY_GEAR_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_24v(naming::FLOOR_24V, naming::FRIENDLY_FLOOR_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_12v(naming::FLOOR_12V, naming::FRIENDLY_FLOOR_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_floor_5v(naming::FLOOR_5V, naming::FRIENDLY_FLOOR_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_riddle_rpi_5v(naming::RIDDLE_RPI_5V, naming::FRIENDLY_RIDDLE_RPI_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_riddle_rpi_12v(naming::RIDDLE_RPI_12V, naming::FRIENDLY_RIDDLE_RPI_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_riddle_5v(naming::RIDDLE_5V, naming::FRIENDLY_RIDDLE_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_boiler_room_subpanel_24v(naming::BOILER_ROOM_SUBPANEL_24V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_boiler_room_subpanel_12v(naming::BOILER_ROOM_SUBPANEL_12V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_boiler_room_subpanel_5v(naming::BOILER_ROOM_SUBPANEL_5V, naming::FRIENDLY_BOILER_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lab_room_subpanel_24v(naming::LAB_ROOM_SUBPANEL_24V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lab_room_subpanel_12v(naming::LAB_ROOM_SUBPANEL_12V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_lab_room_subpanel_5v(naming::LAB_ROOM_SUBPANEL_5V, naming::FRIENDLY_LAB_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_study_room_subpanel_24v(naming::STUDY_ROOM_SUBPANEL_24V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_study_room_subpanel_12v(naming::STUDY_ROOM_SUBPANEL_12V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_study_room_subpanel_5v(naming::STUDY_ROOM_SUBPANEL_5V, naming::FRIENDLY_STUDY_ROOM_SUBPANEL_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gun_drawers_24v(naming::GUN_DRAWERS_24V, naming::FRIENDLY_GUN_DRAWERS_24V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gun_drawers_12v(naming::GUN_DRAWERS_12V, naming::FRIENDLY_GUN_DRAWERS_12V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_gun_drawers_5v(naming::GUN_DRAWERS_5V, naming::FRIENDLY_GUN_DRAWERS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_keys_5v(naming::KEYS_5V, naming::FRIENDLY_KEYS_5V, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_empty_35(naming::EMPTY_35, naming::FRIENDLY_EMPTY_35, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_empty_34(naming::EMPTY_34, naming::FRIENDLY_EMPTY_34, "relay", naming::ACTION_TYPE_RELAY, power_commands, 2);
+SentientDeviceDef dev_controller(naming::CONTROLLER, naming::FRIENDLY_CONTROLLER, "controller", naming::ACTION_TYPE_RELAY, controller_commands, 5);
 
 // Create the device registry
 SentientDeviceRegistry deviceRegistry;
@@ -440,175 +440,175 @@ void handle_mqtt_command(char *topic, uint8_t *payload, unsigned int length)
         Serial.println(command);
 
         // Route to device-specific handlers
-        if (device == naming::DEV_GEAR_24V)
+        if (device == naming::GEAR_24V)
         {
             if (command == "power_on")
-                set_relay_state(gear_24v_pin, true, gear_24v_state, "Gear 24V", naming::DEV_GEAR_24V, "power_on");
+                set_relay_state(gear_24v_pin, true, gear_24v_state, "Gear 24V", naming::GEAR_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(gear_24v_pin, false, gear_24v_state, "Gear 24V", naming::DEV_GEAR_24V, "power_off");
+                set_relay_state(gear_24v_pin, false, gear_24v_state, "Gear 24V", naming::GEAR_24V, "power_off");
         }
-        else if (device == naming::DEV_GEAR_12V)
+        else if (device == naming::GEAR_12V)
         {
             if (command == "power_on")
-                set_relay_state(gear_12v_pin, true, gear_12v_state, "Gear 12V", naming::DEV_GEAR_12V, "power_on");
+                set_relay_state(gear_12v_pin, true, gear_12v_state, "Gear 12V", naming::GEAR_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(gear_12v_pin, false, gear_12v_state, "Gear 12V", naming::DEV_GEAR_12V, "power_off");
+                set_relay_state(gear_12v_pin, false, gear_12v_state, "Gear 12V", naming::GEAR_12V, "power_off");
         }
-        else if (device == naming::DEV_GEAR_5V)
+        else if (device == naming::GEAR_5V)
         {
             if (command == "power_on")
-                set_relay_state(gear_5v_pin, true, gear_5v_state, "Gear 5V", naming::DEV_GEAR_5V, "power_on");
+                set_relay_state(gear_5v_pin, true, gear_5v_state, "Gear 5V", naming::GEAR_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(gear_5v_pin, false, gear_5v_state, "Gear 5V", naming::DEV_GEAR_5V, "power_off");
+                set_relay_state(gear_5v_pin, false, gear_5v_state, "Gear 5V", naming::GEAR_5V, "power_off");
         }
-        else if (device == naming::DEV_FLOOR_24V)
+        else if (device == naming::FLOOR_24V)
         {
             if (command == "power_on")
-                set_relay_state(floor_24v_pin, true, floor_24v_state, "Floor 24V", naming::DEV_FLOOR_24V, "power_on");
+                set_relay_state(floor_24v_pin, true, floor_24v_state, "Floor 24V", naming::FLOOR_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(floor_24v_pin, false, floor_24v_state, "Floor 24V", naming::DEV_FLOOR_24V, "power_off");
+                set_relay_state(floor_24v_pin, false, floor_24v_state, "Floor 24V", naming::FLOOR_24V, "power_off");
         }
-        else if (device == naming::DEV_FLOOR_12V)
+        else if (device == naming::FLOOR_12V)
         {
             if (command == "power_on")
-                set_relay_state(floor_12v_pin, true, floor_12v_state, "Floor 12V", naming::DEV_FLOOR_12V, "power_on");
+                set_relay_state(floor_12v_pin, true, floor_12v_state, "Floor 12V", naming::FLOOR_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(floor_12v_pin, false, floor_12v_state, "Floor 12V", naming::DEV_FLOOR_12V, "power_off");
+                set_relay_state(floor_12v_pin, false, floor_12v_state, "Floor 12V", naming::FLOOR_12V, "power_off");
         }
-        else if (device == naming::DEV_FLOOR_5V)
+        else if (device == naming::FLOOR_5V)
         {
             if (command == "power_on")
-                set_relay_state(floor_5v_pin, true, floor_5v_state, "Floor 5V", naming::DEV_FLOOR_5V, "power_on");
+                set_relay_state(floor_5v_pin, true, floor_5v_state, "Floor 5V", naming::FLOOR_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(floor_5v_pin, false, floor_5v_state, "Floor 5V", naming::DEV_FLOOR_5V, "power_off");
+                set_relay_state(floor_5v_pin, false, floor_5v_state, "Floor 5V", naming::FLOOR_5V, "power_off");
         }
-        else if (device == naming::DEV_RIDDLE_RPI_5V)
+        else if (device == naming::RIDDLE_RPI_5V)
         {
             if (command == "power_on")
-                set_relay_state(riddle_rpi_5v_pin, true, riddle_rpi_5v_state, "Riddle RPi 5V", naming::DEV_RIDDLE_RPI_5V, "power_on");
+                set_relay_state(riddle_rpi_5v_pin, true, riddle_rpi_5v_state, "Riddle RPi 5V", naming::RIDDLE_RPI_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(riddle_rpi_5v_pin, false, riddle_rpi_5v_state, "Riddle RPi 5V", naming::DEV_RIDDLE_RPI_5V, "power_off");
+                set_relay_state(riddle_rpi_5v_pin, false, riddle_rpi_5v_state, "Riddle RPi 5V", naming::RIDDLE_RPI_5V, "power_off");
         }
-        else if (device == naming::DEV_RIDDLE_RPI_12V)
+        else if (device == naming::RIDDLE_RPI_12V)
         {
             if (command == "power_on")
-                set_relay_state(riddle_rpi_12v_pin, true, riddle_rpi_12v_state, "Riddle RPi 12V", naming::DEV_RIDDLE_RPI_12V, "power_on");
+                set_relay_state(riddle_rpi_12v_pin, true, riddle_rpi_12v_state, "Riddle RPi 12V", naming::RIDDLE_RPI_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(riddle_rpi_12v_pin, false, riddle_rpi_12v_state, "Riddle RPi 12V", naming::DEV_RIDDLE_RPI_12V, "power_off");
+                set_relay_state(riddle_rpi_12v_pin, false, riddle_rpi_12v_state, "Riddle RPi 12V", naming::RIDDLE_RPI_12V, "power_off");
         }
-        else if (device == naming::DEV_RIDDLE_5V)
+        else if (device == naming::RIDDLE_5V)
         {
             if (command == "power_on")
-                set_relay_state(riddle_5v_pin, true, riddle_5v_state, "Riddle 5V", naming::DEV_RIDDLE_5V, "power_on");
+                set_relay_state(riddle_5v_pin, true, riddle_5v_state, "Riddle 5V", naming::RIDDLE_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(riddle_5v_pin, false, riddle_5v_state, "Riddle 5V", naming::DEV_RIDDLE_5V, "power_off");
+                set_relay_state(riddle_5v_pin, false, riddle_5v_state, "Riddle 5V", naming::RIDDLE_5V, "power_off");
         }
-        else if (device == naming::DEV_BOILER_ROOM_SUBPANEL_24V)
+        else if (device == naming::BOILER_ROOM_SUBPANEL_24V)
         {
             if (command == "power_on")
-                set_relay_state(boiler_room_subpanel_24v_pin, true, boiler_room_subpanel_24v_state, "Boiler Subpanel 24V", naming::DEV_BOILER_ROOM_SUBPANEL_24V, "power_on");
+                set_relay_state(boiler_room_subpanel_24v_pin, true, boiler_room_subpanel_24v_state, "Boiler Subpanel 24V", naming::BOILER_ROOM_SUBPANEL_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(boiler_room_subpanel_24v_pin, false, boiler_room_subpanel_24v_state, "Boiler Subpanel 24V", naming::DEV_BOILER_ROOM_SUBPANEL_24V, "power_off");
+                set_relay_state(boiler_room_subpanel_24v_pin, false, boiler_room_subpanel_24v_state, "Boiler Subpanel 24V", naming::BOILER_ROOM_SUBPANEL_24V, "power_off");
         }
-        else if (device == naming::DEV_BOILER_ROOM_SUBPANEL_12V)
+        else if (device == naming::BOILER_ROOM_SUBPANEL_12V)
         {
             if (command == "power_on")
-                set_relay_state(boiler_room_subpanel_12v_pin, true, boiler_room_subpanel_12v_state, "Boiler Subpanel 12V", naming::DEV_BOILER_ROOM_SUBPANEL_12V, "power_on");
+                set_relay_state(boiler_room_subpanel_12v_pin, true, boiler_room_subpanel_12v_state, "Boiler Subpanel 12V", naming::BOILER_ROOM_SUBPANEL_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(boiler_room_subpanel_12v_pin, false, boiler_room_subpanel_12v_state, "Boiler Subpanel 12V", naming::DEV_BOILER_ROOM_SUBPANEL_12V, "power_off");
+                set_relay_state(boiler_room_subpanel_12v_pin, false, boiler_room_subpanel_12v_state, "Boiler Subpanel 12V", naming::BOILER_ROOM_SUBPANEL_12V, "power_off");
         }
-        else if (device == naming::DEV_BOILER_ROOM_SUBPANEL_5V)
+        else if (device == naming::BOILER_ROOM_SUBPANEL_5V)
         {
             if (command == "power_on")
-                set_relay_state(boiler_room_subpanel_5v_pin, true, boiler_room_subpanel_5v_state, "Boiler Subpanel 5V", naming::DEV_BOILER_ROOM_SUBPANEL_5V, "power_on");
+                set_relay_state(boiler_room_subpanel_5v_pin, true, boiler_room_subpanel_5v_state, "Boiler Subpanel 5V", naming::BOILER_ROOM_SUBPANEL_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(boiler_room_subpanel_5v_pin, false, boiler_room_subpanel_5v_state, "Boiler Subpanel 5V", naming::DEV_BOILER_ROOM_SUBPANEL_5V, "power_off");
+                set_relay_state(boiler_room_subpanel_5v_pin, false, boiler_room_subpanel_5v_state, "Boiler Subpanel 5V", naming::BOILER_ROOM_SUBPANEL_5V, "power_off");
         }
-        else if (device == naming::DEV_LAB_ROOM_SUBPANEL_24V)
+        else if (device == naming::LAB_ROOM_SUBPANEL_24V)
         {
             if (command == "power_on")
-                set_relay_state(lab_room_subpanel_24v_pin, true, lab_room_subpanel_24v_state, "Lab Subpanel 24V", naming::DEV_LAB_ROOM_SUBPANEL_24V, "power_on");
+                set_relay_state(lab_room_subpanel_24v_pin, true, lab_room_subpanel_24v_state, "Lab Subpanel 24V", naming::LAB_ROOM_SUBPANEL_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(lab_room_subpanel_24v_pin, false, lab_room_subpanel_24v_state, "Lab Subpanel 24V", naming::DEV_LAB_ROOM_SUBPANEL_24V, "power_off");
+                set_relay_state(lab_room_subpanel_24v_pin, false, lab_room_subpanel_24v_state, "Lab Subpanel 24V", naming::LAB_ROOM_SUBPANEL_24V, "power_off");
         }
-        else if (device == naming::DEV_LAB_ROOM_SUBPANEL_12V)
+        else if (device == naming::LAB_ROOM_SUBPANEL_12V)
         {
             if (command == "power_on")
-                set_relay_state(lab_room_subpanel_12v_pin, true, lab_room_subpanel_12v_state, "Lab Subpanel 12V", naming::DEV_LAB_ROOM_SUBPANEL_12V, "power_on");
+                set_relay_state(lab_room_subpanel_12v_pin, true, lab_room_subpanel_12v_state, "Lab Subpanel 12V", naming::LAB_ROOM_SUBPANEL_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(lab_room_subpanel_12v_pin, false, lab_room_subpanel_12v_state, "Lab Subpanel 12V", naming::DEV_LAB_ROOM_SUBPANEL_12V, "power_off");
+                set_relay_state(lab_room_subpanel_12v_pin, false, lab_room_subpanel_12v_state, "Lab Subpanel 12V", naming::LAB_ROOM_SUBPANEL_12V, "power_off");
         }
-        else if (device == naming::DEV_LAB_ROOM_SUBPANEL_5V)
+        else if (device == naming::LAB_ROOM_SUBPANEL_5V)
         {
             if (command == "power_on")
-                set_relay_state(lab_room_subpanel_5v_pin, true, lab_room_subpanel_5v_state, "Lab Subpanel 5V", naming::DEV_LAB_ROOM_SUBPANEL_5V, "power_on");
+                set_relay_state(lab_room_subpanel_5v_pin, true, lab_room_subpanel_5v_state, "Lab Subpanel 5V", naming::LAB_ROOM_SUBPANEL_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(lab_room_subpanel_5v_pin, false, lab_room_subpanel_5v_state, "Lab Subpanel 5V", naming::DEV_LAB_ROOM_SUBPANEL_5V, "power_off");
+                set_relay_state(lab_room_subpanel_5v_pin, false, lab_room_subpanel_5v_state, "Lab Subpanel 5V", naming::LAB_ROOM_SUBPANEL_5V, "power_off");
         }
-        else if (device == naming::DEV_STUDY_ROOM_SUBPANEL_24V)
+        else if (device == naming::STUDY_ROOM_SUBPANEL_24V)
         {
             if (command == "power_on")
-                set_relay_state(study_room_subpanel_24v_pin, true, study_room_subpanel_24v_state, "Study Subpanel 24V", naming::DEV_STUDY_ROOM_SUBPANEL_24V, "power_on");
+                set_relay_state(study_room_subpanel_24v_pin, true, study_room_subpanel_24v_state, "Study Subpanel 24V", naming::STUDY_ROOM_SUBPANEL_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(study_room_subpanel_24v_pin, false, study_room_subpanel_24v_state, "Study Subpanel 24V", naming::DEV_STUDY_ROOM_SUBPANEL_24V, "power_off");
+                set_relay_state(study_room_subpanel_24v_pin, false, study_room_subpanel_24v_state, "Study Subpanel 24V", naming::STUDY_ROOM_SUBPANEL_24V, "power_off");
         }
-        else if (device == naming::DEV_STUDY_ROOM_SUBPANEL_12V)
+        else if (device == naming::STUDY_ROOM_SUBPANEL_12V)
         {
             if (command == "power_on")
-                set_relay_state(study_room_subpanel_12v_pin, true, study_room_subpanel_12v_state, "Study Subpanel 12V", naming::DEV_STUDY_ROOM_SUBPANEL_12V, "power_on");
+                set_relay_state(study_room_subpanel_12v_pin, true, study_room_subpanel_12v_state, "Study Subpanel 12V", naming::STUDY_ROOM_SUBPANEL_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(study_room_subpanel_12v_pin, false, study_room_subpanel_12v_state, "Study Subpanel 12V", naming::DEV_STUDY_ROOM_SUBPANEL_12V, "power_off");
+                set_relay_state(study_room_subpanel_12v_pin, false, study_room_subpanel_12v_state, "Study Subpanel 12V", naming::STUDY_ROOM_SUBPANEL_12V, "power_off");
         }
-        else if (device == naming::DEV_STUDY_ROOM_SUBPANEL_5V)
+        else if (device == naming::STUDY_ROOM_SUBPANEL_5V)
         {
             if (command == "power_on")
-                set_relay_state(study_room_subpanel_5v_pin, true, study_room_subpanel_5v_state, "Study Subpanel 5V", naming::DEV_STUDY_ROOM_SUBPANEL_5V, "power_on");
+                set_relay_state(study_room_subpanel_5v_pin, true, study_room_subpanel_5v_state, "Study Subpanel 5V", naming::STUDY_ROOM_SUBPANEL_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(study_room_subpanel_5v_pin, false, study_room_subpanel_5v_state, "Study Subpanel 5V", naming::DEV_STUDY_ROOM_SUBPANEL_5V, "power_off");
+                set_relay_state(study_room_subpanel_5v_pin, false, study_room_subpanel_5v_state, "Study Subpanel 5V", naming::STUDY_ROOM_SUBPANEL_5V, "power_off");
         }
-        else if (device == naming::DEV_GUN_DRAWERS_24V)
+        else if (device == naming::GUN_DRAWERS_24V)
         {
             if (command == "power_on")
-                set_relay_state(gun_drawers_24v_pin, true, gun_drawers_24v_state, "Gun Drawers 24V", naming::DEV_GUN_DRAWERS_24V, "power_on");
+                set_relay_state(gun_drawers_24v_pin, true, gun_drawers_24v_state, "Gun Drawers 24V", naming::GUN_DRAWERS_24V, "power_on");
             else if (command == "power_off")
-                set_relay_state(gun_drawers_24v_pin, false, gun_drawers_24v_state, "Gun Drawers 24V", naming::DEV_GUN_DRAWERS_24V, "power_off");
+                set_relay_state(gun_drawers_24v_pin, false, gun_drawers_24v_state, "Gun Drawers 24V", naming::GUN_DRAWERS_24V, "power_off");
         }
-        else if (device == naming::DEV_GUN_DRAWERS_12V)
+        else if (device == naming::GUN_DRAWERS_12V)
         {
             if (command == "power_on")
-                set_relay_state(gun_drawers_12v_pin, true, gun_drawers_12v_state, "Gun Drawers 12V", naming::DEV_GUN_DRAWERS_12V, "power_on");
+                set_relay_state(gun_drawers_12v_pin, true, gun_drawers_12v_state, "Gun Drawers 12V", naming::GUN_DRAWERS_12V, "power_on");
             else if (command == "power_off")
-                set_relay_state(gun_drawers_12v_pin, false, gun_drawers_12v_state, "Gun Drawers 12V", naming::DEV_GUN_DRAWERS_12V, "power_off");
+                set_relay_state(gun_drawers_12v_pin, false, gun_drawers_12v_state, "Gun Drawers 12V", naming::GUN_DRAWERS_12V, "power_off");
         }
-        else if (device == naming::DEV_GUN_DRAWERS_5V)
+        else if (device == naming::GUN_DRAWERS_5V)
         {
             if (command == "power_on")
-                set_relay_state(gun_drawers_5v_pin, true, gun_drawers_5v_state, "Gun Drawers 5V", naming::DEV_GUN_DRAWERS_5V, "power_on");
+                set_relay_state(gun_drawers_5v_pin, true, gun_drawers_5v_state, "Gun Drawers 5V", naming::GUN_DRAWERS_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(gun_drawers_5v_pin, false, gun_drawers_5v_state, "Gun Drawers 5V", naming::DEV_GUN_DRAWERS_5V, "power_off");
+                set_relay_state(gun_drawers_5v_pin, false, gun_drawers_5v_state, "Gun Drawers 5V", naming::GUN_DRAWERS_5V, "power_off");
         }
-        else if (device == naming::DEV_KEYS_5V)
+        else if (device == naming::KEYS_5V)
         {
             if (command == "power_on")
-                set_relay_state(keys_5v_pin, true, keys_5v_state, "Keys 5V", naming::DEV_KEYS_5V, "power_on");
+                set_relay_state(keys_5v_pin, true, keys_5v_state, "Keys 5V", naming::KEYS_5V, "power_on");
             else if (command == "power_off")
-                set_relay_state(keys_5v_pin, false, keys_5v_state, "Keys 5V", naming::DEV_KEYS_5V, "power_off");
+                set_relay_state(keys_5v_pin, false, keys_5v_state, "Keys 5V", naming::KEYS_5V, "power_off");
         }
-        else if (device == naming::DEV_EMPTY_35)
+        else if (device == naming::EMPTY_35)
         {
             if (command == "power_on")
-                set_relay_state(empty_35_pin, true, empty_35_state, "Empty 35", naming::DEV_EMPTY_35, "power_on");
+                set_relay_state(empty_35_pin, true, empty_35_state, "Empty 35", naming::EMPTY_35, "power_on");
             else if (command == "power_off")
-                set_relay_state(empty_35_pin, false, empty_35_state, "Empty 35", naming::DEV_EMPTY_35, "power_off");
+                set_relay_state(empty_35_pin, false, empty_35_state, "Empty 35", naming::EMPTY_35, "power_off");
         }
-        else if (device == naming::DEV_EMPTY_34)
+        else if (device == naming::EMPTY_34)
         {
             if (command == "power_on")
-                set_relay_state(empty_34_pin, true, empty_34_state, "Empty 34", naming::DEV_EMPTY_34, "power_on");
+                set_relay_state(empty_34_pin, true, empty_34_state, "Empty 34", naming::EMPTY_34, "power_on");
             else if (command == "power_off")
-                set_relay_state(empty_34_pin, false, empty_34_state, "Empty 34", naming::DEV_EMPTY_34, "power_off");
+                set_relay_state(empty_34_pin, false, empty_34_state, "Empty 34", naming::EMPTY_34, "power_off");
         }
-        else if (device == naming::DEV_CONTROLLER)
+        else if (device == naming::CONTROLLER)
         {
             // Controller-level commands
             if (command == naming::CMD_ALL_ON)
@@ -736,60 +736,60 @@ void set_relay_state(int pin, bool state, bool &state_var, const char *device_na
 
 void all_relays_on()
 {
-    set_relay_state(gear_24v_pin, true, gear_24v_state, "Gear 24V", naming::DEV_GEAR_24V, nullptr);
-    set_relay_state(gear_12v_pin, true, gear_12v_state, "Gear 12V", naming::DEV_GEAR_12V, nullptr);
-    set_relay_state(gear_5v_pin, true, gear_5v_state, "Gear 5V", naming::DEV_GEAR_5V, nullptr);
-    set_relay_state(floor_24v_pin, true, floor_24v_state, "Floor 24V", naming::DEV_FLOOR_24V, nullptr);
-    set_relay_state(floor_12v_pin, true, floor_12v_state, "Floor 12V", naming::DEV_FLOOR_12V, nullptr);
-    set_relay_state(floor_5v_pin, true, floor_5v_state, "Floor 5V", naming::DEV_FLOOR_5V, nullptr);
-    set_relay_state(riddle_rpi_5v_pin, true, riddle_rpi_5v_state, "Riddle RPi 5V", naming::DEV_RIDDLE_RPI_5V, nullptr);
-    set_relay_state(riddle_rpi_12v_pin, true, riddle_rpi_12v_state, "Riddle RPi 12V", naming::DEV_RIDDLE_RPI_12V, nullptr);
-    set_relay_state(riddle_5v_pin, true, riddle_5v_state, "Riddle 5V", naming::DEV_RIDDLE_5V, nullptr);
-    set_relay_state(boiler_room_subpanel_24v_pin, true, boiler_room_subpanel_24v_state, "Boiler Room Subpanel 24V", naming::DEV_BOILER_ROOM_SUBPANEL_24V, nullptr);
-    set_relay_state(boiler_room_subpanel_12v_pin, true, boiler_room_subpanel_12v_state, "Boiler Room Subpanel 12V", naming::DEV_BOILER_ROOM_SUBPANEL_12V, nullptr);
-    set_relay_state(boiler_room_subpanel_5v_pin, true, boiler_room_subpanel_5v_state, "Boiler Room Subpanel 5V", naming::DEV_BOILER_ROOM_SUBPANEL_5V, nullptr);
-    set_relay_state(lab_room_subpanel_24v_pin, true, lab_room_subpanel_24v_state, "Lab Room Subpanel 24V", naming::DEV_LAB_ROOM_SUBPANEL_24V, nullptr);
-    set_relay_state(lab_room_subpanel_12v_pin, true, lab_room_subpanel_12v_state, "Lab Room Subpanel 12V", naming::DEV_LAB_ROOM_SUBPANEL_12V, nullptr);
-    set_relay_state(lab_room_subpanel_5v_pin, true, lab_room_subpanel_5v_state, "Lab Room Subpanel 5V", naming::DEV_LAB_ROOM_SUBPANEL_5V, nullptr);
-    set_relay_state(study_room_subpanel_24v_pin, true, study_room_subpanel_24v_state, "Study Room Subpanel 24V", naming::DEV_STUDY_ROOM_SUBPANEL_24V, nullptr);
-    set_relay_state(study_room_subpanel_12v_pin, true, study_room_subpanel_12v_state, "Study Room Subpanel 12V", naming::DEV_STUDY_ROOM_SUBPANEL_12V, nullptr);
-    set_relay_state(study_room_subpanel_5v_pin, true, study_room_subpanel_5v_state, "Study Room Subpanel 5V", naming::DEV_STUDY_ROOM_SUBPANEL_5V, nullptr);
-    set_relay_state(gun_drawers_24v_pin, true, gun_drawers_24v_state, "Gun Drawers 24V", naming::DEV_GUN_DRAWERS_24V, nullptr);
-    set_relay_state(gun_drawers_12v_pin, true, gun_drawers_12v_state, "Gun Drawers 12V", naming::DEV_GUN_DRAWERS_12V, nullptr);
-    set_relay_state(gun_drawers_5v_pin, true, gun_drawers_5v_state, "Gun Drawers 5V", naming::DEV_GUN_DRAWERS_5V, nullptr);
-    set_relay_state(keys_5v_pin, true, keys_5v_state, "Keys 5V", naming::DEV_KEYS_5V, nullptr);
-    set_relay_state(empty_35_pin, true, empty_35_state, "Empty 35", naming::DEV_EMPTY_35, nullptr);
-    set_relay_state(empty_34_pin, true, empty_34_state, "Empty 34", naming::DEV_EMPTY_34, nullptr);
+    set_relay_state(gear_24v_pin, true, gear_24v_state, "Gear 24V", naming::GEAR_24V, nullptr);
+    set_relay_state(gear_12v_pin, true, gear_12v_state, "Gear 12V", naming::GEAR_12V, nullptr);
+    set_relay_state(gear_5v_pin, true, gear_5v_state, "Gear 5V", naming::GEAR_5V, nullptr);
+    set_relay_state(floor_24v_pin, true, floor_24v_state, "Floor 24V", naming::FLOOR_24V, nullptr);
+    set_relay_state(floor_12v_pin, true, floor_12v_state, "Floor 12V", naming::FLOOR_12V, nullptr);
+    set_relay_state(floor_5v_pin, true, floor_5v_state, "Floor 5V", naming::FLOOR_5V, nullptr);
+    set_relay_state(riddle_rpi_5v_pin, true, riddle_rpi_5v_state, "Riddle RPi 5V", naming::RIDDLE_RPI_5V, nullptr);
+    set_relay_state(riddle_rpi_12v_pin, true, riddle_rpi_12v_state, "Riddle RPi 12V", naming::RIDDLE_RPI_12V, nullptr);
+    set_relay_state(riddle_5v_pin, true, riddle_5v_state, "Riddle 5V", naming::RIDDLE_5V, nullptr);
+    set_relay_state(boiler_room_subpanel_24v_pin, true, boiler_room_subpanel_24v_state, "Boiler Room Subpanel 24V", naming::BOILER_ROOM_SUBPANEL_24V, nullptr);
+    set_relay_state(boiler_room_subpanel_12v_pin, true, boiler_room_subpanel_12v_state, "Boiler Room Subpanel 12V", naming::BOILER_ROOM_SUBPANEL_12V, nullptr);
+    set_relay_state(boiler_room_subpanel_5v_pin, true, boiler_room_subpanel_5v_state, "Boiler Room Subpanel 5V", naming::BOILER_ROOM_SUBPANEL_5V, nullptr);
+    set_relay_state(lab_room_subpanel_24v_pin, true, lab_room_subpanel_24v_state, "Lab Room Subpanel 24V", naming::LAB_ROOM_SUBPANEL_24V, nullptr);
+    set_relay_state(lab_room_subpanel_12v_pin, true, lab_room_subpanel_12v_state, "Lab Room Subpanel 12V", naming::LAB_ROOM_SUBPANEL_12V, nullptr);
+    set_relay_state(lab_room_subpanel_5v_pin, true, lab_room_subpanel_5v_state, "Lab Room Subpanel 5V", naming::LAB_ROOM_SUBPANEL_5V, nullptr);
+    set_relay_state(study_room_subpanel_24v_pin, true, study_room_subpanel_24v_state, "Study Room Subpanel 24V", naming::STUDY_ROOM_SUBPANEL_24V, nullptr);
+    set_relay_state(study_room_subpanel_12v_pin, true, study_room_subpanel_12v_state, "Study Room Subpanel 12V", naming::STUDY_ROOM_SUBPANEL_12V, nullptr);
+    set_relay_state(study_room_subpanel_5v_pin, true, study_room_subpanel_5v_state, "Study Room Subpanel 5V", naming::STUDY_ROOM_SUBPANEL_5V, nullptr);
+    set_relay_state(gun_drawers_24v_pin, true, gun_drawers_24v_state, "Gun Drawers 24V", naming::GUN_DRAWERS_24V, nullptr);
+    set_relay_state(gun_drawers_12v_pin, true, gun_drawers_12v_state, "Gun Drawers 12V", naming::GUN_DRAWERS_12V, nullptr);
+    set_relay_state(gun_drawers_5v_pin, true, gun_drawers_5v_state, "Gun Drawers 5V", naming::GUN_DRAWERS_5V, nullptr);
+    set_relay_state(keys_5v_pin, true, keys_5v_state, "Keys 5V", naming::KEYS_5V, nullptr);
+    set_relay_state(empty_35_pin, true, empty_35_state, "Empty 35", naming::EMPTY_35, nullptr);
+    set_relay_state(empty_34_pin, true, empty_34_state, "Empty 34", naming::EMPTY_34, nullptr);
 
     Serial.println(F("[PowerCtrl] All relays powered ON"));
 }
 
 void all_relays_off()
 {
-    set_relay_state(gear_24v_pin, false, gear_24v_state, "Gear 24V", naming::DEV_GEAR_24V, nullptr);
-    set_relay_state(gear_12v_pin, false, gear_12v_state, "Gear 12V", naming::DEV_GEAR_12V, nullptr);
-    set_relay_state(gear_5v_pin, false, gear_5v_state, "Gear 5V", naming::DEV_GEAR_5V, nullptr);
-    set_relay_state(floor_24v_pin, false, floor_24v_state, "Floor 24V", naming::DEV_FLOOR_24V, nullptr);
-    set_relay_state(floor_12v_pin, false, floor_12v_state, "Floor 12V", naming::DEV_FLOOR_12V, nullptr);
-    set_relay_state(floor_5v_pin, false, floor_5v_state, "Floor 5V", naming::DEV_FLOOR_5V, nullptr);
-    set_relay_state(riddle_rpi_5v_pin, false, riddle_rpi_5v_state, "Riddle RPi 5V", naming::DEV_RIDDLE_RPI_5V, nullptr);
-    set_relay_state(riddle_rpi_12v_pin, false, riddle_rpi_12v_state, "Riddle RPi 12V", naming::DEV_RIDDLE_RPI_12V, nullptr);
-    set_relay_state(riddle_5v_pin, false, riddle_5v_state, "Riddle 5V", naming::DEV_RIDDLE_5V, nullptr);
-    set_relay_state(boiler_room_subpanel_24v_pin, false, boiler_room_subpanel_24v_state, "Boiler Room Subpanel 24V", naming::DEV_BOILER_ROOM_SUBPANEL_24V, nullptr);
-    set_relay_state(boiler_room_subpanel_12v_pin, false, boiler_room_subpanel_12v_state, "Boiler Room Subpanel 12V", naming::DEV_BOILER_ROOM_SUBPANEL_12V, nullptr);
-    set_relay_state(boiler_room_subpanel_5v_pin, false, boiler_room_subpanel_5v_state, "Boiler Room Subpanel 5V", naming::DEV_BOILER_ROOM_SUBPANEL_5V, nullptr);
-    set_relay_state(lab_room_subpanel_24v_pin, false, lab_room_subpanel_24v_state, "Lab Room Subpanel 24V", naming::DEV_LAB_ROOM_SUBPANEL_24V, nullptr);
-    set_relay_state(lab_room_subpanel_12v_pin, false, lab_room_subpanel_12v_state, "Lab Room Subpanel 12V", naming::DEV_LAB_ROOM_SUBPANEL_12V, nullptr);
-    set_relay_state(lab_room_subpanel_5v_pin, false, lab_room_subpanel_5v_state, "Lab Room Subpanel 5V", naming::DEV_LAB_ROOM_SUBPANEL_5V, nullptr);
-    set_relay_state(study_room_subpanel_24v_pin, false, study_room_subpanel_24v_state, "Study Room Subpanel 24V", naming::DEV_STUDY_ROOM_SUBPANEL_24V, nullptr);
-    set_relay_state(study_room_subpanel_12v_pin, false, study_room_subpanel_12v_state, "Study Room Subpanel 12V", naming::DEV_STUDY_ROOM_SUBPANEL_12V, nullptr);
-    set_relay_state(study_room_subpanel_5v_pin, false, study_room_subpanel_5v_state, "Study Room Subpanel 5V", naming::DEV_STUDY_ROOM_SUBPANEL_5V, nullptr);
-    set_relay_state(gun_drawers_24v_pin, false, gun_drawers_24v_state, "Gun Drawers 24V", naming::DEV_GUN_DRAWERS_24V, nullptr);
-    set_relay_state(gun_drawers_12v_pin, false, gun_drawers_12v_state, "Gun Drawers 12V", naming::DEV_GUN_DRAWERS_12V, nullptr);
-    set_relay_state(gun_drawers_5v_pin, false, gun_drawers_5v_state, "Gun Drawers 5V", naming::DEV_GUN_DRAWERS_5V, nullptr);
-    set_relay_state(keys_5v_pin, false, keys_5v_state, "Keys 5V", naming::DEV_KEYS_5V, nullptr);
-    set_relay_state(empty_35_pin, false, empty_35_state, "Empty 35", naming::DEV_EMPTY_35, nullptr);
-    set_relay_state(empty_34_pin, false, empty_34_state, "Empty 34", naming::DEV_EMPTY_34, nullptr);
+    set_relay_state(gear_24v_pin, false, gear_24v_state, "Gear 24V", naming::GEAR_24V, nullptr);
+    set_relay_state(gear_12v_pin, false, gear_12v_state, "Gear 12V", naming::GEAR_12V, nullptr);
+    set_relay_state(gear_5v_pin, false, gear_5v_state, "Gear 5V", naming::GEAR_5V, nullptr);
+    set_relay_state(floor_24v_pin, false, floor_24v_state, "Floor 24V", naming::FLOOR_24V, nullptr);
+    set_relay_state(floor_12v_pin, false, floor_12v_state, "Floor 12V", naming::FLOOR_12V, nullptr);
+    set_relay_state(floor_5v_pin, false, floor_5v_state, "Floor 5V", naming::FLOOR_5V, nullptr);
+    set_relay_state(riddle_rpi_5v_pin, false, riddle_rpi_5v_state, "Riddle RPi 5V", naming::RIDDLE_RPI_5V, nullptr);
+    set_relay_state(riddle_rpi_12v_pin, false, riddle_rpi_12v_state, "Riddle RPi 12V", naming::RIDDLE_RPI_12V, nullptr);
+    set_relay_state(riddle_5v_pin, false, riddle_5v_state, "Riddle 5V", naming::RIDDLE_5V, nullptr);
+    set_relay_state(boiler_room_subpanel_24v_pin, false, boiler_room_subpanel_24v_state, "Boiler Room Subpanel 24V", naming::BOILER_ROOM_SUBPANEL_24V, nullptr);
+    set_relay_state(boiler_room_subpanel_12v_pin, false, boiler_room_subpanel_12v_state, "Boiler Room Subpanel 12V", naming::BOILER_ROOM_SUBPANEL_12V, nullptr);
+    set_relay_state(boiler_room_subpanel_5v_pin, false, boiler_room_subpanel_5v_state, "Boiler Room Subpanel 5V", naming::BOILER_ROOM_SUBPANEL_5V, nullptr);
+    set_relay_state(lab_room_subpanel_24v_pin, false, lab_room_subpanel_24v_state, "Lab Room Subpanel 24V", naming::LAB_ROOM_SUBPANEL_24V, nullptr);
+    set_relay_state(lab_room_subpanel_12v_pin, false, lab_room_subpanel_12v_state, "Lab Room Subpanel 12V", naming::LAB_ROOM_SUBPANEL_12V, nullptr);
+    set_relay_state(lab_room_subpanel_5v_pin, false, lab_room_subpanel_5v_state, "Lab Room Subpanel 5V", naming::LAB_ROOM_SUBPANEL_5V, nullptr);
+    set_relay_state(study_room_subpanel_24v_pin, false, study_room_subpanel_24v_state, "Study Room Subpanel 24V", naming::STUDY_ROOM_SUBPANEL_24V, nullptr);
+    set_relay_state(study_room_subpanel_12v_pin, false, study_room_subpanel_12v_state, "Study Room Subpanel 12V", naming::STUDY_ROOM_SUBPANEL_12V, nullptr);
+    set_relay_state(study_room_subpanel_5v_pin, false, study_room_subpanel_5v_state, "Study Room Subpanel 5V", naming::STUDY_ROOM_SUBPANEL_5V, nullptr);
+    set_relay_state(gun_drawers_24v_pin, false, gun_drawers_24v_state, "Gun Drawers 24V", naming::GUN_DRAWERS_24V, nullptr);
+    set_relay_state(gun_drawers_12v_pin, false, gun_drawers_12v_state, "Gun Drawers 12V", naming::GUN_DRAWERS_12V, nullptr);
+    set_relay_state(gun_drawers_5v_pin, false, gun_drawers_5v_state, "Gun Drawers 5V", naming::GUN_DRAWERS_5V, nullptr);
+    set_relay_state(keys_5v_pin, false, keys_5v_state, "Keys 5V", naming::KEYS_5V, nullptr);
+    set_relay_state(empty_35_pin, false, empty_35_state, "Empty 35", naming::EMPTY_35, nullptr);
+    set_relay_state(empty_34_pin, false, empty_34_state, "Empty 34", naming::EMPTY_34, nullptr);
 
     Serial.println(F("[PowerCtrl] All relays powered OFF"));
 }
@@ -853,30 +853,30 @@ void emergency_power_off()
     // Publish individual relay OFF states for real-time UI updates
     if (mqtt.isConnected())
     {
-        publish_relay_state(naming::DEV_GEAR_24V, false);
-        publish_relay_state(naming::DEV_GEAR_12V, false);
-        publish_relay_state(naming::DEV_GEAR_5V, false);
-        publish_relay_state(naming::DEV_FLOOR_24V, false);
-        publish_relay_state(naming::DEV_FLOOR_12V, false);
-        publish_relay_state(naming::DEV_FLOOR_5V, false);
-        publish_relay_state(naming::DEV_RIDDLE_RPI_5V, false);
-        publish_relay_state(naming::DEV_RIDDLE_RPI_12V, false);
-        publish_relay_state(naming::DEV_RIDDLE_5V, false);
-        publish_relay_state(naming::DEV_BOILER_ROOM_SUBPANEL_24V, false);
-        publish_relay_state(naming::DEV_BOILER_ROOM_SUBPANEL_12V, false);
-        publish_relay_state(naming::DEV_BOILER_ROOM_SUBPANEL_5V, false);
-        publish_relay_state(naming::DEV_LAB_ROOM_SUBPANEL_24V, false);
-        publish_relay_state(naming::DEV_LAB_ROOM_SUBPANEL_12V, false);
-        publish_relay_state(naming::DEV_LAB_ROOM_SUBPANEL_5V, false);
-        publish_relay_state(naming::DEV_STUDY_ROOM_SUBPANEL_24V, false);
-        publish_relay_state(naming::DEV_STUDY_ROOM_SUBPANEL_12V, false);
-        publish_relay_state(naming::DEV_STUDY_ROOM_SUBPANEL_5V, false);
-        publish_relay_state(naming::DEV_GUN_DRAWERS_24V, false);
-        publish_relay_state(naming::DEV_GUN_DRAWERS_12V, false);
-        publish_relay_state(naming::DEV_GUN_DRAWERS_5V, false);
-        publish_relay_state(naming::DEV_KEYS_5V, false);
-        publish_relay_state(naming::DEV_EMPTY_35, false);
-        publish_relay_state(naming::DEV_EMPTY_34, false);
+        publish_relay_state(naming::GEAR_24V, false);
+        publish_relay_state(naming::GEAR_12V, false);
+        publish_relay_state(naming::GEAR_5V, false);
+        publish_relay_state(naming::FLOOR_24V, false);
+        publish_relay_state(naming::FLOOR_12V, false);
+        publish_relay_state(naming::FLOOR_5V, false);
+        publish_relay_state(naming::RIDDLE_RPI_5V, false);
+        publish_relay_state(naming::RIDDLE_RPI_12V, false);
+        publish_relay_state(naming::RIDDLE_5V, false);
+        publish_relay_state(naming::BOILER_ROOM_SUBPANEL_24V, false);
+        publish_relay_state(naming::BOILER_ROOM_SUBPANEL_12V, false);
+        publish_relay_state(naming::BOILER_ROOM_SUBPANEL_5V, false);
+        publish_relay_state(naming::LAB_ROOM_SUBPANEL_24V, false);
+        publish_relay_state(naming::LAB_ROOM_SUBPANEL_12V, false);
+        publish_relay_state(naming::LAB_ROOM_SUBPANEL_5V, false);
+        publish_relay_state(naming::STUDY_ROOM_SUBPANEL_24V, false);
+        publish_relay_state(naming::STUDY_ROOM_SUBPANEL_12V, false);
+        publish_relay_state(naming::STUDY_ROOM_SUBPANEL_5V, false);
+        publish_relay_state(naming::GUN_DRAWERS_24V, false);
+        publish_relay_state(naming::GUN_DRAWERS_12V, false);
+        publish_relay_state(naming::GUN_DRAWERS_5V, false);
+        publish_relay_state(naming::KEYS_5V, false);
+        publish_relay_state(naming::EMPTY_35, false);
+        publish_relay_state(naming::EMPTY_34, false);
     }
 
     // Publish emergency event
@@ -978,76 +978,76 @@ void report_actual_relay_states()
 
     // Read and report all 24 relays
     gear_24v_state = digitalRead(gear_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_GEAR_24V, gear_24v_state);
+    publish_relay_state(naming::GEAR_24V, gear_24v_state);
 
     gear_12v_state = digitalRead(gear_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_GEAR_12V, gear_12v_state);
+    publish_relay_state(naming::GEAR_12V, gear_12v_state);
 
     gear_5v_state = digitalRead(gear_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_GEAR_5V, gear_5v_state);
+    publish_relay_state(naming::GEAR_5V, gear_5v_state);
 
     floor_24v_state = digitalRead(floor_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_FLOOR_24V, floor_24v_state);
+    publish_relay_state(naming::FLOOR_24V, floor_24v_state);
 
     floor_12v_state = digitalRead(floor_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_FLOOR_12V, floor_12v_state);
+    publish_relay_state(naming::FLOOR_12V, floor_12v_state);
 
     floor_5v_state = digitalRead(floor_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_FLOOR_5V, floor_5v_state);
+    publish_relay_state(naming::FLOOR_5V, floor_5v_state);
 
     riddle_rpi_5v_state = digitalRead(riddle_rpi_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_RIDDLE_RPI_5V, riddle_rpi_5v_state);
+    publish_relay_state(naming::RIDDLE_RPI_5V, riddle_rpi_5v_state);
 
     riddle_rpi_12v_state = digitalRead(riddle_rpi_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_RIDDLE_RPI_12V, riddle_rpi_12v_state);
+    publish_relay_state(naming::RIDDLE_RPI_12V, riddle_rpi_12v_state);
 
     riddle_5v_state = digitalRead(riddle_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_RIDDLE_5V, riddle_5v_state);
+    publish_relay_state(naming::RIDDLE_5V, riddle_5v_state);
 
     boiler_room_subpanel_24v_state = digitalRead(boiler_room_subpanel_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_BOILER_ROOM_SUBPANEL_24V, boiler_room_subpanel_24v_state);
+    publish_relay_state(naming::BOILER_ROOM_SUBPANEL_24V, boiler_room_subpanel_24v_state);
 
     boiler_room_subpanel_12v_state = digitalRead(boiler_room_subpanel_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_BOILER_ROOM_SUBPANEL_12V, boiler_room_subpanel_12v_state);
+    publish_relay_state(naming::BOILER_ROOM_SUBPANEL_12V, boiler_room_subpanel_12v_state);
 
     boiler_room_subpanel_5v_state = digitalRead(boiler_room_subpanel_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_BOILER_ROOM_SUBPANEL_5V, boiler_room_subpanel_5v_state);
+    publish_relay_state(naming::BOILER_ROOM_SUBPANEL_5V, boiler_room_subpanel_5v_state);
 
     lab_room_subpanel_24v_state = digitalRead(lab_room_subpanel_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_LAB_ROOM_SUBPANEL_24V, lab_room_subpanel_24v_state);
+    publish_relay_state(naming::LAB_ROOM_SUBPANEL_24V, lab_room_subpanel_24v_state);
 
     lab_room_subpanel_12v_state = digitalRead(lab_room_subpanel_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_LAB_ROOM_SUBPANEL_12V, lab_room_subpanel_12v_state);
+    publish_relay_state(naming::LAB_ROOM_SUBPANEL_12V, lab_room_subpanel_12v_state);
 
     lab_room_subpanel_5v_state = digitalRead(lab_room_subpanel_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_LAB_ROOM_SUBPANEL_5V, lab_room_subpanel_5v_state);
+    publish_relay_state(naming::LAB_ROOM_SUBPANEL_5V, lab_room_subpanel_5v_state);
 
     study_room_subpanel_24v_state = digitalRead(study_room_subpanel_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_STUDY_ROOM_SUBPANEL_24V, study_room_subpanel_24v_state);
+    publish_relay_state(naming::STUDY_ROOM_SUBPANEL_24V, study_room_subpanel_24v_state);
 
     study_room_subpanel_12v_state = digitalRead(study_room_subpanel_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_STUDY_ROOM_SUBPANEL_12V, study_room_subpanel_12v_state);
+    publish_relay_state(naming::STUDY_ROOM_SUBPANEL_12V, study_room_subpanel_12v_state);
 
     study_room_subpanel_5v_state = digitalRead(study_room_subpanel_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_STUDY_ROOM_SUBPANEL_5V, study_room_subpanel_5v_state);
+    publish_relay_state(naming::STUDY_ROOM_SUBPANEL_5V, study_room_subpanel_5v_state);
 
     gun_drawers_24v_state = digitalRead(gun_drawers_24v_pin) == HIGH;
-    publish_relay_state(naming::DEV_GUN_DRAWERS_24V, gun_drawers_24v_state);
+    publish_relay_state(naming::GUN_DRAWERS_24V, gun_drawers_24v_state);
 
     gun_drawers_12v_state = digitalRead(gun_drawers_12v_pin) == HIGH;
-    publish_relay_state(naming::DEV_GUN_DRAWERS_12V, gun_drawers_12v_state);
+    publish_relay_state(naming::GUN_DRAWERS_12V, gun_drawers_12v_state);
 
     gun_drawers_5v_state = digitalRead(gun_drawers_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_GUN_DRAWERS_5V, gun_drawers_5v_state);
+    publish_relay_state(naming::GUN_DRAWERS_5V, gun_drawers_5v_state);
 
     keys_5v_state = digitalRead(keys_5v_pin) == HIGH;
-    publish_relay_state(naming::DEV_KEYS_5V, keys_5v_state);
+    publish_relay_state(naming::KEYS_5V, keys_5v_state);
 
     empty_35_state = digitalRead(empty_35_pin) == HIGH;
-    publish_relay_state(naming::DEV_EMPTY_35, empty_35_state);
+    publish_relay_state(naming::EMPTY_35, empty_35_state);
 
     empty_34_state = digitalRead(empty_34_pin) == HIGH;
-    publish_relay_state(naming::DEV_EMPTY_34, empty_34_state);
+    publish_relay_state(naming::EMPTY_34, empty_34_state);
 
     Serial.println(F("[PowerCtrl] === All 24 Relay States Reported ==="));
 
